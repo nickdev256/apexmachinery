@@ -1,0 +1,417 @@
+/* ============================================================
+   APEX MACHINERY — BRANDS PAGE
+============================================================ */
+
+
+/* ============================================================
+   BRANDS TOOLBAR
+============================================================ */
+
+.brands-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--space-4);
+
+  margin-bottom: var(--space-6);
+
+  flex-wrap: wrap;
+}
+
+
+/* ============================================================
+   SEARCH BOX
+============================================================ */
+
+.brands-search {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+  max-width: 480px;
+
+  padding: 4px 14px;
+
+  background: var(--white);
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  color: var(--text-muted);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.brands-search:focus-within {
+  border-color: var(--navy);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(11, 31, 77, 0.08);
+}
+
+.brands-search svg {
+  flex-shrink: 0;
+
+  color: var(--text-muted);
+}
+
+.brands-search input {
+  width: 100%;
+
+  height: 44px;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: var(--text-dark);
+
+  font-family: inherit;
+
+  font-size: 0.9rem;
+}
+
+.brands-search input::placeholder {
+  color: var(--text-muted);
+}
+
+
+/* ============================================================
+   BRAND COUNT
+============================================================ */
+
+.brands-count {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 8px 14px;
+
+  background: rgba(11, 31, 77, 0.06);
+
+  border-radius: 999px;
+
+  color: var(--navy);
+
+  font-weight: 700;
+
+  font-size: 0.85rem;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   EMERGING BRANDS
+============================================================ */
+
+.emerging-brands {
+  margin-top: var(--space-8);
+
+  padding: var(--space-7);
+
+  background: var(--bg-light);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--radius);
+}
+
+.emerging-brands h3 {
+  margin: 6px 0 5px;
+
+  color: var(--navy);
+
+  font-size: 1.35rem;
+}
+
+.emerging-brands > p {
+  color: var(--text-muted);
+
+  margin-bottom: var(--space-5);
+}
+
+
+/* ============================================================
+   EMERGING GRID
+============================================================ */
+
+.emerging-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, minmax(0, 1fr));
+
+  gap: var(--space-3);
+}
+
+
+/* ============================================================
+   EMERGING BRAND TILE
+============================================================ */
+
+.emerging-tile {
+  min-height: 95px;
+
+  background: var(--white);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  padding: var(--space-4);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+
+  cursor: default;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease;
+}
+
+.emerging-tile svg {
+  color: var(--gold-dark);
+
+  transition:
+    transform 0.2s ease;
+}
+
+.emerging-tile:hover {
+  color: var(--navy);
+
+  border-color: var(--gold);
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 8px 24px
+    rgba(11, 31, 77, 0.08);
+}
+
+.emerging-tile:hover svg {
+  transform: scale(1.08);
+}
+
+
+/* ============================================================
+   BULK PROCUREMENT CTA
+============================================================ */
+
+.bulk-cta {
+  margin-top: var(--space-8);
+
+  background: var(--navy);
+
+  color: var(--white);
+
+  border-radius: var(--radius);
+
+  padding:
+    var(--space-7)
+    var(--space-7);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: var(--space-6);
+
+  flex-wrap: wrap;
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+
+/* Decorative circle */
+
+.bulk-cta::after {
+  content: "";
+
+  position: absolute;
+
+  width: 230px;
+  height: 230px;
+
+  right: -100px;
+  bottom: -150px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.08);
+
+  border-radius: 50%;
+}
+
+
+/* ============================================================
+   CTA CONTENT
+============================================================ */
+
+.bulk-cta > div:first-child {
+  position: relative;
+
+  z-index: 1;
+}
+
+.bulk-cta h3 {
+  color: var(--white);
+
+  margin: 7px 0 8px;
+
+  font-size: 1.4rem;
+}
+
+.bulk-cta p {
+  color: rgba(255, 255, 255, 0.78);
+
+  max-width: 560px;
+
+  margin: 0;
+
+  line-height: 1.6;
+
+  font-size: 0.9rem;
+}
+
+
+/* ============================================================
+   CTA BUTTON
+============================================================ */
+
+.bulk-cta .btn {
+  position: relative;
+
+  z-index: 2;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .emerging-grid {
+    grid-template-columns:
+      repeat(4, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — SMALL TABLET
+============================================================ */
+
+@media (max-width: 700px) {
+
+  .brands-toolbar {
+    align-items: stretch;
+
+    flex-direction: column;
+  }
+
+  .brands-search {
+    max-width: none;
+  }
+
+  .brands-count {
+    align-self: flex-start;
+  }
+
+  .emerging-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+  .bulk-cta {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    padding: var(--space-6);
+  }
+
+  .bulk-cta .btn {
+    width: 100%;
+
+    text-align: center;
+  }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — MOBILE
+============================================================ */
+
+@media (max-width: 480px) {
+
+  .emerging-brands {
+    padding: var(--space-5);
+  }
+
+  .emerging-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+  .emerging-tile {
+    min-height: 85px;
+
+    padding: 14px 8px;
+
+    font-size: 0.68rem;
+  }
+
+  .bulk-cta {
+    padding: var(--space-5);
+  }
+
+  .bulk-cta h3 {
+    font-size: 1.2rem;
+  }
+
+}

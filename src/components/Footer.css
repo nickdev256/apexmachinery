@@ -1,0 +1,425 @@
+/* ============================================================
+   APEX MACHINERY — PREMIUM FOOTER
+============================================================ */
+
+.footer {
+  background: var(--navy);
+  color: rgba(255, 255, 255, 0.78);
+  padding-top: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   SUBTLE TOP ACCENT
+============================================================ */
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gold);
+}
+
+
+/* ============================================================
+   MAIN FOOTER GRID
+============================================================ */
+
+.footer-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(260px, 2fr)
+    minmax(130px, 1fr)
+    minmax(130px, 1fr)
+    minmax(130px, 1fr);
+
+  gap: 55px;
+
+  padding-bottom: 48px;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.12);
+
+  align-items: start;
+}
+
+
+/* ============================================================
+   COMPANY / BRAND SECTION
+============================================================ */
+
+.footer-brand {
+  max-width: 330px;
+}
+
+
+/* ============================================================
+   LOGO
+============================================================ */
+
+.footer-logo {
+  display: block;
+
+  width: 175px;
+  max-width: 100%;
+
+  height: auto;
+
+  margin-bottom: 18px;
+}
+
+.footer-logo img {
+  display: block;
+
+  width: 175px;
+  height: auto;
+
+  max-width: 100%;
+
+  object-fit: contain;
+
+  background: transparent;
+
+  border-radius: 0;
+}
+
+
+/* ============================================================
+   COMPANY NAME
+============================================================ */
+
+.footer-brand h3 {
+  margin: 0 0 7px;
+
+  color: var(--white);
+
+  font-size: 1.05rem;
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+}
+
+
+/* ============================================================
+   TAGLINE
+============================================================ */
+
+.footer-brand > p {
+  margin: 0 0 22px;
+
+  color: var(--gold);
+
+  font-size: 0.86rem;
+
+  font-weight: 600;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   CONTACT DETAILS
+============================================================ */
+
+.footer-contact {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 13px;
+
+  margin: 0;
+}
+
+.footer-contact div {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 11px;
+
+  line-height: 1.45;
+}
+
+.footer-contact svg {
+  flex-shrink: 0;
+
+  color: var(--gold);
+
+  margin-top: 2px;
+}
+
+.footer-contact span {
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 0.84rem;
+}
+
+
+/* ============================================================
+   FOOTER COLUMNS
+============================================================ */
+
+.footer-col {
+  min-width: 0;
+}
+
+.footer-col h4 {
+  margin: 3px 0 20px;
+
+  color: var(--white);
+
+  font-size: 0.94rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+}
+
+.footer-col ul {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 13px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.footer-col li {
+  margin: 0;
+  padding: 0;
+}
+
+.footer-col a {
+  display: inline-block;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 0.85rem;
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.footer-col a:hover {
+  color: var(--gold);
+
+  transform: translateX(3px);
+}
+
+
+/* ============================================================
+   FOOTER BOTTOM
+============================================================ */
+
+.footer-bottom {
+  min-height: 72px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  padding: 18px 0;
+}
+
+.footer-bottom p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-size: 0.78rem;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   SOCIAL MEDIA
+============================================================ */
+
+.footer-social {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+.footer-social a {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.24);
+
+  border-radius: 50%;
+
+  color: rgba(255, 255, 255, 0.72);
+
+  text-decoration: none;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.footer-social a:hover {
+  color: var(--navy);
+
+  background: var(--gold);
+
+  border-color: var(--gold);
+
+  transform: translateY(-3px);
+}
+
+.footer-social svg {
+  width: 17px;
+  height: 17px;
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (max-width: 1000px) {
+
+  .footer {
+    padding-top: 55px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1.5fr 1fr 1fr;
+
+    gap: 40px;
+  }
+
+  .footer-brand {
+    grid-column: span 3;
+
+    max-width: 500px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL TABLET
+============================================================ */
+
+@media (max-width: 750px) {
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+
+    gap: 38px 30px;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 560px) {
+
+  .footer {
+    padding-top: 48px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+
+    gap: 34px;
+
+    padding-bottom: 35px;
+  }
+
+  .footer-brand {
+    grid-column: auto;
+
+    max-width: 100%;
+  }
+
+  .footer-logo,
+  .footer-logo img {
+    width: 155px;
+  }
+
+  .footer-brand h3 {
+    font-size: 1rem;
+  }
+
+  .footer-col h4 {
+    margin-bottom: 15px;
+  }
+
+  .footer-bottom {
+    min-height: auto;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    text-align: center;
+
+    gap: 18px;
+
+    padding: 22px 0 25px;
+  }
+
+  .footer-social {
+    justify-content: center;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL PHONES
+============================================================ */
+
+@media (max-width: 380px) {
+
+  .footer-logo,
+  .footer-logo img {
+    width: 140px;
+  }
+
+  .footer-social a {
+    width: 34px;
+    height: 34px;
+  }
+
+}

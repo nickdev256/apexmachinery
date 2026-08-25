@@ -1,0 +1,1386 @@
+/* ============================================================
+   APEX MACHINERY — ADMIN DASHBOARD
+   FULL RESPONSIVE STYLESHEET
+   ============================================================ */
+
+
+/* ============================================================
+   ROOT DASHBOARD
+   ============================================================ */
+
+.admin-dashboard {
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+
+  display: flex;
+
+  overflow: hidden;
+
+  background: #f5f7fb;
+
+  font-family: var(--font-main);
+
+  box-sizing: border-box;
+}
+
+.admin-dashboard *,
+.admin-dashboard *::before,
+.admin-dashboard *::after {
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   ADMIN CONTENT
+   ============================================================ */
+
+.admin-content {
+  flex: 1;
+
+  width: calc(100% - 260px);
+
+  min-width: 0;
+  min-height: 0;
+
+  height: 100vh;
+
+  padding: 18px 22px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.admin-header {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  min-height: 65px;
+
+  margin-bottom: 14px;
+}
+
+.admin-header-left {
+  min-width: 0;
+}
+
+.admin-header-left .eyebrow {
+  margin-bottom: 4px;
+}
+
+.admin-header-left h1 {
+  margin: 0 0 4px;
+
+  line-height: 1.05;
+}
+
+.admin-header-left p {
+  color: var(--text-muted);
+
+  line-height: 1.25;
+
+  max-width: 650px;
+}
+
+.admin-header-actions {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 9px;
+
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   HEADER ICON BUTTON
+   ============================================================ */
+
+.admin-icon-button {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  background: var(--white);
+
+  color: var(--navy);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.admin-icon-button:hover {
+  background: var(--bg-light);
+
+  border-color: var(--navy);
+}
+
+.admin-icon-button:active {
+  transform: translateY(1px);
+}
+
+.notification-dot {
+  position: absolute;
+
+  top: 7px;
+  right: 7px;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--danger);
+
+  border: 2px solid var(--white);
+}
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+.admin-stats {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 11px;
+
+  margin-bottom: 13px;
+}
+
+.admin-stat {
+  width: 100%;
+  min-width: 0;
+
+  padding: 12px 14px;
+
+  text-align: left;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.admin-stat-button {
+  appearance: none;
+
+  border: 1px solid var(--border);
+
+  background: var(--white);
+
+  color: inherit;
+
+  font-family: inherit;
+
+  cursor: pointer;
+}
+
+.admin-stat-button:hover {
+  transform: translateY(-1px);
+
+  border-color: var(--gold);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-stat-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-bottom: 7px;
+}
+
+.admin-stat-icon {
+  width: 32px;
+  height: 32px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--radius);
+
+  background: var(--info-bg);
+
+  color: var(--navy);
+}
+
+.admin-stat strong {
+  display: block;
+
+  color: var(--navy);
+
+  line-height: 1.05;
+
+  margin-bottom: 3px;
+}
+
+.admin-stat-label {
+  display: block;
+
+  color: var(--text-muted);
+
+  line-height: 1.15;
+}
+
+.admin-up {
+  color: var(--success);
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.admin-down {
+  color: var(--danger);
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   QUICK ACTIONS
+   ============================================================ */
+
+.admin-quick-section {
+  width: 100%;
+
+  margin-bottom: 13px;
+}
+
+.admin-section-title {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+}
+
+.admin-section-title h2 {
+  line-height: 1.1;
+}
+
+.admin-quick-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 9px;
+
+  width: 100%;
+}
+
+.admin-quick-card {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  background: var(--white);
+
+  color: var(--navy);
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.admin-quick-card:hover {
+  border-color: var(--gold);
+
+  background: #fffdf6;
+
+  transform: translateY(-1px);
+}
+
+.admin-quick-card > div:nth-child(2) {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.admin-quick-card strong {
+  line-height: 1.1;
+}
+
+.admin-quick-card span {
+  color: var(--text-muted);
+
+  line-height: 1.15;
+
+  margin-top: 2px;
+}
+
+.admin-quick-card > svg {
+  flex-shrink: 0;
+}
+
+.admin-quick-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--radius);
+
+  background: var(--navy);
+
+  color: var(--white);
+}
+
+
+/* ============================================================
+   TWO COLUMN SECTIONS
+   ============================================================ */
+
+.admin-mid-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(0, 1fr);
+
+  gap: 13px;
+
+  margin-bottom: 13px;
+
+  min-width: 0;
+}
+
+.admin-mid-grid > * {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   GENERAL ADMIN CARDS
+   ============================================================ */
+
+.admin-chart,
+.admin-category,
+.admin-orders,
+.admin-alerts {
+  min-width: 0;
+
+  padding: 13px;
+
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+
+.admin-section-header {
+  width: 100%;
+
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 8px;
+}
+
+.admin-section-header > div {
+  min-width: 0;
+}
+
+.admin-section-header h3 {
+  line-height: 1.1;
+
+  margin: 0 0 2px;
+}
+
+.admin-section-header p,
+.admin-section-header span {
+  color: var(--text-muted);
+
+  line-height: 1.15;
+}
+
+.admin-section-header select {
+  flex-shrink: 0;
+
+  padding: 7px 9px;
+
+  border: 1px solid var(--border);
+
+  border-radius: var(--radius);
+
+  background: var(--white);
+
+  color: var(--navy);
+
+  font-family: inherit;
+}
+
+
+/* ============================================================
+   SALES CHART
+   ============================================================ */
+
+.admin-chart {
+  position: relative;
+}
+
+.admin-chart-wrapper {
+  width: 100%;
+
+  height: 120px;
+
+  overflow: hidden;
+
+  margin-top: 2px;
+}
+
+.admin-chart-svg {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+}
+
+.admin-chart-labels {
+  display: grid;
+
+  grid-template-columns:
+    repeat(6, 1fr);
+
+  gap: 4px;
+
+  margin-top: 2px;
+
+  color: var(--text-muted);
+
+  text-align: center;
+}
+
+.admin-chart-link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  margin-top: 4px;
+
+  padding: 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--navy);
+
+  font-family: inherit;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.admin-chart-link:hover {
+  color: var(--gold-dark);
+}
+
+
+/* ============================================================
+   CATEGORY DISTRIBUTION
+   ============================================================ */
+
+.admin-category {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.admin-category-row {
+  width: 100%;
+
+  display: block;
+
+  padding: 3px 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: inherit;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.admin-category-row:hover {
+  background: rgba(11, 31, 77, 0.025);
+}
+
+.admin-category-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-bottom: 3px;
+}
+
+.admin-category-top span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.admin-category-top strong {
+  flex-shrink: 0;
+
+  color: var(--navy);
+}
+
+.admin-bar {
+  width: 100%;
+
+  height: 5px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+
+  background: #e9edf4;
+}
+
+.admin-bar-fill {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: var(--navy);
+
+  transition: width 0.25s ease;
+}
+
+.admin-bar-fill.warn {
+  background: var(--gold);
+}
+
+.admin-category .admin-view-btn {
+  margin-top: 5px;
+}
+
+
+/* ============================================================
+   VIEW BUTTON
+   ============================================================ */
+
+.admin-view-btn {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  flex-shrink: 0;
+
+  padding: 4px 7px;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--navy);
+
+  font-family: inherit;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.admin-view-btn:hover {
+  color: var(--gold-dark);
+}
+
+
+/* ============================================================
+   RECENT ORDERS
+   ============================================================ */
+
+.admin-orders {
+  min-width: 0;
+}
+
+.admin-table-wrapper {
+  width: 100%;
+
+  max-width: 100%;
+
+  overflow: hidden;
+}
+
+.dashboard-table {
+  width: 100%;
+
+  max-width: 100%;
+
+  table-layout: fixed;
+
+  border-collapse: collapse;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 6px 7px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  vertical-align: middle;
+}
+
+.dashboard-table th {
+  color: var(--text-muted);
+
+  font-weight: 700;
+
+  text-align: left;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.dashboard-table td {
+  border-bottom: 1px solid #edf0f5;
+}
+
+.dashboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-table th:nth-child(1),
+.dashboard-table td:nth-child(1) {
+  width: 17%;
+}
+
+.dashboard-table th:nth-child(2),
+.dashboard-table td:nth-child(2) {
+  width: 28%;
+}
+
+.dashboard-table th:nth-child(3),
+.dashboard-table td:nth-child(3) {
+  width: 16%;
+}
+
+.dashboard-table th:nth-child(4),
+.dashboard-table td:nth-child(4) {
+  width: 23%;
+}
+
+.dashboard-table th:nth-child(5),
+.dashboard-table td:nth-child(5) {
+  width: 16%;
+}
+
+.admin-clickable-row {
+  cursor: pointer;
+
+  transition: background 0.15s ease;
+}
+
+.admin-clickable-row:hover {
+  background: #fafbfd;
+}
+
+.admin-priority {
+  display: inline-block;
+
+  margin-top: 1px;
+}
+
+
+/* ============================================================
+   INVENTORY ALERTS
+   ============================================================ */
+
+.admin-alerts {
+  min-width: 0;
+}
+
+.admin-alerts .admin-section-header h3 {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+}
+
+.admin-alert-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  margin-bottom: 7px;
+}
+
+.admin-alert-item {
+  width: 100%;
+
+  display: block;
+
+  padding: 6px 7px;
+
+  border: none;
+
+  border-radius: var(--radius);
+
+  background: transparent;
+
+  color: inherit;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.admin-alert-item:hover {
+  background: #faf8f0;
+}
+
+.admin-alert-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-bottom: 1px;
+}
+
+.admin-alert-top strong {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+.admin-alert-top span {
+  flex-shrink: 0;
+
+  color: var(--danger);
+
+  font-weight: 700;
+}
+
+.admin-alert-item small {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: var(--text-muted);
+}
+
+
+/* ============================================================
+   SUMMARY CARDS
+   ============================================================ */
+
+.admin-summary-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 9px;
+
+  margin-bottom: 9px;
+}
+
+.admin-summary-card {
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 10px 12px;
+
+  border: 1px solid var(--border);
+
+  background: var(--white);
+
+  color: var(--navy);
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.admin-summary-card:hover {
+  border-color: var(--gold);
+
+  transform: translateY(-1px);
+
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-summary-icon {
+  width: 34px;
+  height: 34px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--radius);
+
+  background: var(--info-bg);
+
+  color: var(--navy);
+}
+
+.admin-summary-card > div:last-child {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.admin-summary-card strong {
+  line-height: 1.1;
+}
+
+.admin-summary-card span {
+  color: var(--text-muted);
+
+  line-height: 1.1;
+
+  margin-top: 2px;
+}
+
+
+/* ============================================================
+   MANAGEMENT LINKS
+   ============================================================ */
+
+.admin-management-links {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  padding: 6px 0 0;
+
+  border-top: 1px solid var(--border);
+}
+
+.admin-management-links button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 5px 9px;
+
+  border: none;
+
+  border-radius: var(--radius);
+
+  background: transparent;
+
+  color: var(--navy);
+
+  font-family: inherit;
+
+  cursor: pointer;
+}
+
+.admin-management-links button:hover {
+  background: var(--info-bg);
+
+  color: var(--navy);
+}
+
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+
+.admin-dashboard .badge {
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+
+.admin-sidebar {
+  width: 260px;
+
+  min-width: 260px;
+
+  height: 100vh;
+
+  min-height: 100vh;
+
+  overflow: hidden;
+
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   PREVENT OVERFLOW
+   ============================================================ */
+
+.admin-dashboard,
+.admin-content,
+.admin-header,
+.admin-stats,
+.admin-quick-section,
+.admin-quick-grid,
+.admin-mid-grid,
+.admin-summary-grid,
+.admin-management-links {
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   DESKTOP — SHORT SCREENS
+   ============================================================ */
+
+@media (min-width: 1001px) and (max-height: 850px) {
+
+  .admin-content {
+    padding-top: 10px;
+    padding-bottom: 8px;
+  }
+
+  .admin-header {
+    min-height: 55px;
+
+    margin-bottom: 8px;
+  }
+
+  .admin-stats {
+    gap: 8px;
+
+    margin-bottom: 8px;
+  }
+
+  .admin-stat {
+    padding: 9px 12px;
+  }
+
+  .admin-quick-section {
+    margin-bottom: 8px;
+  }
+
+  .admin-quick-grid {
+    gap: 7px;
+  }
+
+  .admin-quick-card {
+    padding: 8px 10px;
+  }
+
+  .admin-mid-grid {
+    gap: 9px;
+
+    margin-bottom: 8px;
+  }
+
+  .admin-chart,
+  .admin-category,
+  .admin-orders,
+  .admin-alerts {
+    padding: 10px;
+  }
+
+  .admin-chart-wrapper {
+    height: 92px;
+  }
+
+  .dashboard-table th,
+  .dashboard-table td {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .admin-summary-grid {
+    gap: 7px;
+
+    margin-bottom: 5px;
+  }
+
+  .admin-summary-card {
+    padding: 8px 10px;
+  }
+
+  .admin-management-links {
+    padding-top: 4px;
+  }
+
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+   ============================================================ */
+
+@media (min-width: 1400px) {
+
+  .admin-content {
+    padding-left: 26px;
+    padding-right: 26px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1100px) {
+
+  .admin-dashboard {
+    height: auto;
+
+    min-height: 100vh;
+
+    overflow: auto;
+  }
+
+  .admin-content {
+    width: calc(100% - 220px);
+
+    height: auto;
+
+    min-height: 100vh;
+
+    overflow: visible;
+
+    padding: 20px;
+  }
+
+  .admin-sidebar {
+    width: 220px;
+
+    min-width: 220px;
+  }
+
+  .admin-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-quick-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-mid-grid {
+    grid-template-columns: 1fr;
+
+    overflow: visible;
+  }
+
+  .admin-summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+
+/* ============================================================
+   TABLET / SMALL LAPTOP
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+  .admin-dashboard {
+    flex-direction: column;
+
+    overflow: visible;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+
+    min-width: 100%;
+
+    height: auto;
+
+    min-height: auto;
+
+    position: relative;
+
+    overflow: visible;
+  }
+
+  .admin-content {
+    width: 100%;
+
+    height: auto;
+
+    min-height: 0;
+
+    overflow: visible;
+
+    padding: 18px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+  .admin-content {
+    padding: 15px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+  .admin-header-actions {
+    width: 100%;
+
+    justify-content: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+  .admin-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+  }
+
+  .admin-quick-grid {
+    grid-template-columns: 1fr;
+
+    gap: 7px;
+  }
+
+  .admin-summary-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-management-links {
+    justify-content: flex-start;
+  }
+
+  .admin-table-wrapper {
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-table {
+    min-width: 650px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  .admin-content {
+    padding: 12px;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-header-actions {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .admin-header-actions .btn {
+    width: 100%;
+  }
+
+  .admin-mid-grid {
+    gap: 10px;
+  }
+
+}
+
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+.admin-dashboard button:focus-visible,
+.admin-dashboard a:focus-visible,
+.admin-dashboard select:focus-visible,
+.admin-dashboard input:focus-visible {
+  outline: 3px solid var(--gold);
+
+  outline-offset: 2px;
+}
+
+
+/* ============================================================
+   REDUCE MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .admin-dashboard *,
+  .admin-dashboard *::before,
+  .admin-dashboard *::after {
+    transition: none !important;
+
+    scroll-behavior: auto !important;
+  }
+
+}

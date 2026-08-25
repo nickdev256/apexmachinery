@@ -1,0 +1,3599 @@
+[
+  {
+    "id": 1,
+    "slug": "industrial-machinery-1",
+    "name": "CNC Milling Center Industrial",
+    "brand": "AeroForce",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 5430,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 17,
+    "stock": 54,
+    "status": "In Stock",
+    "description": "The CNC Milling Center Industrial by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1001",
+      "Category": "Industrial Machinery",
+      "Warranty": "2 Years",
+      "Power Rating": "150W",
+      "Weight": "153.9 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 2,
+    "slug": "industrial-machinery-2",
+    "name": "Industrial Lathe Heavy-Duty",
+    "brand": "ForgeSteel",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 310440,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 240,
+    "stock": 117,
+    "status": "In Stock",
+    "description": "The Industrial Lathe Heavy-Duty by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1002",
+      "Category": "Industrial Machinery",
+      "Warranty": "3 Years",
+      "Power Rating": "200W",
+      "Weight": "171.1 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 3,
+    "slug": "industrial-machinery-3",
+    "name": "Hydraulic Press 20-Ton Standard",
+    "brand": "ArcTech",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 165450,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 123,
+    "stock": 60,
+    "status": "In Stock",
+    "description": "The Hydraulic Press 20-Ton Standard by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1003",
+      "Category": "Industrial Machinery",
+      "Warranty": "1 Year",
+      "Power Rating": "250W",
+      "Weight": "188.4 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 4,
+    "slug": "industrial-machinery-4",
+    "name": "Sheet Metal Bender XR Series",
+    "brand": "LiftPro",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 20460,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 5,
+    "stock": 3,
+    "status": "Limited",
+    "description": "The Sheet Metal Bender XR Series by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1004",
+      "Category": "Industrial Machinery",
+      "Warranty": "2 Years",
+      "Power Rating": "300W",
+      "Weight": "5.6 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 5,
+    "slug": "industrial-machinery-5",
+    "name": "Conveyor System Module Elite",
+    "brand": "TorqueLine",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 325470,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 228,
+    "stock": 66,
+    "status": "In Stock",
+    "description": "The Conveyor System Module Elite by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1005",
+      "Category": "Industrial Machinery",
+      "Warranty": "3 Years",
+      "Power Rating": "350W",
+      "Weight": "22.9 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 6,
+    "slug": "industrial-machinery-6",
+    "name": "Industrial Shredder",
+    "brand": "IronClad",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 180480,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 111,
+    "stock": 9,
+    "status": "Limited",
+    "description": "The Industrial Shredder by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1006",
+      "Category": "Industrial Machinery",
+      "Warranty": "1 Year",
+      "Power Rating": "400W",
+      "Weight": "40.1 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 7,
+    "slug": "industrial-machinery-7",
+    "name": "Vertical Band Saw Pro",
+    "brand": "DuraDrive",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 35490,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 334,
+    "stock": 72,
+    "status": "In Stock",
+    "description": "The Vertical Band Saw Pro by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1007",
+      "Category": "Industrial Machinery",
+      "Warranty": "2 Years",
+      "Power Rating": "450W",
+      "Weight": "57.4 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 8,
+    "slug": "industrial-machinery-8",
+    "name": "Plate Rolling Machine Industrial",
+    "brand": "PrecisionWorks",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 340500,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 217,
+    "stock": 15,
+    "status": "In Stock",
+    "description": "The Plate Rolling Machine Industrial by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80",
+      "https://images.unsplash.com/photo-1565043666747-69f6646db940?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1008",
+      "Category": "Industrial Machinery",
+      "Warranty": "3 Years",
+      "Power Rating": "500W",
+      "Weight": "74.6 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 9,
+    "slug": "industrial-machinery-9",
+    "name": "CNC Milling Center Heavy-Duty",
+    "brand": "HydraForce",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 195510,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 100,
+    "stock": 77,
+    "status": "In Stock",
+    "description": "The CNC Milling Center Heavy-Duty by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1009",
+      "Category": "Industrial Machinery",
+      "Warranty": "1 Year",
+      "Power Rating": "550W",
+      "Weight": "91.9 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 10,
+    "slug": "industrial-machinery-10",
+    "name": "Industrial Lathe Standard",
+    "brand": "VoltMaster",
+    "category": "industrial-machinery",
+    "categoryName": "Industrial Machinery",
+    "price": 50520,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 322,
+    "stock": 20,
+    "status": "In Stock",
+    "description": "The Industrial Lathe Standard by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1010",
+      "Category": "Industrial Machinery",
+      "Warranty": "2 Years",
+      "Power Rating": "600W",
+      "Weight": "109.1 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Industrial Machinery",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 11,
+    "slug": "power-tools-11",
+    "name": "Cordless Power Drill XR Series",
+    "brand": "ForgeSteel",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 355530,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 205,
+    "stock": 83,
+    "status": "In Stock",
+    "description": "The Cordless Power Drill XR Series by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1011",
+      "Category": "Power Tools",
+      "Warranty": "3 Years",
+      "Power Rating": "650W",
+      "Weight": "126.4 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Power Tools",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 12,
+    "slug": "power-tools-12",
+    "name": "Angle Grinder 9-Inch Elite",
+    "brand": "ArcTech",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 210540,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 88,
+    "stock": 26,
+    "status": "In Stock",
+    "description": "The Angle Grinder 9-Inch Elite by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1012",
+      "Category": "Power Tools",
+      "Warranty": "1 Year",
+      "Power Rating": "700W",
+      "Weight": "143.6 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Power Tools",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 13,
+    "slug": "power-tools-13",
+    "name": "Rotary Hammer SDS-Plus",
+    "brand": "LiftPro",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 65550,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 311,
+    "stock": 89,
+    "status": "In Stock",
+    "description": "The Rotary Hammer SDS-Plus by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1013",
+      "Category": "Power Tools",
+      "Warranty": "2 Years",
+      "Power Rating": "750W",
+      "Weight": "160.9 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Power Tools",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 14,
+    "slug": "power-tools-14",
+    "name": "Impact Wrench 1/2\" Pro",
+    "brand": "TorqueLine",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 370550,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 194,
+    "stock": 32,
+    "status": "In Stock",
+    "description": "The Impact Wrench 1/2\" Pro by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1014",
+      "Category": "Power Tools",
+      "Warranty": "3 Years",
+      "Power Rating": "800W",
+      "Weight": "178.1 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Power Tools",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 15,
+    "slug": "power-tools-15",
+    "name": "Electric Jigsaw Industrial",
+    "brand": "IronClad",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 225560,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 77,
+    "stock": 95,
+    "status": "In Stock",
+    "description": "The Electric Jigsaw Industrial by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1015",
+      "Category": "Power Tools",
+      "Warranty": "1 Year",
+      "Power Rating": "850W",
+      "Weight": "195.3 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Power Tools",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 16,
+    "slug": "power-tools-16",
+    "name": "Circular Saw 190mm Heavy-Duty",
+    "brand": "DuraDrive",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 80570,
+    "currency": "USD",
+    "rating": 4.5,
+    "reviewCount": 300,
+    "stock": 38,
+    "status": "In Stock",
+    "description": "The Circular Saw 190mm Heavy-Duty by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1016",
+      "Category": "Power Tools",
+      "Warranty": "2 Years",
+      "Power Rating": "900W",
+      "Weight": "12.6 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Power Tools",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 17,
+    "slug": "power-tools-17",
+    "name": "Reciprocating Saw Standard",
+    "brand": "PrecisionWorks",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 385580,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 182,
+    "stock": 100,
+    "status": "In Stock",
+    "description": "The Reciprocating Saw Standard by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1017",
+      "Category": "Power Tools",
+      "Warranty": "3 Years",
+      "Power Rating": "950W",
+      "Weight": "29.8 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Power Tools",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 18,
+    "slug": "power-tools-18",
+    "name": "Cordless Impact Driver XR Series",
+    "brand": "HydraForce",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 240590,
+    "currency": "USD",
+    "rating": 3.8,
+    "reviewCount": 65,
+    "stock": 43,
+    "status": "In Stock",
+    "description": "The Cordless Impact Driver XR Series by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1018",
+      "Category": "Power Tools",
+      "Warranty": "1 Year",
+      "Power Rating": "1000W",
+      "Weight": "47.1 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Power Tools",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 19,
+    "slug": "power-tools-19",
+    "name": "Cordless Power Drill Elite",
+    "brand": "VoltMaster",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 95600,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 288,
+    "stock": 106,
+    "status": "In Stock",
+    "description": "The Cordless Power Drill Elite by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80",
+      "https://images.unsplash.com/photo-1581147036324-c1c9c1c1c1c1?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1019",
+      "Category": "Power Tools",
+      "Warranty": "2 Years",
+      "Power Rating": "1050W",
+      "Weight": "64.3 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Power Tools",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 20,
+    "slug": "power-tools-20",
+    "name": "Angle Grinder 9-Inch",
+    "brand": "AeroForce",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 400610,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 171,
+    "stock": 49,
+    "status": "In Stock",
+    "description": "The Angle Grinder 9-Inch by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1020",
+      "Category": "Power Tools",
+      "Warranty": "3 Years",
+      "Power Rating": "100W",
+      "Weight": "81.6 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Power Tools",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 21,
+    "slug": "power-tools-21",
+    "name": "Rotary Hammer SDS-Plus Pro",
+    "brand": "ForgeSteel",
+    "category": "power-tools",
+    "categoryName": "Power Tools",
+    "price": 255620,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 54,
+    "stock": 112,
+    "status": "In Stock",
+    "description": "The Rotary Hammer SDS-Plus Pro by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80",
+      "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1021",
+      "Category": "Power Tools",
+      "Warranty": "1 Year",
+      "Power Rating": "150W",
+      "Weight": "98.8 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Power Tools",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 22,
+    "slug": "compressors-22",
+    "name": "Heavy-Duty Air Compressor 200L Industrial",
+    "brand": "LiftPro",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 110630,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 277,
+    "stock": 55,
+    "status": "In Stock",
+    "description": "The Heavy-Duty Air Compressor 200L Industrial by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1022",
+      "Category": "Compressors",
+      "Warranty": "2 Years",
+      "Power Rating": "200W",
+      "Weight": "116.1 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Compressors",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 23,
+    "slug": "compressors-23",
+    "name": "Rotary Screw Compressor Heavy-Duty",
+    "brand": "TorqueLine",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 415640,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 159,
+    "stock": 118,
+    "status": "In Stock",
+    "description": "The Rotary Screw Compressor Heavy-Duty by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1023",
+      "Category": "Compressors",
+      "Warranty": "3 Years",
+      "Power Rating": "250W",
+      "Weight": "133.3 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Compressors",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 24,
+    "slug": "compressors-24",
+    "name": "Portable Air Compressor 50L Standard",
+    "brand": "IronClad",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 270650,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 42,
+    "stock": 61,
+    "status": "In Stock",
+    "description": "The Portable Air Compressor 50L Standard by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1024",
+      "Category": "Compressors",
+      "Warranty": "1 Year",
+      "Power Rating": "300W",
+      "Weight": "150.6 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Compressors",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 25,
+    "slug": "compressors-25",
+    "name": "Oil-Free Compressor XR Series",
+    "brand": "DuraDrive",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 125660,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 265,
+    "stock": 3,
+    "status": "Limited",
+    "description": "The Oil-Free Compressor XR Series by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1025",
+      "Category": "Compressors",
+      "Warranty": "2 Years",
+      "Power Rating": "350W",
+      "Weight": "167.8 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Compressors",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 26,
+    "slug": "compressors-26",
+    "name": "Two-Stage Piston Compressor Elite",
+    "brand": "PrecisionWorks",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 430670,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 148,
+    "stock": 66,
+    "status": "In Stock",
+    "description": "The Two-Stage Piston Compressor Elite by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1026",
+      "Category": "Compressors",
+      "Warranty": "3 Years",
+      "Power Rating": "400W",
+      "Weight": "185.1 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Compressors",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 27,
+    "slug": "compressors-27",
+    "name": "Heavy-Duty Air Compressor 200L",
+    "brand": "HydraForce",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 285680,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 31,
+    "stock": 9,
+    "status": "Limited",
+    "description": "The Heavy-Duty Air Compressor 200L by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1027",
+      "Category": "Compressors",
+      "Warranty": "1 Year",
+      "Power Rating": "450W",
+      "Weight": "202.3 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Compressors",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 28,
+    "slug": "compressors-28",
+    "name": "Rotary Screw Compressor Pro",
+    "brand": "VoltMaster",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 140690,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 254,
+    "stock": 72,
+    "status": "In Stock",
+    "description": "The Rotary Screw Compressor Pro by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1028",
+      "Category": "Compressors",
+      "Warranty": "2 Years",
+      "Power Rating": "500W",
+      "Weight": "19.6 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Compressors",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 29,
+    "slug": "compressors-29",
+    "name": "Portable Air Compressor 50L Industrial",
+    "brand": "AeroForce",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 445700,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 136,
+    "stock": 15,
+    "status": "In Stock",
+    "description": "The Portable Air Compressor 50L Industrial by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1029",
+      "Category": "Compressors",
+      "Warranty": "3 Years",
+      "Power Rating": "550W",
+      "Weight": "36.8 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Compressors",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 30,
+    "slug": "compressors-30",
+    "name": "Oil-Free Compressor Heavy-Duty",
+    "brand": "ForgeSteel",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 300710,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 19,
+    "stock": 78,
+    "status": "In Stock",
+    "description": "The Oil-Free Compressor Heavy-Duty by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1030",
+      "Category": "Compressors",
+      "Warranty": "1 Year",
+      "Power Rating": "600W",
+      "Weight": "54.1 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Compressors",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 31,
+    "slug": "compressors-31",
+    "name": "Two-Stage Piston Compressor Standard",
+    "brand": "ArcTech",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 155720,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 242,
+    "stock": 21,
+    "status": "In Stock",
+    "description": "The Two-Stage Piston Compressor Standard by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1031",
+      "Category": "Compressors",
+      "Warranty": "2 Years",
+      "Power Rating": "650W",
+      "Weight": "71.3 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Compressors",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 32,
+    "slug": "compressors-32",
+    "name": "Heavy-Duty Air Compressor 200L XR Series",
+    "brand": "LiftPro",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 10730,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 125,
+    "stock": 84,
+    "status": "In Stock",
+    "description": "The Heavy-Duty Air Compressor 200L XR Series by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1032",
+      "Category": "Compressors",
+      "Warranty": "3 Years",
+      "Power Rating": "700W",
+      "Weight": "88.5 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Compressors",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 33,
+    "slug": "compressors-33",
+    "name": "Rotary Screw Compressor Elite",
+    "brand": "TorqueLine",
+    "category": "compressors",
+    "categoryName": "Compressors",
+    "price": 315740,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 8,
+    "stock": 27,
+    "status": "In Stock",
+    "description": "The Rotary Screw Compressor Elite by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1033",
+      "Category": "Compressors",
+      "Warranty": "1 Year",
+      "Power Rating": "750W",
+      "Weight": "105.8 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Compressors",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 34,
+    "slug": "generators-34",
+    "name": "Diesel Generator 500kVA",
+    "brand": "DuraDrive",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 170750,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 231,
+    "stock": 89,
+    "status": "In Stock",
+    "description": "The Diesel Generator 500kVA by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1034",
+      "Category": "Generators",
+      "Warranty": "2 Years",
+      "Power Rating": "800W",
+      "Weight": "123.0 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Generators",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 35,
+    "slug": "generators-35",
+    "name": "Portable Generator 10kW Pro",
+    "brand": "PrecisionWorks",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 25760,
+    "currency": "USD",
+    "rating": 4.5,
+    "reviewCount": 114,
+    "stock": 32,
+    "status": "In Stock",
+    "description": "The Portable Generator 10kW Pro by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1035",
+      "Category": "Generators",
+      "Warranty": "3 Years",
+      "Power Rating": "850W",
+      "Weight": "140.3 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Generators",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 36,
+    "slug": "generators-36",
+    "name": "Silent Inverter Generator Industrial",
+    "brand": "HydraForce",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 330770,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 336,
+    "stock": 95,
+    "status": "In Stock",
+    "description": "The Silent Inverter Generator Industrial by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1036",
+      "Category": "Generators",
+      "Warranty": "1 Year",
+      "Power Rating": "900W",
+      "Weight": "157.5 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Generators",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 37,
+    "slug": "generators-37",
+    "name": "Standby Power Generator Heavy-Duty",
+    "brand": "VoltMaster",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 185780,
+    "currency": "USD",
+    "rating": 3.8,
+    "reviewCount": 219,
+    "stock": 38,
+    "status": "In Stock",
+    "description": "The Standby Power Generator Heavy-Duty by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1037",
+      "Category": "Generators",
+      "Warranty": "2 Years",
+      "Power Rating": "950W",
+      "Weight": "174.8 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Generators",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 38,
+    "slug": "generators-38",
+    "name": "Industrial Generator 250kVA Standard",
+    "brand": "AeroForce",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 40790,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 102,
+    "stock": 101,
+    "status": "In Stock",
+    "description": "The Industrial Generator 250kVA Standard by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1038",
+      "Category": "Generators",
+      "Warranty": "3 Years",
+      "Power Rating": "1000W",
+      "Weight": "192.0 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Generators",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 39,
+    "slug": "generators-39",
+    "name": "Diesel Generator 500kVA XR Series",
+    "brand": "ForgeSteel",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 345800,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 325,
+    "stock": 44,
+    "status": "In Stock",
+    "description": "The Diesel Generator 500kVA XR Series by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1039",
+      "Category": "Generators",
+      "Warranty": "1 Year",
+      "Power Rating": "1050W",
+      "Weight": "9.3 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Generators",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 40,
+    "slug": "generators-40",
+    "name": "Portable Generator 10kW Elite",
+    "brand": "ArcTech",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 200810,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 208,
+    "stock": 107,
+    "status": "In Stock",
+    "description": "The Portable Generator 10kW Elite by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1040",
+      "Category": "Generators",
+      "Warranty": "2 Years",
+      "Power Rating": "100W",
+      "Weight": "26.5 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Generators",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 41,
+    "slug": "generators-41",
+    "name": "Silent Inverter Generator",
+    "brand": "LiftPro",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 55820,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 91,
+    "stock": 50,
+    "status": "In Stock",
+    "description": "The Silent Inverter Generator by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1041",
+      "Category": "Generators",
+      "Warranty": "3 Years",
+      "Power Rating": "150W",
+      "Weight": "43.8 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Generators",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 42,
+    "slug": "generators-42",
+    "name": "Standby Power Generator Pro",
+    "brand": "TorqueLine",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 360820,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 313,
+    "stock": 112,
+    "status": "In Stock",
+    "description": "The Standby Power Generator Pro by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1042",
+      "Category": "Generators",
+      "Warranty": "1 Year",
+      "Power Rating": "200W",
+      "Weight": "61.0 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Generators",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 43,
+    "slug": "generators-43",
+    "name": "Industrial Generator 250kVA Industrial",
+    "brand": "IronClad",
+    "category": "generators",
+    "categoryName": "Generators",
+    "price": 215830,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 196,
+    "stock": 55,
+    "status": "In Stock",
+    "description": "The Industrial Generator 250kVA Industrial by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1043",
+      "Category": "Generators",
+      "Warranty": "2 Years",
+      "Power Rating": "250W",
+      "Weight": "78.3 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Generators",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 44,
+    "slug": "safety-equipment-44",
+    "name": "Industrial Safety Helmet Heavy-Duty",
+    "brand": "PrecisionWorks",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 70840,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 79,
+    "stock": 118,
+    "status": "In Stock",
+    "description": "The Industrial Safety Helmet Heavy-Duty by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1044",
+      "Category": "Safety Equipment",
+      "Warranty": "3 Years",
+      "Power Rating": "300W",
+      "Weight": "95.5 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Safety Equipment",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 45,
+    "slug": "safety-equipment-45",
+    "name": "High-Visibility Safety Vest Standard",
+    "brand": "HydraForce",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 375850,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 302,
+    "stock": 61,
+    "status": "In Stock",
+    "description": "The High-Visibility Safety Vest Standard by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1045",
+      "Category": "Safety Equipment",
+      "Warranty": "1 Year",
+      "Power Rating": "350W",
+      "Weight": "112.8 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Safety Equipment",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 46,
+    "slug": "safety-equipment-46",
+    "name": "Safety Goggles Anti-Fog XR Series",
+    "brand": "VoltMaster",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 230860,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 185,
+    "stock": 4,
+    "status": "Limited",
+    "description": "The Safety Goggles Anti-Fog XR Series by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1046",
+      "Category": "Safety Equipment",
+      "Warranty": "2 Years",
+      "Power Rating": "400W",
+      "Weight": "130.0 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Safety Equipment",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 47,
+    "slug": "safety-equipment-47",
+    "name": "Cut-Resistant Work Gloves Elite",
+    "brand": "AeroForce",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 85870,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 68,
+    "stock": 67,
+    "status": "In Stock",
+    "description": "The Cut-Resistant Work Gloves Elite by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1047",
+      "Category": "Safety Equipment",
+      "Warranty": "3 Years",
+      "Power Rating": "450W",
+      "Weight": "147.3 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Safety Equipment",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 48,
+    "slug": "safety-equipment-48",
+    "name": "Fall Protection Harness",
+    "brand": "ForgeSteel",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 390880,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 291,
+    "stock": 10,
+    "status": "In Stock",
+    "description": "The Fall Protection Harness by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1048",
+      "Category": "Safety Equipment",
+      "Warranty": "1 Year",
+      "Power Rating": "500W",
+      "Weight": "164.5 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Safety Equipment",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 49,
+    "slug": "safety-equipment-49",
+    "name": "Respirator Mask Kit Pro",
+    "brand": "ArcTech",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 245890,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 173,
+    "stock": 73,
+    "status": "In Stock",
+    "description": "The Respirator Mask Kit Pro by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1049",
+      "Category": "Safety Equipment",
+      "Warranty": "2 Years",
+      "Power Rating": "550W",
+      "Weight": "181.7 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Safety Equipment",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 50,
+    "slug": "safety-equipment-50",
+    "name": "Industrial Safety Helmet Industrial",
+    "brand": "LiftPro",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 100900,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 56,
+    "stock": 15,
+    "status": "In Stock",
+    "description": "The Industrial Safety Helmet Industrial by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1050",
+      "Category": "Safety Equipment",
+      "Warranty": "3 Years",
+      "Power Rating": "600W",
+      "Weight": "199.0 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Safety Equipment",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 51,
+    "slug": "safety-equipment-51",
+    "name": "High-Visibility Safety Vest Heavy-Duty",
+    "brand": "TorqueLine",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 405910,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 279,
+    "stock": 78,
+    "status": "In Stock",
+    "description": "The High-Visibility Safety Vest Heavy-Duty by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1051",
+      "Category": "Safety Equipment",
+      "Warranty": "1 Year",
+      "Power Rating": "650W",
+      "Weight": "16.2 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Safety Equipment",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 52,
+    "slug": "safety-equipment-52",
+    "name": "Safety Goggles Anti-Fog Standard",
+    "brand": "IronClad",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 260920,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 162,
+    "stock": 21,
+    "status": "In Stock",
+    "description": "The Safety Goggles Anti-Fog Standard by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1052",
+      "Category": "Safety Equipment",
+      "Warranty": "2 Years",
+      "Power Rating": "700W",
+      "Weight": "33.5 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Safety Equipment",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 53,
+    "slug": "safety-equipment-53",
+    "name": "Cut-Resistant Work Gloves XR Series",
+    "brand": "DuraDrive",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 115930,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 45,
+    "stock": 84,
+    "status": "In Stock",
+    "description": "The Cut-Resistant Work Gloves XR Series by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1053",
+      "Category": "Safety Equipment",
+      "Warranty": "3 Years",
+      "Power Rating": "750W",
+      "Weight": "50.7 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Safety Equipment",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 54,
+    "slug": "safety-equipment-54",
+    "name": "Fall Protection Harness Elite",
+    "brand": "PrecisionWorks",
+    "category": "safety-equipment",
+    "categoryName": "Safety Equipment",
+    "price": 420940,
+    "currency": "USD",
+    "rating": 4.5,
+    "reviewCount": 268,
+    "stock": 27,
+    "status": "In Stock",
+    "description": "The Fall Protection Harness Elite by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1054",
+      "Category": "Safety Equipment",
+      "Warranty": "1 Year",
+      "Power Rating": "800W",
+      "Weight": "68.0 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Safety Equipment",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 55,
+    "slug": "hydraulics-55",
+    "name": "Hydraulic Cylinder Assembly",
+    "brand": "VoltMaster",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 275950,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 150,
+    "stock": 90,
+    "status": "In Stock",
+    "description": "The Hydraulic Cylinder Assembly by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1055",
+      "Category": "Hydraulics",
+      "Warranty": "2 Years",
+      "Power Rating": "850W",
+      "Weight": "85.2 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Hydraulics",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 56,
+    "slug": "hydraulics-56",
+    "name": "Hydraulic Pump Unit Pro",
+    "brand": "AeroForce",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 130960,
+    "currency": "USD",
+    "rating": 3.8,
+    "reviewCount": 33,
+    "stock": 33,
+    "status": "In Stock",
+    "description": "The Hydraulic Pump Unit Pro by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1056",
+      "Category": "Hydraulics",
+      "Warranty": "3 Years",
+      "Power Rating": "900W",
+      "Weight": "102.5 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Hydraulics",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 57,
+    "slug": "hydraulics-57",
+    "name": "Hydraulic Hose Kit Industrial",
+    "brand": "ForgeSteel",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 435970,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 256,
+    "stock": 96,
+    "status": "In Stock",
+    "description": "The Hydraulic Hose Kit Industrial by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1057",
+      "Category": "Hydraulics",
+      "Warranty": "1 Year",
+      "Power Rating": "950W",
+      "Weight": "119.7 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Hydraulics",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 58,
+    "slug": "hydraulics-58",
+    "name": "Hydraulic Jack 20-Ton Heavy-Duty",
+    "brand": "ArcTech",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 290980,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 139,
+    "stock": 38,
+    "status": "In Stock",
+    "description": "The Hydraulic Jack 20-Ton Heavy-Duty by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1058",
+      "Category": "Hydraulics",
+      "Warranty": "2 Years",
+      "Power Rating": "1000W",
+      "Weight": "137.0 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Hydraulics",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 59,
+    "slug": "hydraulics-59",
+    "name": "Hydraulic Power Pack Standard",
+    "brand": "LiftPro",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 145990,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 22,
+    "stock": 101,
+    "status": "In Stock",
+    "description": "The Hydraulic Power Pack Standard by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1059",
+      "Category": "Hydraulics",
+      "Warranty": "3 Years",
+      "Power Rating": "1050W",
+      "Weight": "154.2 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Hydraulics",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 60,
+    "slug": "hydraulics-60",
+    "name": "Hydraulic Cylinder Assembly XR Series",
+    "brand": "TorqueLine",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 451000,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 245,
+    "stock": 44,
+    "status": "In Stock",
+    "description": "The Hydraulic Cylinder Assembly XR Series by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1060",
+      "Category": "Hydraulics",
+      "Warranty": "1 Year",
+      "Power Rating": "100W",
+      "Weight": "171.5 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Hydraulics",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 61,
+    "slug": "hydraulics-61",
+    "name": "Hydraulic Pump Unit Elite",
+    "brand": "IronClad",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 306010,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 127,
+    "stock": 107,
+    "status": "In Stock",
+    "description": "The Hydraulic Pump Unit Elite by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1061",
+      "Category": "Hydraulics",
+      "Warranty": "2 Years",
+      "Power Rating": "150W",
+      "Weight": "188.7 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Hydraulics",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 62,
+    "slug": "hydraulics-62",
+    "name": "Hydraulic Hose Kit",
+    "brand": "DuraDrive",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 161020,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 10,
+    "stock": 50,
+    "status": "In Stock",
+    "description": "The Hydraulic Hose Kit by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1062",
+      "Category": "Hydraulics",
+      "Warranty": "3 Years",
+      "Power Rating": "200W",
+      "Weight": "6.0 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Hydraulics",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 63,
+    "slug": "hydraulics-63",
+    "name": "Hydraulic Jack 20-Ton Pro",
+    "brand": "PrecisionWorks",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 16030,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 233,
+    "stock": 113,
+    "status": "In Stock",
+    "description": "The Hydraulic Jack 20-Ton Pro by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1063",
+      "Category": "Hydraulics",
+      "Warranty": "1 Year",
+      "Power Rating": "250W",
+      "Weight": "23.2 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Hydraulics",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 64,
+    "slug": "hydraulics-64",
+    "name": "Hydraulic Power Pack Industrial",
+    "brand": "HydraForce",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 321040,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 116,
+    "stock": 56,
+    "status": "In Stock",
+    "description": "The Hydraulic Power Pack Industrial by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1064",
+      "Category": "Hydraulics",
+      "Warranty": "2 Years",
+      "Power Rating": "300W",
+      "Weight": "40.5 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Hydraulics",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 65,
+    "slug": "hydraulics-65",
+    "name": "Hydraulic Cylinder Assembly Heavy-Duty",
+    "brand": "VoltMaster",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 176050,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 339,
+    "stock": 119,
+    "status": "In Stock",
+    "description": "The Hydraulic Cylinder Assembly Heavy-Duty by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1065",
+      "Category": "Hydraulics",
+      "Warranty": "3 Years",
+      "Power Rating": "350W",
+      "Weight": "57.7 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Hydraulics",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 66,
+    "slug": "hydraulics-66",
+    "name": "Hydraulic Pump Unit Standard",
+    "brand": "AeroForce",
+    "category": "hydraulics",
+    "categoryName": "Hydraulics",
+    "price": 31060,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 222,
+    "stock": 62,
+    "status": "In Stock",
+    "description": "The Hydraulic Pump Unit Standard by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80",
+      "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1066",
+      "Category": "Hydraulics",
+      "Warranty": "1 Year",
+      "Power Rating": "400W",
+      "Weight": "75.0 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Hydraulics",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 67,
+    "slug": "metal-working-67",
+    "name": "MIG Welding Machine XR Series",
+    "brand": "ArcTech",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 336070,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 105,
+    "stock": 4,
+    "status": "Limited",
+    "description": "The MIG Welding Machine XR Series by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1067",
+      "Category": "Metal Working",
+      "Warranty": "2 Years",
+      "Power Rating": "450W",
+      "Weight": "92.2 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Metal Working",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 68,
+    "slug": "metal-working-68",
+    "name": "TIG Welder Inverter Elite",
+    "brand": "LiftPro",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 191080,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 327,
+    "stock": 67,
+    "status": "In Stock",
+    "description": "The TIG Welder Inverter Elite by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1068",
+      "Category": "Metal Working",
+      "Warranty": "3 Years",
+      "Power Rating": "500W",
+      "Weight": "109.4 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Metal Working",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 69,
+    "slug": "metal-working-69",
+    "name": "Metal Cutting Bandsaw",
+    "brand": "TorqueLine",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 46090,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 210,
+    "stock": 10,
+    "status": "In Stock",
+    "description": "The Metal Cutting Bandsaw by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1069",
+      "Category": "Metal Working",
+      "Warranty": "1 Year",
+      "Power Rating": "550W",
+      "Weight": "126.7 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Metal Working",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 70,
+    "slug": "metal-working-70",
+    "name": "Bench Grinder 8-Inch Pro",
+    "brand": "IronClad",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 351090,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 93,
+    "stock": 73,
+    "status": "In Stock",
+    "description": "The Bench Grinder 8-Inch Pro by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1070",
+      "Category": "Metal Working",
+      "Warranty": "2 Years",
+      "Power Rating": "600W",
+      "Weight": "143.9 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Metal Working",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 71,
+    "slug": "metal-working-71",
+    "name": "Sheet Metal Shear Industrial",
+    "brand": "DuraDrive",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 206100,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 316,
+    "stock": 16,
+    "status": "In Stock",
+    "description": "The Sheet Metal Shear Industrial by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1071",
+      "Category": "Metal Working",
+      "Warranty": "3 Years",
+      "Power Rating": "650W",
+      "Weight": "161.2 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Metal Working",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 72,
+    "slug": "metal-working-72",
+    "name": "Plasma Cutter 60A Heavy-Duty",
+    "brand": "PrecisionWorks",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 61110,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 199,
+    "stock": 79,
+    "status": "In Stock",
+    "description": "The Plasma Cutter 60A Heavy-Duty by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1072",
+      "Category": "Metal Working",
+      "Warranty": "1 Year",
+      "Power Rating": "700W",
+      "Weight": "178.4 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Metal Working",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 73,
+    "slug": "metal-working-73",
+    "name": "MIG Welding Machine Standard",
+    "brand": "HydraForce",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 366120,
+    "currency": "USD",
+    "rating": 4.5,
+    "reviewCount": 82,
+    "stock": 22,
+    "status": "In Stock",
+    "description": "The MIG Welding Machine Standard by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1073",
+      "Category": "Metal Working",
+      "Warranty": "2 Years",
+      "Power Rating": "750W",
+      "Weight": "195.7 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Metal Working",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 74,
+    "slug": "metal-working-74",
+    "name": "TIG Welder Inverter XR Series",
+    "brand": "VoltMaster",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 221130,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 304,
+    "stock": 85,
+    "status": "In Stock",
+    "description": "The TIG Welder Inverter XR Series by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1074",
+      "Category": "Metal Working",
+      "Warranty": "3 Years",
+      "Power Rating": "800W",
+      "Weight": "12.9 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Metal Working",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 75,
+    "slug": "metal-working-75",
+    "name": "Metal Cutting Bandsaw Elite",
+    "brand": "AeroForce",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 76140,
+    "currency": "USD",
+    "rating": 3.8,
+    "reviewCount": 187,
+    "stock": 27,
+    "status": "In Stock",
+    "description": "The Metal Cutting Bandsaw Elite by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1075",
+      "Category": "Metal Working",
+      "Warranty": "1 Year",
+      "Power Rating": "850W",
+      "Weight": "30.2 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Metal Working",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 76,
+    "slug": "metal-working-76",
+    "name": "Bench Grinder 8-Inch",
+    "brand": "ForgeSteel",
+    "category": "metal-working",
+    "categoryName": "Metal Working",
+    "price": 381150,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 70,
+    "stock": 90,
+    "status": "In Stock",
+    "description": "The Bench Grinder 8-Inch by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80",
+      "https://images.unsplash.com/photo-1565608087341-404b25492fee?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1076",
+      "Category": "Metal Working",
+      "Warranty": "2 Years",
+      "Power Rating": "900W",
+      "Weight": "47.4 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Metal Working",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 77,
+    "slug": "construction-77",
+    "name": "Concrete Mixer 500L Pro",
+    "brand": "LiftPro",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 236160,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 293,
+    "stock": 33,
+    "status": "In Stock",
+    "description": "The Concrete Mixer 500L Pro by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1077",
+      "Category": "Construction",
+      "Warranty": "3 Years",
+      "Power Rating": "950W",
+      "Weight": "64.7 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Construction",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 78,
+    "slug": "construction-78",
+    "name": "Vibratory Plate Compactor Industrial",
+    "brand": "TorqueLine",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 91170,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 176,
+    "stock": 96,
+    "status": "In Stock",
+    "description": "The Vibratory Plate Compactor Industrial by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1078",
+      "Category": "Construction",
+      "Warranty": "1 Year",
+      "Power Rating": "1000W",
+      "Weight": "81.9 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Construction",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 79,
+    "slug": "construction-79",
+    "name": "Scaffolding Tower Kit Heavy-Duty",
+    "brand": "IronClad",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 396180,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 59,
+    "stock": 39,
+    "status": "In Stock",
+    "description": "The Scaffolding Tower Kit Heavy-Duty by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1079",
+      "Category": "Construction",
+      "Warranty": "2 Years",
+      "Power Rating": "1050W",
+      "Weight": "99.2 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Construction",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 80,
+    "slug": "construction-80",
+    "name": "Demolition Hammer Standard",
+    "brand": "DuraDrive",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 251190,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 282,
+    "stock": 102,
+    "status": "In Stock",
+    "description": "The Demolition Hammer Standard by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1080",
+      "Category": "Construction",
+      "Warranty": "3 Years",
+      "Power Rating": "100W",
+      "Weight": "116.4 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Construction",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 81,
+    "slug": "construction-81",
+    "name": "Laser Level Tool XR Series",
+    "brand": "PrecisionWorks",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 106200,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 164,
+    "stock": 45,
+    "status": "In Stock",
+    "description": "The Laser Level Tool XR Series by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1081",
+      "Category": "Construction",
+      "Warranty": "1 Year",
+      "Power Rating": "150W",
+      "Weight": "133.7 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Construction",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 82,
+    "slug": "construction-82",
+    "name": "Concrete Mixer 500L Elite",
+    "brand": "HydraForce",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 411210,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 47,
+    "stock": 108,
+    "status": "In Stock",
+    "description": "The Concrete Mixer 500L Elite by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1082",
+      "Category": "Construction",
+      "Warranty": "2 Years",
+      "Power Rating": "200W",
+      "Weight": "150.9 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Construction",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 83,
+    "slug": "construction-83",
+    "name": "Vibratory Plate Compactor",
+    "brand": "VoltMaster",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 266220,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 270,
+    "stock": 50,
+    "status": "In Stock",
+    "description": "The Vibratory Plate Compactor by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1083",
+      "Category": "Construction",
+      "Warranty": "3 Years",
+      "Power Rating": "250W",
+      "Weight": "168.2 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Construction",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 84,
+    "slug": "construction-84",
+    "name": "Scaffolding Tower Kit Pro",
+    "brand": "AeroForce",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 121230,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 153,
+    "stock": 113,
+    "status": "In Stock",
+    "description": "The Scaffolding Tower Kit Pro by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1084",
+      "Category": "Construction",
+      "Warranty": "1 Year",
+      "Power Rating": "300W",
+      "Weight": "185.4 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Construction",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 85,
+    "slug": "construction-85",
+    "name": "Demolition Hammer Industrial",
+    "brand": "ForgeSteel",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 426240,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 36,
+    "stock": 56,
+    "status": "In Stock",
+    "description": "The Demolition Hammer Industrial by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1085",
+      "Category": "Construction",
+      "Warranty": "2 Years",
+      "Power Rating": "350W",
+      "Weight": "202.6 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Construction",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 86,
+    "slug": "construction-86",
+    "name": "Laser Level Tool Heavy-Duty",
+    "brand": "ArcTech",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 281250,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 259,
+    "stock": 119,
+    "status": "In Stock",
+    "description": "The Laser Level Tool Heavy-Duty by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1086",
+      "Category": "Construction",
+      "Warranty": "3 Years",
+      "Power Rating": "400W",
+      "Weight": "19.9 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Construction",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 87,
+    "slug": "construction-87",
+    "name": "Concrete Mixer 500L Standard",
+    "brand": "LiftPro",
+    "category": "construction",
+    "categoryName": "Construction",
+    "price": 136260,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 141,
+    "stock": 62,
+    "status": "In Stock",
+    "description": "The Concrete Mixer 500L Standard by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80",
+      "https://images.unsplash.com/photo-1541976590-713941681591?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1087",
+      "Category": "Construction",
+      "Warranty": "1 Year",
+      "Power Rating": "450W",
+      "Weight": "37.1 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Construction",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 88,
+    "slug": "electrical-88",
+    "name": "Industrial Circuit Breaker Panel XR Series",
+    "brand": "IronClad",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 441270,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 24,
+    "stock": 5,
+    "status": "Limited",
+    "description": "The Industrial Circuit Breaker Panel XR Series by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1088",
+      "Category": "Electrical",
+      "Warranty": "2 Years",
+      "Power Rating": "500W",
+      "Weight": "54.4 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Electrical",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 89,
+    "slug": "electrical-89",
+    "name": "Cable Management System Elite",
+    "brand": "DuraDrive",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 296280,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 247,
+    "stock": 68,
+    "status": "In Stock",
+    "description": "The Cable Management System Elite by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1089",
+      "Category": "Electrical",
+      "Warranty": "3 Years",
+      "Power Rating": "550W",
+      "Weight": "71.6 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Electrical",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 90,
+    "slug": "electrical-90",
+    "name": "Voltage Stabilizer 10kVA",
+    "brand": "PrecisionWorks",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 151290,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 130,
+    "stock": 11,
+    "status": "In Stock",
+    "description": "The Voltage Stabilizer 10kVA by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1090",
+      "Category": "Electrical",
+      "Warranty": "1 Year",
+      "Power Rating": "600W",
+      "Weight": "88.9 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Electrical",
+      "PrecisionWorks"
+    ]
+  },
+  {
+    "id": 91,
+    "slug": "electrical-91",
+    "name": "Industrial Extension Reel Pro",
+    "brand": "HydraForce",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 6300,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 13,
+    "stock": 74,
+    "status": "In Stock",
+    "description": "The Industrial Extension Reel Pro by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1091",
+      "Category": "Electrical",
+      "Warranty": "2 Years",
+      "Power Rating": "650W",
+      "Weight": "106.1 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Electrical",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 92,
+    "slug": "electrical-92",
+    "name": "Distribution Transformer Industrial",
+    "brand": "VoltMaster",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 311310,
+    "currency": "USD",
+    "rating": 4.5,
+    "reviewCount": 236,
+    "stock": 16,
+    "status": "In Stock",
+    "description": "The Distribution Transformer Industrial by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1092",
+      "Category": "Electrical",
+      "Warranty": "3 Years",
+      "Power Rating": "700W",
+      "Weight": "123.4 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Electrical",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 93,
+    "slug": "electrical-93",
+    "name": "Industrial Circuit Breaker Panel Heavy-Duty",
+    "brand": "AeroForce",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 166320,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 118,
+    "stock": 79,
+    "status": "In Stock",
+    "description": "The Industrial Circuit Breaker Panel Heavy-Duty by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1093",
+      "Category": "Electrical",
+      "Warranty": "1 Year",
+      "Power Rating": "750W",
+      "Weight": "140.6 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Electrical",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 94,
+    "slug": "electrical-94",
+    "name": "Cable Management System Standard",
+    "brand": "ForgeSteel",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 21330,
+    "currency": "USD",
+    "rating": 3.8,
+    "reviewCount": 341,
+    "stock": 22,
+    "status": "In Stock",
+    "description": "The Cable Management System Standard by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1094",
+      "Category": "Electrical",
+      "Warranty": "2 Years",
+      "Power Rating": "800W",
+      "Weight": "157.9 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Electrical",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 95,
+    "slug": "electrical-95",
+    "name": "Voltage Stabilizer 10kVA XR Series",
+    "brand": "ArcTech",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 326340,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 224,
+    "stock": 85,
+    "status": "In Stock",
+    "description": "The Voltage Stabilizer 10kVA XR Series by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1095",
+      "Category": "Electrical",
+      "Warranty": "3 Years",
+      "Power Rating": "850W",
+      "Weight": "175.1 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Electrical",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 96,
+    "slug": "electrical-96",
+    "name": "Industrial Extension Reel Elite",
+    "brand": "LiftPro",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 181350,
+    "currency": "USD",
+    "rating": 4.3,
+    "reviewCount": 107,
+    "stock": 28,
+    "status": "In Stock",
+    "description": "The Industrial Extension Reel Elite by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1096",
+      "Category": "Electrical",
+      "Warranty": "1 Year",
+      "Power Rating": "900W",
+      "Weight": "192.4 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Electrical",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 97,
+    "slug": "electrical-97",
+    "name": "Distribution Transformer",
+    "brand": "TorqueLine",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 36360,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 330,
+    "stock": 91,
+    "status": "In Stock",
+    "description": "The Distribution Transformer by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1097",
+      "Category": "Electrical",
+      "Warranty": "2 Years",
+      "Power Rating": "950W",
+      "Weight": "9.6 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Electrical",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 98,
+    "slug": "electrical-98",
+    "name": "Industrial Circuit Breaker Panel Pro",
+    "brand": "IronClad",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 341360,
+    "currency": "USD",
+    "rating": 4.8,
+    "reviewCount": 213,
+    "stock": 34,
+    "status": "In Stock",
+    "description": "The Industrial Circuit Breaker Panel Pro by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1098",
+      "Category": "Electrical",
+      "Warranty": "3 Years",
+      "Power Rating": "1000W",
+      "Weight": "26.9 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Electrical",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 99,
+    "slug": "electrical-99",
+    "name": "Cable Management System Industrial",
+    "brand": "DuraDrive",
+    "category": "electrical",
+    "categoryName": "Electrical",
+    "price": 196370,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 96,
+    "stock": 97,
+    "status": "In Stock",
+    "description": "The Cable Management System Industrial by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80",
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1099",
+      "Category": "Electrical",
+      "Warranty": "1 Year",
+      "Power Rating": "1050W",
+      "Weight": "44.1 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Electrical",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 100,
+    "slug": "automation-100",
+    "name": "PLC Control Module Heavy-Duty",
+    "brand": "HydraForce",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 51380,
+    "currency": "USD",
+    "rating": 4.1,
+    "reviewCount": 318,
+    "stock": 39,
+    "status": "In Stock",
+    "description": "The PLC Control Module Heavy-Duty by HydraForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "HydraForce",
+      "Model No.": "HYD-1100",
+      "Category": "Automation",
+      "Warranty": "2 Years",
+      "Power Rating": "100W",
+      "Weight": "61.4 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Automation",
+      "HydraForce"
+    ]
+  },
+  {
+    "id": 101,
+    "slug": "automation-101",
+    "name": "Industrial Robotic Arm Standard",
+    "brand": "VoltMaster",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 356390,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 201,
+    "stock": 102,
+    "status": "In Stock",
+    "description": "The Industrial Robotic Arm Standard by VoltMaster is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "VoltMaster",
+      "Model No.": "VOL-1101",
+      "Category": "Automation",
+      "Warranty": "3 Years",
+      "Power Rating": "150W",
+      "Weight": "78.6 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Automation",
+      "VoltMaster"
+    ]
+  },
+  {
+    "id": 102,
+    "slug": "automation-102",
+    "name": "Conveyor Sensor Kit XR Series",
+    "brand": "AeroForce",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 211400,
+    "currency": "USD",
+    "rating": 4.6,
+    "reviewCount": 84,
+    "stock": 45,
+    "status": "In Stock",
+    "description": "The Conveyor Sensor Kit XR Series by AeroForce is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "AeroForce",
+      "Model No.": "AER-1102",
+      "Category": "Automation",
+      "Warranty": "1 Year",
+      "Power Rating": "200W",
+      "Weight": "95.8 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Automation",
+      "AeroForce"
+    ]
+  },
+  {
+    "id": 103,
+    "slug": "automation-103",
+    "name": "SCADA Control Panel Elite",
+    "brand": "ForgeSteel",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 66410,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 307,
+    "stock": 108,
+    "status": "In Stock",
+    "description": "The SCADA Control Panel Elite by ForgeSteel is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ForgeSteel",
+      "Model No.": "FOR-1103",
+      "Category": "Automation",
+      "Warranty": "2 Years",
+      "Power Rating": "250W",
+      "Weight": "113.1 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Automation",
+      "ForgeSteel"
+    ]
+  },
+  {
+    "id": 104,
+    "slug": "automation-104",
+    "name": "Automated Guided Vehicle",
+    "brand": "ArcTech",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 371420,
+    "currency": "USD",
+    "rating": 3.9,
+    "reviewCount": 190,
+    "stock": 51,
+    "status": "In Stock",
+    "description": "The Automated Guided Vehicle by ArcTech is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "ArcTech",
+      "Model No.": "ARC-1104",
+      "Category": "Automation",
+      "Warranty": "3 Years",
+      "Power Rating": "300W",
+      "Weight": "130.3 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Automation",
+      "ArcTech"
+    ]
+  },
+  {
+    "id": 105,
+    "slug": "automation-105",
+    "name": "PLC Control Module Pro",
+    "brand": "LiftPro",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 226430,
+    "currency": "USD",
+    "rating": 4.2,
+    "reviewCount": 73,
+    "stock": 114,
+    "status": "In Stock",
+    "description": "The PLC Control Module Pro by LiftPro is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "LiftPro",
+      "Model No.": "LIF-1105",
+      "Category": "Automation",
+      "Warranty": "1 Year",
+      "Power Rating": "350W",
+      "Weight": "147.6 kg",
+      "Country of Origin": "Germany"
+    },
+    "badges": [
+      "Automation",
+      "LiftPro"
+    ]
+  },
+  {
+    "id": 106,
+    "slug": "automation-106",
+    "name": "Industrial Robotic Arm Industrial",
+    "brand": "TorqueLine",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 81440,
+    "currency": "USD",
+    "rating": 4.4,
+    "reviewCount": 295,
+    "stock": 57,
+    "status": "In Stock",
+    "description": "The Industrial Robotic Arm Industrial by TorqueLine is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "TorqueLine",
+      "Model No.": "TOR-1106",
+      "Category": "Automation",
+      "Warranty": "2 Years",
+      "Power Rating": "400W",
+      "Weight": "164.8 kg",
+      "Country of Origin": "USA"
+    },
+    "badges": [
+      "Automation",
+      "TorqueLine"
+    ]
+  },
+  {
+    "id": 107,
+    "slug": "automation-107",
+    "name": "Conveyor Sensor Kit Heavy-Duty",
+    "brand": "IronClad",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 386450,
+    "currency": "USD",
+    "rating": 4.7,
+    "reviewCount": 178,
+    "stock": 0,
+    "status": "Out of Stock",
+    "description": "The Conveyor Sensor Kit Heavy-Duty by IronClad is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "IronClad",
+      "Model No.": "IRO-1107",
+      "Category": "Automation",
+      "Warranty": "3 Years",
+      "Power Rating": "450W",
+      "Weight": "182.1 kg",
+      "Country of Origin": "Japan"
+    },
+    "badges": [
+      "Automation",
+      "IronClad"
+    ]
+  },
+  {
+    "id": 108,
+    "slug": "automation-108",
+    "name": "SCADA Control Panel Standard",
+    "brand": "DuraDrive",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 241460,
+    "currency": "USD",
+    "rating": 4.9,
+    "reviewCount": 61,
+    "stock": 62,
+    "status": "In Stock",
+    "description": "The SCADA Control Panel Standard by DuraDrive is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "DuraDrive",
+      "Model No.": "DUR-1108",
+      "Category": "Automation",
+      "Warranty": "1 Year",
+      "Power Rating": "500W",
+      "Weight": "199.3 kg",
+      "Country of Origin": "South Korea"
+    },
+    "badges": [
+      "Automation",
+      "DuraDrive"
+    ]
+  },
+  {
+    "id": 109,
+    "slug": "automation-109",
+    "name": "Automated Guided Vehicle XR Series",
+    "brand": "PrecisionWorks",
+    "category": "automation",
+    "categoryName": "Automation",
+    "price": 96470,
+    "currency": "USD",
+    "rating": 4,
+    "reviewCount": 284,
+    "stock": 5,
+    "status": "Limited",
+    "description": "The Automated Guided Vehicle XR Series by PrecisionWorks is engineered for demanding industrial environments, combining durability, precision, and performance to keep your operations running at peak efficiency. Built to meet enterprise procurement standards with certified components and extended service life.",
+    "images": [
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80"
+    ],
+    "specifications": {
+      "Brand": "PrecisionWorks",
+      "Model No.": "PRE-1109",
+      "Category": "Automation",
+      "Warranty": "2 Years",
+      "Power Rating": "550W",
+      "Weight": "16.6 kg",
+      "Country of Origin": "Italy"
+    },
+    "badges": [
+      "Automation",
+      "PrecisionWorks"
+    ]
+  }
+]

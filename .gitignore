@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+*.log
+public/images/machines/THE GENTLEMEN THIEF EMMY.2026.mkv
+*.mp4
+*.mov

@@ -1,0 +1,1431 @@
+/* ============================================================
+   ADMIN INVENTORY PAGE
+   ============================================================ */
+
+.admin-inventory-page {
+  min-height: 100vh;
+  padding: 28px;
+  background: #f5f7fb;
+  color: var(--text-dark);
+}
+
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+
+.admin-inventory-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #dce2eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-back-button:hover {
+  background: #f1f4f8;
+  border-color: var(--navy);
+  transform: translateX(-2px);
+  box-shadow: 0 4px 12px rgba(11, 31, 77, 0.08);
+}
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b95a7;
+  font-size: 0.8rem;
+}
+
+.admin-breadcrumb strong {
+  color: var(--navy);
+}
+
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 28px;
+}
+
+.admin-page-header h1 {
+  margin: 5px 0 8px;
+  color: var(--navy);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.admin-page-header p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.admin-page-header .btn {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+.admin-inventory-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-inventory-stat {
+  min-height: 110px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border: 1px solid #e3e7ee;
+  background: #ffffff;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-inventory-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(11, 31, 77, 0.07);
+}
+
+.admin-inventory-stat-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(11, 31, 77, 0.08);
+  color: var(--navy);
+}
+
+.admin-inventory-stat-icon.warning {
+  background: rgba(196, 144, 36, 0.12);
+  color: #a56d00;
+}
+
+.admin-inventory-stat-icon.danger {
+  background: rgba(190, 60, 60, 0.1);
+  color: #b43a3a;
+}
+
+.admin-inventory-stat strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--navy);
+  font-size: 1.2rem;
+}
+
+.admin-inventory-stat span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.inventory-value-stat strong {
+  font-size: 1rem;
+}
+
+
+/* ============================================================
+   INVENTORY CONTAINER
+   ============================================================ */
+
+.admin-inventory-container {
+  padding: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
+.admin-inventory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px;
+  border-bottom: 1px solid #e7eaf0;
+  background: #ffffff;
+  flex-wrap: wrap;
+}
+
+.admin-inventory-search {
+  min-width: 280px;
+  max-width: 430px;
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  min-height: 42px;
+  padding: 0 13px;
+
+  border: 1px solid #dce2eb;
+  border-radius: 8px;
+
+  color: #7c8798;
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-inventory-search:focus-within {
+  border-color: var(--navy);
+  box-shadow:
+    0 0 0 3px rgba(11, 31, 77, 0.08);
+}
+
+.admin-inventory-search input {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-dark);
+  font-size: 0.85rem;
+}
+
+.admin-inventory-search input::placeholder {
+  color: #a1a9b6;
+}
+
+.admin-clear-search {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: #edf0f5;
+  color: #687386;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.admin-inventory-toolbar select {
+  min-height: 42px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #dce2eb;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.admin-inventory-toolbar select:focus {
+  border-color: var(--navy);
+}
+
+.admin-inventory-count {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+}
+
+.dashboard-table th {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e7eaf0;
+  background: #fafbfd;
+  color: #697487;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.dashboard-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #edf0f4;
+  color: #3d4655;
+  font-size: 0.83rem;
+  vertical-align: middle;
+}
+
+.dashboard-table tbody tr {
+  transition: background 0.18s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+.dashboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ============================================================
+   PRODUCT
+   ============================================================ */
+
+.admin-inventory-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.admin-inventory-image {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border: 1px solid #e2e6ed;
+  border-radius: 8px;
+
+  background: #f7f8fa;
+  color: #9aa3b2;
+}
+
+.admin-inventory-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-inventory-product strong {
+  display: block;
+  max-width: 300px;
+  margin-bottom: 5px;
+  color: var(--navy);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.admin-inventory-product small {
+  display: block;
+  color: #8b95a5;
+  font-size: 0.72rem;
+}
+
+
+/* ============================================================
+   STOCK STATUS
+   ============================================================ */
+
+.admin-stock-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-stock-status > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.admin-stock-status.in-stock {
+  color: #287b52;
+  background: #eaf7ef;
+}
+
+.admin-stock-status.low-stock {
+  color: #a56d00;
+  background: #fff6df;
+}
+
+.admin-stock-status.out-of-stock {
+  color: #b23c3c;
+  background: #fceded;
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.admin-inventory-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-action-btn {
+  width: 34px;
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #dfe4eb;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #667184;
+
+  cursor: pointer;
+
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.admin-action-btn:hover {
+  color: var(--navy);
+  border-color: var(--navy);
+  background: #f5f7fb;
+}
+
+.admin-action-btn.restock:hover {
+  color: #287b52;
+  border-color: #287b52;
+  background: #eef9f2;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.admin-empty {
+  height: 260px;
+  text-align: center;
+}
+
+.admin-empty > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  color: #9aa3b2;
+}
+
+.admin-empty strong {
+  color: var(--navy);
+  font-size: 0.95rem;
+}
+
+.admin-empty span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(7, 18, 43, 0.58);
+
+  backdrop-filter: blur(4px);
+}
+
+.admin-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+
+  overflow-y: auto;
+
+  border-radius: 12px;
+  background: #ffffff;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.22);
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 24px;
+
+  border-bottom: 1px solid #e8ebf0;
+}
+
+.admin-modal-header h2 {
+  margin: 5px 0 0;
+  color: var(--navy);
+  font-size: 1.35rem;
+}
+
+.admin-modal-close {
+  width: 34px;
+  height: 34px;
+
+  border: 1px solid #dfe4eb;
+  border-radius: 7px;
+
+  background: #ffffff;
+  color: #697386;
+
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.admin-modal-close:hover {
+  color: var(--navy);
+  border-color: var(--navy);
+}
+
+
+/* ============================================================
+   INVENTORY FORM
+   ============================================================ */
+
+.admin-inventory-form {
+  padding: 24px;
+}
+
+.admin-selected-product {
+  padding: 15px;
+  margin-bottom: 20px;
+
+  border: 1px solid #e3e7ed;
+  border-radius: 8px;
+
+  background: #f8fafc;
+}
+
+.admin-selected-product strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--navy);
+}
+
+.admin-selected-product span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field label {
+  color: var(--navy);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 44px;
+
+  padding: 0 12px;
+
+  border: 1px solid #dce2eb;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: var(--text-dark);
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--navy);
+  box-shadow:
+    0 0 0 3px rgba(11, 31, 77, 0.07);
+}
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+
+/* ============================================================
+   PRODUCT DETAILS
+   ============================================================ */
+
+.inventory-details {
+  padding: 24px;
+}
+
+.inventory-details-image {
+  width: 100%;
+  height: 230px;
+  object-fit: contain;
+  margin-bottom: 20px;
+
+  border: 1px solid #e5e9ef;
+  border-radius: 9px;
+
+  background: #f7f8fa;
+}
+
+.inventory-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 13px 0;
+
+  border-bottom: 1px solid #edf0f4;
+}
+
+.inventory-detail-row:last-of-type {
+  border-bottom: none;
+}
+
+.inventory-detail-row span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.inventory-detail-row strong {
+  color: var(--navy);
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.inventory-details-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+
+  .admin-inventory-stats {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+}
+
+
+@media (max-width: 900px) {
+
+  .admin-inventory-page {
+    padding: 20px;
+  }
+
+  .admin-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-inventory-stats {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-inventory-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-inventory-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .admin-inventory-toolbar select {
+    width: 100%;
+  }
+
+  .admin-inventory-count {
+    margin-left: 0;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .admin-inventory-page {
+    padding: 14px;
+  }
+
+  .admin-inventory-topbar {
+    margin-bottom: 18px;
+  }
+
+  .admin-breadcrumb {
+    display: none;
+  }
+
+  .admin-back-button {
+    min-height: 38px;
+    padding: 0 12px;
+  }
+
+  .admin-page-header h1 {
+    font-size: 1.7rem;
+  }
+
+  .admin-page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-inventory-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-modal-overlay {
+    padding: 12px;
+  }
+
+  .admin-modal-header,
+  .admin-inventory-form,
+  .inventory-details {
+    padding: 18px;
+  }
+
+  .inventory-detail-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .inventory-detail-row strong {
+    text-align: left;
+  }
+
+  .inventory-details-actions,
+  .admin-modal-actions {
+    flex-direction: column;
+  }
+
+  .inventory-details-actions .btn,
+  .admin-modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+}/* ============================================================
+   ADMIN INVENTORY
+   ============================================================ */
+
+.admin-inventory-page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f6f8fb;
+}
+
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.admin-header-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.admin-header-left h1 {
+  margin: 8px 0 8px;
+  color: var(--navy);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.admin-header-left p {
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 650px;
+}
+
+
+/* ============================================================
+   BACK BUTTON
+   ============================================================ */
+
+.admin-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--navy);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  margin-bottom: 18px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.admin-back-button:hover {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+
+
+/* ============================================================
+   STATISTICS
+   ============================================================ */
+
+.admin-inventory-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-inventory-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+}
+
+.admin-inventory-stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(11, 31, 77, 0.08);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-inventory-stat strong {
+  display: block;
+  color: var(--navy);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.admin-inventory-stat span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.inventory-stat-danger .admin-inventory-stat-icon {
+  color: #b42318;
+  background: rgba(180, 35, 24, 0.08);
+}
+
+
+/* ============================================================
+   INVENTORY CONTAINER
+   ============================================================ */
+
+.admin-inventory-container {
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   TOOLBAR
+   ============================================================ */
+
+.admin-inventory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.admin-inventory-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  min-width: 280px;
+  flex: 1;
+  max-width: 440px;
+  color: var(--text-muted);
+}
+
+.admin-inventory-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-dark);
+}
+
+.admin-inventory-toolbar select {
+  min-height: 42px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 12px;
+  background: var(--white);
+  color: var(--text-dark);
+  outline: none;
+}
+
+.admin-inventory-toolbar select:focus {
+  border-color: var(--navy);
+}
+
+.admin-inventory-count {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+
+/* ============================================================
+   PRODUCT
+   ============================================================ */
+
+.admin-inventory-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.admin-inventory-image {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f3f6;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-inventory-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-inventory-product strong {
+  display: block;
+  color: var(--navy);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.admin-inventory-product small {
+  display: block;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+
+/* ============================================================
+   STOCK STATUS
+   ============================================================ */
+
+.admin-stock-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-stock-status > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: block;
+}
+
+.admin-stock-status.in-stock {
+  color: #087443;
+  background: #eaf8f0;
+}
+
+.admin-stock-status.in-stock > span {
+  background: #12a05c;
+}
+
+.admin-stock-status.low-stock {
+  color: #9a6700;
+  background: #fff7df;
+}
+
+.admin-stock-status.low-stock > span {
+  background: #d99a00;
+}
+
+.admin-stock-status.out-of-stock {
+  color: #b42318;
+  background: #fff0ef;
+}
+
+.admin-stock-status.out-of-stock > span {
+  background: #d92d20;
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.admin-inventory-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.admin-action-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--navy);
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-action-btn:hover {
+  background: var(--navy);
+  color: var(--white);
+  border-color: var(--navy);
+}
+
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.admin-empty {
+  text-align: center;
+  padding: 70px 20px !important;
+  color: var(--text-muted);
+}
+
+.admin-empty strong,
+.admin-empty span {
+  display: block;
+}
+
+.admin-empty strong {
+  color: var(--navy);
+  margin-top: 12px;
+}
+
+.admin-empty span {
+  margin-top: 5px;
+}
+
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(4, 12, 30, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.admin-modal {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+}
+
+.inventory-details-modal {
+  width: min(620px, 100%);
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-modal-header h2 {
+  color: var(--navy);
+  margin: 7px 0 0;
+}
+
+.admin-modal-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--text-dark);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.admin-modal-close:hover {
+  background: #f2f4f7;
+}
+
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.admin-inventory-form {
+  padding: 24px;
+}
+
+.admin-selected-product {
+  background: #f6f8fb;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.admin-selected-product strong {
+  display: block;
+  color: var(--navy);
+}
+
+.admin-selected-product span {
+  display: block;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.field label {
+  color: var(--navy);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+  background: var(--white);
+  color: var(--text-dark);
+  box-sizing: border-box;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(11, 31, 77, 0.08);
+}
+
+.field input:disabled {
+  background: #f0f1f3;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.admin-field-help {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   STATUS PREVIEW
+   ============================================================ */
+
+.admin-status-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #fafbfc;
+}
+
+.admin-status-preview > span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+
+/* ============================================================
+   PRODUCT DETAILS
+   ============================================================ */
+
+.inventory-details {
+  padding: 24px;
+}
+
+.inventory-details-image {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.inventory-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.inventory-detail-row span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.inventory-detail-row strong {
+  color: var(--navy);
+  text-align: right;
+}
+
+
+/* ============================================================
+   MODAL ACTIONS
+   ============================================================ */
+
+.admin-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 24px 24px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+  .admin-inventory-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .admin-inventory-page {
+    padding: 20px;
+  }
+
+  .admin-inventory-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inventory-toolbar {
+    align-items: stretch;
+  }
+
+  .admin-inventory-search {
+    min-width: 100%;
+    max-width: none;
+  }
+
+  .admin-inventory-toolbar select {
+    flex: 1;
+  }
+
+  .admin-inventory-count {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-inventory-page {
+    padding: 14px;
+  }
+
+  .admin-inventory-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-page-header {
+    align-items: stretch;
+  }
+
+  .admin-page-header > .btn {
+    width: 100%;
+  }
+
+  .admin-inventory-toolbar {
+    flex-direction: column;
+  }
+
+  .admin-inventory-toolbar select {
+    width: 100%;
+  }
+
+  .admin-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .admin-modal-actions .btn {
+    width: 100%;
+  }
+
+  .inventory-detail-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .inventory-detail-row strong {
+    text-align: left;
+  }
+}

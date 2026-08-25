@@ -1,0 +1,30 @@
+.notfound-page {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light);
+}
+.notfound-inner {
+  text-align: center;
+  max-width: 520px;
+}
+.notfound-code {
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.notfound-inner h1 {
+  margin: var(--space-3) 0 var(--space-3);
+}
+.notfound-inner p {
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+}
+.notfound-actions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}

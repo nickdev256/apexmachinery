@@ -1,0 +1,92 @@
+:root {
+  /* ============================================================
+     BRAND COLORS
+  ============================================================ */
+
+  --navy: #0B1F4D;
+  --navy-hover: #132B67;
+
+  --gold: #D4A017;
+  --gold-dark: #B78912;
+
+  --white: #FFFFFF;
+
+  --bg-light: #F8F8F8;
+
+  --text-dark: #222222;
+  --text-muted: #5B5F6B;
+
+  --border: #DDDDDD;
+
+
+  /* ============================================================
+     STATUS COLORS
+     Flat colors - no gradients
+  ============================================================ */
+
+  --success: #1E7A34;
+  --success-bg: #E7F3EA;
+
+  --warning: #B7791F;
+  --warning-bg: #FCF3E1;
+
+  --danger: #B3261E;
+  --danger-bg: #FBE9E8;
+
+  --info: #1D4E9B;
+  --info-bg: #E8EEF9;
+
+
+  /* ============================================================
+     TYPOGRAPHY
+  ============================================================ */
+
+  --font-main: "Times New Roman", Times, serif;
+
+  /* Base font */
+  --font-size-base: 18px;
+
+  /* Common sizes */
+  --font-size-xs: 0.85rem;
+  --font-size-sm: 0.95rem;
+  --font-size-md: 1.05rem;
+  --font-size-lg: 1.2rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+  --font-size-3xl: 2.5rem;
+
+  /* Heading sizes */
+  --heading-xl: clamp(2.2rem, 4vw, 3.5rem);
+  --heading-lg: clamp(2rem, 3vw, 2.8rem);
+  --heading-md: clamp(1.6rem, 2.5vw, 2.25rem);
+
+
+  /* ============================================================
+     LAYOUT
+  ============================================================ */
+
+  --radius: 4px;
+
+  --shadow-sm:
+    0 1px 2px rgba(11, 31, 77, 0.08);
+
+  --shadow-md:
+    0 4px 12px rgba(11, 31, 77, 0.10);
+
+  --container-width: 1280px;
+
+
+  /* ============================================================
+     SPACING SCALE
+  ============================================================ */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+}

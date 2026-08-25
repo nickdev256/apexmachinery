@@ -1,0 +1,124 @@
+.progress-bar {
+  display: flex;
+  align-items: center;
+  margin: var(--space-6) 0;
+}
+.progress-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+.progress-step:last-child {
+  flex: 0;
+}
+.progress-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-light);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.progress-dot.done {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+.progress-dot.current {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+.progress-step span {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 90px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.progress-step span.active-label {
+  color: var(--navy);
+  font-weight: 700;
+}
+.progress-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 4px;
+}
+.progress-line.done {
+  background: var(--navy);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+.timeline-item {
+  display: flex;
+  gap: var(--space-4);
+  padding-bottom: var(--space-5);
+  position: relative;
+}
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item.done:not(:last-child)::before {
+  background: var(--navy);
+}
+.timeline-marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-light);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  z-index: 1;
+}
+.timeline-item.done .timeline-marker {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--white);
+}
+.timeline-item.current .timeline-marker {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+.timeline-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.timeline-top strong {
+  color: var(--navy);
+}
+.timeline-top span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.timeline-content p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
