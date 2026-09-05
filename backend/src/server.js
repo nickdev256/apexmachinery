@@ -15,216 +15,108 @@ import homeRoutes from './routes/homeRoutes.js';
 
 const app = express();
 
-
-// ============================================================
-// CONFIGURATION
-// ============================================================
-
 const PORT =
   process.env.PORT || 5000;
 
 
 // ============================================================
-// NORMALIZE ORIGIN
+// ALLOWED ORIGINS
 // ============================================================
 
-function normalizeOrigin(
-  value
-) {
+const allowedOrigins = new Set([
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
 
-  if (
-    !value ||
-    typeof value !== 'string'
-  ) {
+  'https://www.apexmachinery256.com',
+  'https://apexmachinery256.com',
 
-    return null;
+  'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
 
-  }
-
-
-  return value
-    .trim()
-    .replace(/\/+$/, '');
-
-}
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+].filter(Boolean));
 
 
 // ============================================================
-// ALLOWED FRONTEND ORIGINS
-// ============================================================
-
-const allowedOrigins =
-  [
-    // --------------------------------------------------------
-    // LOCAL DEVELOPMENT
-    // --------------------------------------------------------
-
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-
-
-    // --------------------------------------------------------
-    // PRODUCTION DOMAIN
-    // --------------------------------------------------------
-
-    'https://www.apexmachinery256.com',
-    'https://apexmachinery256.com',
-
-
-    // --------------------------------------------------------
-    // VERCEL DEPLOYMENT
-    // --------------------------------------------------------
-
-    'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
-
-
-    // --------------------------------------------------------
-    // ENVIRONMENT CONFIGURATION
-    // --------------------------------------------------------
-
-    process.env.FRONTEND_URL,
-    process.env.CLIENT_URL,
-  ]
-    .map(
-      normalizeOrigin
-    )
-    .filter(Boolean)
-    .filter(
-      (
-        origin,
-        index,
-        array
-      ) =>
-        array.indexOf(
-          origin
-        ) === index
-    );
-
-
-// ============================================================
-// CORS CHECK
-// ============================================================
-
-function isAllowedOrigin(
-  origin
-) {
-
-  /*
-   * Requests without an Origin header:
-   *
-   * - Postman
-   * - Render health checks
-   * - curl
-   * - server-to-server requests
-   */
-
-  if (
-    !origin
-  ) {
-
-    return true;
-
-  }
-
-
-  const normalizedOrigin =
-    normalizeOrigin(
-      origin
-    );
-
-
-  return allowedOrigins.includes(
-    normalizedOrigin
-  );
-
-}
-
-
-// ============================================================
-// CORS CONFIGURATION
-// ============================================================
-
-const corsOptions = {
-
-  origin(
-    origin,
-    callback
-  ) {
-
-    if (
-      isAllowedOrigin(
-        origin
-      )
-    ) {
-
-      return callback(
-        null,
-        true
-      );
-
-    }
-
-
-    console.warn(
-      `[CORS BLOCKED] ${
-        origin ||
-        'Unknown origin'
-      }`
-    );
-
-
-    const error =
-      new Error(
-        `CORS blocked for origin: ${origin}`
-      );
-
-
-    error.status = 403;
-
-
-    return callback(
-      error
-    );
-
-  },
-
-
-  credentials: true,
-
-
-  methods: [
-    'GET',
-    'HEAD',
-    'POST',
-    'PUT',
-    'PATCH',
-    'DELETE',
-    'OPTIONS',
-  ],
-
-
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'Accept',
-    'Origin',
-    'X-Requested-With',
-  ],
-
-
-  optionsSuccessStatus: 204,
-
-};
-
-
-// ============================================================
-// CORS MIDDLEWARE
+// CORS
 // ============================================================
 
 app.use(
-  cors(
-    corsOptions
-  )
+  cors({
+    origin: (
+      origin,
+      callback
+    ) => {
+
+      // Allow requests without Origin header
+      if (!origin) {
+
+        return callback(
+          null,
+          true
+        );
+
+      }
+
+
+      if (
+        allowedOrigins.has(
+          origin
+        )
+      ) {
+
+        console.log(
+          `[CORS ALLOWED] ${origin}`
+        );
+
+
+        return callback(
+          null,
+          true
+        );
+
+      }
+
+
+      console.warn(
+        `[CORS BLOCKED] ${origin}`
+      );
+
+
+      const error =
+        new Error(
+          `CORS blocked origin: ${origin}`
+        );
+
+
+      error.status = 403;
+
+
+      return callback(
+        error
+      );
+
+    },
+
+
+    credentials: true,
+
+
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'PATCH',
+      'DELETE',
+      'OPTIONS',
+    ],
+
+
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+    ],
+  })
 );
 
 
@@ -263,15 +155,12 @@ app.use(
     );
 
 
-    if (
-      req.headers.origin
-    ) {
-
-      console.log(
-        `[ORIGIN] ${req.headers.origin}`
-      );
-
-    }
+    console.log(
+      `[REQUEST ORIGIN] ${
+        req.headers.origin ||
+        'none'
+      }`
+    );
 
 
     next();
@@ -291,7 +180,7 @@ app.get(
     res
   ) => {
 
-    return res.json({
+    res.json({
 
       success: true,
 
@@ -305,7 +194,14 @@ app.get(
         process.env.NODE_ENV ||
         'development',
 
-      allowedOrigins,
+      requestOrigin:
+        req.headers.origin ||
+        null,
+
+      allowedOrigins:
+        Array.from(
+          allowedOrigins
+        ),
 
     });
 
@@ -314,7 +210,7 @@ app.get(
 
 
 // ============================================================
-// ROOT API CHECK
+// ROOT API
 // ============================================================
 
 app.get(
@@ -324,7 +220,7 @@ app.get(
     res
   ) => {
 
-    return res.json({
+    res.json({
 
       success: true,
 
@@ -363,7 +259,7 @@ app.get(
 
 
 // ============================================================
-// AUTH ROUTES
+// ROUTES
 // ============================================================
 
 app.use(
@@ -372,19 +268,11 @@ app.use(
 );
 
 
-// ============================================================
-// CUSTOMER ROUTES
-// ============================================================
-
 app.use(
   '/api/customer',
   customerRoutes
 );
 
-
-// ============================================================
-// ADMIN ROUTES
-// ============================================================
 
 app.use(
   '/api/admin',
@@ -392,29 +280,11 @@ app.use(
 );
 
 
-// ============================================================
-// PUBLIC PRODUCT ROUTES
-// ============================================================
-//
-// GET /api/products
-// GET /api/products/categories
-// GET /api/products/:id
-//
-// ============================================================
-
 app.use(
   '/api/products',
   productRoutes
 );
 
-
-// ============================================================
-// PUBLIC HOME ROUTES
-// ============================================================
-//
-// GET /api/home
-//
-// ============================================================
 
 app.use(
   '/api/home',
@@ -449,7 +319,6 @@ console.log(
 
 // ============================================================
 // 404
-// MUST COME AFTER ALL ROUTES
 // ============================================================
 
 app.use(
@@ -458,7 +327,7 @@ app.use(
     res
   ) => {
 
-    return res
+    res
       .status(404)
       .json({
 
@@ -508,7 +377,7 @@ app.use(
       500;
 
 
-    return res
+    res
       .status(
         status
       )
@@ -519,16 +388,6 @@ app.use(
         message:
           error.message ||
           'Internal server error.',
-
-        ...(
-          process.env.NODE_ENV ===
-          'development'
-            ? {
-                stack:
-                  error.stack,
-              }
-            : {}
-        ),
 
       });
 
@@ -571,65 +430,25 @@ app.listen(
 
 
     console.log(
-      '----------------------------------------'
-    );
-
-
-    console.log(
       'Allowed frontend origins:'
     );
 
 
-    allowedOrigins.forEach(
-      (
-        origin
-      ) => {
+    Array
+      .from(
+        allowedOrigins
+      )
+      .forEach(
+        (
+          origin
+        ) => {
 
-        console.log(
-          ` - ${origin}`
-        );
+          console.log(
+            ` - ${origin}`
+          );
 
-      }
-    );
-
-
-    console.log(
-      '----------------------------------------'
-    );
-
-
-    console.log(
-      'API endpoints:'
-    );
-
-
-    console.log(
-      ' - /api/health'
-    );
-
-    console.log(
-      ' - /api/auth'
-    );
-
-    console.log(
-      ' - /api/customer'
-    );
-
-    console.log(
-      ' - /api/admin'
-    );
-
-    console.log(
-      ' - /api/products'
-    );
-
-    console.log(
-      ' - /api/products/categories'
-    );
-
-    console.log(
-      ' - /api/home'
-    );
+        }
+      );
 
 
     console.log(
