@@ -7,13 +7,24 @@ import axios from 'axios';
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  'http://localhost:5000/api';
+  'https://apexmachinery.onrender.com/api';
 
+
+// ============================================================
+// AXIOS INSTANCE
+// ============================================================
 
 const productApi =
   axios.create({
     baseURL:
       `${API_URL}/products`,
+
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+
+    timeout: 30000,
   });
 
 
@@ -22,10 +33,12 @@ const productApi =
 // ============================================================
 
 function unwrap(response) {
+
   return (
     response?.data?.data ??
     response?.data
   );
+
 }
 
 
@@ -34,10 +47,39 @@ function unwrap(response) {
 // ============================================================
 
 export async function getProducts() {
-  const response =
-    await productApi.get('/');
 
-  return unwrap(response);
+  try {
+
+    const response =
+      await productApi.get('/');
+
+
+    return unwrap(response);
+
+  } catch (error) {
+
+    console.error(
+      '[PRODUCT API] Failed to load products:',
+      {
+        message:
+          error?.message,
+
+        status:
+          error?.response?.status,
+
+        data:
+          error?.response?.data,
+
+        apiUrl:
+          `${API_URL}/products`,
+      }
+    );
+
+
+    throw error;
+
+  }
+
 }
 
 
@@ -48,12 +90,45 @@ export async function getProducts() {
 export async function getProduct(
   productId
 ) {
-  const response =
-    await productApi.get(
-      `/${productId}`
+
+  try {
+
+    const response =
+      await productApi.get(
+        `/${encodeURIComponent(
+          productId
+        )}`
+      );
+
+
+    return unwrap(response);
+
+  } catch (error) {
+
+    console.error(
+      '[PRODUCT API] Failed to load product:',
+      {
+        productId,
+
+        message:
+          error?.message,
+
+        status:
+          error?.response?.status,
+
+        data:
+          error?.response?.data,
+
+        apiUrl:
+          `${API_URL}/products/${productId}`,
+      }
     );
 
-  return unwrap(response);
+
+    throw error;
+
+  }
+
 }
 
 
@@ -62,12 +137,41 @@ export async function getProduct(
 // ============================================================
 
 export async function getProductCategories() {
-  const response =
-    await productApi.get(
-      '/categories'
+
+  try {
+
+    const response =
+      await productApi.get(
+        '/categories'
+      );
+
+
+    return unwrap(response);
+
+  } catch (error) {
+
+    console.error(
+      '[PRODUCT API] Failed to load categories:',
+      {
+        message:
+          error?.message,
+
+        status:
+          error?.response?.status,
+
+        data:
+          error?.response?.data,
+
+        apiUrl:
+          `${API_URL}/products/categories`,
+      }
     );
 
-  return unwrap(response);
+
+    throw error;
+
+  }
+
 }
 
 
