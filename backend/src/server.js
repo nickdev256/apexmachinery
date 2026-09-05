@@ -3,10 +3,10 @@ import cors from 'cors';
 import 'dotenv/config';
 
 import authRoutes from './routes/authRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
 
 
-const app =
-  express();
+const app = express();
 
 
 // ============================================================
@@ -18,6 +18,7 @@ const PORT =
 
 const FRONTEND_URL =
   process.env.FRONTEND_URL ||
+  process.env.CLIENT_URL ||
   'http://localhost:5173';
 
 
@@ -54,7 +55,6 @@ app.get(
   (req, res) => {
 
     res.json({
-
       success: true,
 
       message:
@@ -62,7 +62,6 @@ app.get(
 
       timestamp:
         new Date().toISOString(),
-
     });
 
   }
@@ -80,20 +79,44 @@ app.use(
 
 
 // ============================================================
+// CUSTOMER ROUTES
+// ============================================================
+
+app.use(
+  '/api/customer',
+  customerRoutes
+);
+
+
+// ============================================================
+// ROUTE DEBUG
+// ============================================================
+
+console.log(
+  '✅ Auth routes mounted at /api/auth'
+);
+
+console.log(
+  '✅ Customer routes mounted at /api/customer'
+);
+
+
+// ============================================================
 // 404
+// MUST COME AFTER ALL ROUTES
 // ============================================================
 
 app.use(
   (req, res) => {
 
-    res.status(404).json({
+    res
+      .status(404)
+      .json({
+        success: false,
 
-      success: false,
-
-      message:
-        `Route not found: ${req.method} ${req.originalUrl}`,
-
-    });
+        message:
+          `Route not found: ${req.method} ${req.originalUrl}`,
+      });
 
   }
 );
@@ -104,21 +127,39 @@ app.use(
 // ============================================================
 
 app.use(
-  (error, req, res, next) => {
+  (
+    error,
+    req,
+    res,
+    next
+  ) => {
 
     console.error(
       '[SERVER ERROR]',
       error
     );
 
-    res.status(500).json({
 
-      success: false,
+    if (
+      res.headersSent
+    ) {
+      return next(error);
+    }
 
-      message:
-        'Internal server error.',
 
-    });
+    res
+      .status(
+        error.status ||
+        error.statusCode ||
+        500
+      )
+      .json({
+        success: false,
+
+        message:
+          error.message ||
+          'Internal server error.',
+      });
 
   }
 );
@@ -150,6 +191,14 @@ app.listen(
 
     console.log(
       `Health: http://localhost:${PORT}/api/health`
+    );
+
+    console.log(
+      `Auth API: http://localhost:${PORT}/api/auth`
+    );
+
+    console.log(
+      `Customer API: http://localhost:${PORT}/api/customer`
     );
 
     console.log(

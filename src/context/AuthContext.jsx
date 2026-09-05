@@ -8,6 +8,10 @@ import {
 import axios from 'axios';
 
 
+// ============================================================
+// API URL
+// ============================================================
+
 const API_URL =
   import.meta.env.VITE_API_URL ||
   'http://localhost:5000/api';
@@ -18,13 +22,11 @@ const API_URL =
 // ============================================================
 
 export const api = axios.create({
-
   baseURL: API_URL,
 
   headers: {
     'Content-Type': 'application/json',
   },
-
 });
 
 
@@ -48,7 +50,42 @@ const TOKEN_STORAGE_KEY =
 
 
 // ============================================================
-// LOAD USER
+// ROLE HELPERS
+// ============================================================
+
+function normalizeRole(role) {
+
+  return String(role || '')
+    .trim()
+    .toLowerCase();
+
+}
+
+
+function isAdminRole(role) {
+
+  const normalized =
+    normalizeRole(role);
+
+  return (
+    normalized === 'admin' ||
+    normalized === 'administrator'
+  );
+
+}
+
+
+function isCustomerRole(role) {
+
+  return (
+    normalizeRole(role) === 'customer'
+  );
+
+}
+
+
+// ============================================================
+// LOAD STORED USER
 // ============================================================
 
 function loadStoredUser() {
@@ -62,15 +99,22 @@ function loadStoredUser() {
 
 
     if (!stored) {
-
       return null;
-
     }
 
 
-    return JSON.parse(
-      stored
-    );
+    const parsed =
+      JSON.parse(stored);
+
+
+    return {
+      ...parsed,
+
+      role:
+        normalizeRole(
+          parsed?.role
+        ),
+    };
 
   } catch (error) {
 
@@ -79,9 +123,11 @@ function loadStoredUser() {
       error
     );
 
+
     localStorage.removeItem(
       USER_STORAGE_KEY
     );
+
 
     return null;
 
@@ -115,14 +161,10 @@ function loadStoredToken() {
 // SAVE TOKEN
 // ============================================================
 
-function saveStoredToken(
-  token
-) {
+function saveStoredToken(token) {
 
   if (!token) {
-
     return;
-
   }
 
 
@@ -144,6 +186,7 @@ function removeStoredAuthentication() {
     USER_STORAGE_KEY
   );
 
+
   localStorage.removeItem(
     TOKEN_STORAGE_KEY
   );
@@ -159,9 +202,19 @@ export function AuthProvider({
   children,
 }) {
 
+  // ==========================================================
+  // STATE
+  // ==========================================================
+
   const [user, setUser] =
     useState(
       loadStoredUser
+    );
+
+
+  const [token, setToken] =
+    useState(
+      loadStoredToken
     );
 
 
@@ -178,32 +231,78 @@ export function AuthProvider({
     accessToken
   ) {
 
-    if (
-      authenticatedUser
-    ) {
+    if (!authenticatedUser) {
+      return;
+    }
 
-      setUser(
-        authenticatedUser
+
+    const normalizedRole =
+      normalizeRole(
+        authenticatedUser.role
       );
 
 
-      localStorage.setItem(
-        USER_STORAGE_KEY,
-        JSON.stringify(
-          authenticatedUser
-        )
+    // --------------------------------------------------------
+    // ROLE MUST COME FROM BACKEND
+    // --------------------------------------------------------
+
+    if (
+      !isCustomerRole(normalizedRole) &&
+      !isAdminRole(normalizedRole)
+    ) {
+
+      throw new Error(
+        `Invalid account role "${normalizedRole || 'unknown'}".`
       );
 
     }
 
 
+    const normalizedUser = {
+
+      ...authenticatedUser,
+
+      role:
+        normalizedRole,
+    };
+
+
+    // --------------------------------------------------------
+    // SAVE USER
+    // --------------------------------------------------------
+
+    setUser(
+      normalizedUser
+    );
+
+
+    localStorage.setItem(
+      USER_STORAGE_KEY,
+      JSON.stringify(
+        normalizedUser
+      )
+    );
+
+
+    // --------------------------------------------------------
+    // SAVE TOKEN
+    // --------------------------------------------------------
+
     if (accessToken) {
+
+      setToken(
+        accessToken
+      );
+
 
       saveStoredToken(
         accessToken
       );
 
     }
+
+
+    return normalizedUser;
 
   }
 
@@ -216,30 +315,36 @@ export function AuthProvider({
 
     setUser(null);
 
+    setToken(null);
+
     removeStoredAuthentication();
 
   }
 
 
+  // ==========================================================
+  // REQUEST INTERCEPTOR
+  // ==========================================================
 
   useEffect(() => {
 
     const interceptor =
       api.interceptors.request.use(
+
         (config) => {
 
-          const token =
+          const currentToken =
             loadStoredToken();
 
 
-          if (token) {
+          if (currentToken) {
 
             config.headers =
               config.headers || {};
 
 
             config.headers.Authorization =
-              `Bearer ${token}`;
+              `Bearer ${currentToken}`;
 
           }
 
@@ -249,9 +354,7 @@ export function AuthProvider({
         },
 
         (error) =>
-          Promise.reject(
-            error
-          )
+          Promise.reject(error)
 
       );
 
@@ -268,15 +371,7 @@ export function AuthProvider({
 
 
   // ==========================================================
-  // AXIOS RESPONSE INTERCEPTOR
-  // ==========================================================
-  //
-  // If the backend says the session is invalid:
-  //
-  // 401 Unauthorized
-  //
-  // automatically clear the local session.
-  //
+  // RESPONSE INTERCEPTOR
   // ==========================================================
 
   useEffect(() => {
@@ -290,8 +385,7 @@ export function AuthProvider({
         (error) => {
 
           if (
-            error.response?.status ===
-            401
+            error.response?.status === 401
           ) {
 
             clearAuthentication();
@@ -322,24 +416,16 @@ export function AuthProvider({
   // ==========================================================
   // RESTORE SESSION
   // ==========================================================
-  //
-  // Runs whenever the application starts.
-  //
-  // The frontend sends the stored Supabase access token
-  // to the backend.
-  //
-  // Backend verifies the token.
-  //
-  // ==========================================================
 
   useEffect(() => {
 
-    let mounted = true;
+    let mounted =
+      true;
 
 
     async function restoreSession() {
 
-      const token =
+      const currentToken =
         loadStoredToken();
 
 
@@ -347,13 +433,18 @@ export function AuthProvider({
       // NO TOKEN
       // ------------------------------------------------------
 
-      if (!token) {
+      if (!currentToken) {
 
         if (mounted) {
+
+          setUser(null);
+
+          setToken(null);
 
           setLoading(false);
 
         }
+
 
         return;
 
@@ -369,29 +460,66 @@ export function AuthProvider({
 
 
         if (
-          response.data?.success &&
-          response.data?.user
+          !response.data?.success ||
+          !response.data?.user
         ) {
 
-          if (mounted) {
+          throw new Error(
+            'Unable to restore authentication session.'
+          );
 
-            setUser(
-              response.data.user
-            );
+        }
 
 
-            localStorage.setItem(
-              USER_STORAGE_KEY,
-              JSON.stringify(
-                response.data.user
-              )
-            );
+        const restoredUser = {
 
-          }
+          ...response.data.user,
 
-        } else {
+          role:
+            normalizeRole(
+              response.data.user.role
+            ),
+        };
 
-          clearAuthentication();
+
+        // ----------------------------------------------------
+        // VALIDATE ROLE
+        // ----------------------------------------------------
+
+        if (
+          !isCustomerRole(
+            restoredUser.role
+          ) &&
+          !isAdminRole(
+            restoredUser.role
+          )
+        ) {
+
+          throw new Error(
+            'This account does not have a valid access role.'
+          );
+
+        }
+
+
+        if (mounted) {
+
+          setUser(
+            restoredUser
+          );
+
+
+          setToken(
+            currentToken
+          );
+
+
+          localStorage.setItem(
+            USER_STORAGE_KEY,
+            JSON.stringify(
+              restoredUser
+            )
+          );
 
         }
 
@@ -403,7 +531,11 @@ export function AuthProvider({
         );
 
 
-        clearAuthentication();
+        if (mounted) {
+
+          clearAuthentication();
+
+        }
 
       } finally {
 
@@ -433,6 +565,15 @@ export function AuthProvider({
   // ==========================================================
   // LOGIN
   // ==========================================================
+  //
+  // SAME LOGIN FOR:
+  //
+  // customer
+  // admin
+  //
+  // The backend determines the role from the profiles table.
+  //
+  // ==========================================================
 
   async function login({
     email,
@@ -444,23 +585,23 @@ export function AuthProvider({
 
     try {
 
+      // ======================================================
+      // CLEAN VALUES
+      // ======================================================
+
       const cleanEmail =
-        String(
-          email || ''
-        )
+        String(email || '')
           .trim()
           .toLowerCase();
 
 
       const cleanPassword =
-        String(
-          password || ''
-        );
+        String(password || '');
 
 
-      // ------------------------------------------------------
+      // ======================================================
       // VALIDATION
-      // ------------------------------------------------------
+      // ======================================================
 
       if (!cleanEmail) {
 
@@ -480,9 +621,9 @@ export function AuthProvider({
       }
 
 
-      // ------------------------------------------------------
-      // BACKEND REQUEST
-      // ------------------------------------------------------
+      // ======================================================
+      // BACKEND LOGIN
+      // ======================================================
 
       const response =
         await api.post(
@@ -497,9 +638,9 @@ export function AuthProvider({
         );
 
 
-      // ------------------------------------------------------
+      // ======================================================
       // CHECK RESPONSE
-      // ------------------------------------------------------
+      // ======================================================
 
       if (
         !response.data?.success
@@ -523,9 +664,11 @@ export function AuthProvider({
         response.data?.accessToken;
 
 
-      if (
-        !authenticatedUser
-      ) {
+      // ======================================================
+      // USER REQUIRED
+      // ======================================================
+
+      if (!authenticatedUser) {
 
         throw new Error(
           'The server did not return user information.'
@@ -533,6 +676,10 @@ export function AuthProvider({
 
       }
 
+
+      // ======================================================
+      // TOKEN REQUIRED
+      // ======================================================
 
       if (!accessToken) {
 
@@ -543,17 +690,56 @@ export function AuthProvider({
       }
 
 
-      // ------------------------------------------------------
-      // SAVE SESSION
-      // ------------------------------------------------------
+      // ======================================================
+      // NORMALIZE ROLE
+      // ======================================================
+
+      const normalizedRole =
+        normalizeRole(
+          authenticatedUser.role
+        );
+
+
+      // ======================================================
+      // VALIDATE ROLE
+      // ======================================================
+
+      if (
+        !isCustomerRole(
+          normalizedRole
+        ) &&
+        !isAdminRole(
+          normalizedRole
+        )
+      ) {
+
+        throw new Error(
+          `Account role "${normalizedRole || 'unknown'}" is not authorized.`
+        );
+
+      }
+
+
+      const normalizedUser = {
+
+        ...authenticatedUser,
+
+        role:
+          normalizedRole,
+      };
+
+
+      // ======================================================
+      // SAVE LOGIN
+      // ======================================================
 
       saveAuthentication(
-        authenticatedUser,
+        normalizedUser,
         accessToken
       );
 
 
-      return authenticatedUser;
+      return normalizedUser;
 
     } catch (error) {
 
@@ -585,6 +771,27 @@ export function AuthProvider({
   // ==========================================================
   // REGISTER
   // ==========================================================
+  //
+  // CUSTOMER REGISTRATION ONLY
+  //
+  // The frontend sends:
+  //
+  // name
+  // company
+  // email
+  // password
+  //
+  // It does NOT send:
+  //
+  // role
+  // accountType
+  // setupCode
+  //
+  // The backend must always create:
+  //
+  // role = customer
+  //
+  // ==========================================================
 
   async function register({
     name,
@@ -598,35 +805,33 @@ export function AuthProvider({
 
     try {
 
+      // ======================================================
+      // CLEAN VALUES
+      // ======================================================
+
       const cleanName =
-        String(
-          name || ''
-        ).trim();
+        String(name || '')
+          .trim();
 
 
       const cleanCompany =
-        String(
-          company || ''
-        ).trim();
+        String(company || '')
+          .trim();
 
 
       const cleanEmail =
-        String(
-          email || ''
-        )
+        String(email || '')
           .trim()
           .toLowerCase();
 
 
       const cleanPassword =
-        String(
-          password || ''
-        );
+        String(password || '');
 
 
-      // ------------------------------------------------------
-      // VALIDATION
-      // ------------------------------------------------------
+      // ======================================================
+      // NAME VALIDATION
+      // ======================================================
 
       if (!cleanName) {
 
@@ -637,6 +842,21 @@ export function AuthProvider({
       }
 
 
+      if (
+        cleanName.length < 2
+      ) {
+
+        throw new Error(
+          'Your name must contain at least 2 characters.'
+        );
+
+      }
+
+
+      // ======================================================
+      // COMPANY VALIDATION
+      // ======================================================
+
       if (!cleanCompany) {
 
         throw new Error(
@@ -646,10 +866,55 @@ export function AuthProvider({
       }
 
 
+      if (
+        cleanCompany.length < 2
+      ) {
+
+        throw new Error(
+          'Please enter a valid company name.'
+        );
+
+      }
+
+
+      // ======================================================
+      // EMAIL VALIDATION
+      // ======================================================
+
       if (!cleanEmail) {
 
         throw new Error(
           'Please enter your email address.'
+        );
+
+      }
+
+
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+      if (
+        !emailPattern.test(
+          cleanEmail
+        )
+      ) {
+
+        throw new Error(
+          'Please enter a valid email address.'
+        );
+
+      }
+
+
+      // ======================================================
+      // PASSWORD VALIDATION
+      // ======================================================
+
+      if (!cleanPassword) {
+
+        throw new Error(
+          'Please create a password.'
         );
 
       }
@@ -666,34 +931,40 @@ export function AuthProvider({
       }
 
 
-      // ------------------------------------------------------
-      // BACKEND REQUEST
-      // ------------------------------------------------------
+      // ======================================================
+      // CUSTOMER-ONLY PAYLOAD
+      // ======================================================
+
+      const payload = {
+
+        name:
+          cleanName,
+
+        company:
+          cleanCompany,
+
+        email:
+          cleanEmail,
+
+        password:
+          cleanPassword,
+      };
+
+
+      // ======================================================
+      // BACKEND REGISTRATION
+      // ======================================================
 
       const response =
         await api.post(
           '/auth/register',
-          {
-
-            name:
-              cleanName,
-
-            company:
-              cleanCompany,
-
-            email:
-              cleanEmail,
-
-            password:
-              cleanPassword,
-
-          }
+          payload
         );
 
 
-      // ------------------------------------------------------
+      // ======================================================
       // CHECK RESPONSE
-      // ------------------------------------------------------
+      // ======================================================
 
       if (
         !response.data?.success
@@ -717,49 +988,87 @@ export function AuthProvider({
         response.data?.accessToken;
 
 
-      if (
-        !authenticatedUser
-      ) {
+      // ======================================================
+      // USER REQUIRED
+      // ======================================================
+
+      if (!authenticatedUser) {
 
         throw new Error(
-          'The server did not return the new user.'
+          'The server did not return the new customer.'
         );
 
       }
 
 
-      // ------------------------------------------------------
-      // SAVE SESSION IF SUPABASE RETURNED TOKEN
-      // ------------------------------------------------------
+      // ======================================================
+      // NORMALIZE ROLE
+      // ======================================================
+
+      const normalizedRole =
+        normalizeRole(
+          authenticatedUser.role
+        );
+
+
+      // ======================================================
+      // CUSTOMER-ONLY SECURITY CHECK
+      // ======================================================
+
+      if (
+        normalizedRole !==
+        'customer'
+      ) {
+
+        clearAuthentication();
+
+
+        throw new Error(
+          'Public registration can only create customer accounts.'
+        );
+
+      }
+
+
+      const normalizedUser = {
+
+        ...authenticatedUser,
+
+        role:
+          'customer',
+      };
+
+
+      // ======================================================
+      // SAVE SESSION
+      // ======================================================
 
       if (accessToken) {
 
         saveAuthentication(
-          authenticatedUser,
+          normalizedUser,
           accessToken
         );
 
       } else {
 
-        // Some Supabase configurations require
-        // email confirmation before issuing a session.
+        // ----------------------------------------------------
+        // No session returned.
+        //
+        // Do NOT treat the user as authenticated without
+        // an access token.
+        // ----------------------------------------------------
 
-        setUser(
-          authenticatedUser
-        );
+        setUser(null);
 
+        setToken(null);
 
-        localStorage.setItem(
-          USER_STORAGE_KEY,
-          JSON.stringify(
-            authenticatedUser
-          )
-        );
+        removeStoredAuthentication();
 
       }
 
 
-      return authenticatedUser;
+      return normalizedUser;
 
     } catch (error) {
 
@@ -796,11 +1105,11 @@ export function AuthProvider({
 
     try {
 
-      const token =
+      const currentToken =
         loadStoredToken();
 
 
-      if (token) {
+      if (currentToken) {
 
         await api.post(
           '/auth/logout'
@@ -825,12 +1134,25 @@ export function AuthProvider({
 
 
   // ==========================================================
-  // GET CURRENT USER
+  // REFRESH CURRENT USER
   // ==========================================================
 
   async function refreshUser() {
 
     try {
+
+      const currentToken =
+        loadStoredToken();
+
+
+      if (!currentToken) {
+
+        clearAuthentication();
+
+        return null;
+
+      }
+
 
       const response =
         await api.get(
@@ -839,35 +1161,65 @@ export function AuthProvider({
 
 
       if (
-        response.data?.success &&
-        response.data?.user
+        !response.data?.success ||
+        !response.data?.user
       ) {
 
-        const currentUser =
-          response.data.user;
+        clearAuthentication();
 
-
-        setUser(
-          currentUser
-        );
-
-
-        localStorage.setItem(
-          USER_STORAGE_KEY,
-          JSON.stringify(
-            currentUser
-          )
-        );
-
-
-        return currentUser;
+        return null;
 
       }
 
 
-      clearAuthentication();
+      const currentUser = {
 
-      return null;
+        ...response.data.user,
+
+        role:
+          normalizeRole(
+            response.data.user.role
+          ),
+      };
+
+
+      // ======================================================
+      // VALIDATE ROLE
+      // ======================================================
+
+      if (
+        !isCustomerRole(
+          currentUser.role
+        ) &&
+        !isAdminRole(
+          currentUser.role
+        )
+      ) {
+
+        clearAuthentication();
+
+
+        throw new Error(
+          'This account does not have a valid access role.'
+        );
+
+      }
+
+
+      setUser(
+        currentUser
+      );
+
+
+      localStorage.setItem(
+        USER_STORAGE_KEY,
+        JSON.stringify(
+          currentUser
+        )
+      );
+
+
+      return currentUser;
 
     } catch (error) {
 
@@ -879,6 +1231,7 @@ export function AuthProvider({
 
       clearAuthentication();
 
+
       return null;
 
     }
@@ -887,20 +1240,36 @@ export function AuthProvider({
 
 
   // ==========================================================
-  // ROLE HELPERS
+  // AUTH STATE
   // ==========================================================
 
   const isAuthenticated =
-    Boolean(user);
+    Boolean(
+      user &&
+      token
+    );
+
+
+  // ==========================================================
+  // CURRENT ROLE
+  // ==========================================================
+
+  const currentRole =
+    normalizeRole(
+      user?.role
+    );
 
 
   const isAdmin =
-    user?.role === 'admin' ||
-    user?.role === 'administrator';
+    isAdminRole(
+      currentRole
+    );
 
 
   const isCustomer =
-    user?.role === 'customer';
+    isCustomerRole(
+      currentRole
+    );
 
 
   // ==========================================================

@@ -46,6 +46,13 @@ import NotFound from './pages/NotFound';
 
 
 // ============================================================
+// ADMIN LAYOUT
+// ============================================================
+
+import AdminLayout from './components/admin/AdminLayout';
+
+
+// ============================================================
 // ADMIN PAGES
 // ============================================================
 
@@ -87,150 +94,75 @@ export default function App() {
         element={<MainLayout />}
       >
 
-
-        {/* ==================================================
-            HOME
-        ================================================== */}
-
         <Route
           path="/"
           element={<Home />}
         />
-
-
-        {/* ==================================================
-            ABOUT
-        ================================================== */}
 
         <Route
           path="/about"
           element={<About />}
         />
 
-
-        {/* ==================================================
-            SHOP
-        ================================================== */}
-
         <Route
           path="/shop"
           element={<Shop />}
         />
-
-
-        {/* ==================================================
-            INDUSTRIAL EQUIPMENT
-        ================================================== */}
 
         <Route
           path="/industrial-equipment"
           element={<IndustrialEquipment />}
         />
 
-
-        {/* ==================================================
-            POWER TOOLS
-        ================================================== */}
-
         <Route
           path="/power-tools"
           element={<PowerTools />}
         />
-
-
-        {/* ==================================================
-            BRANDS
-        ================================================== */}
 
         <Route
           path="/brands"
           element={<Brands />}
         />
 
-
-        {/* ==================================================
-            SEARCH
-        ================================================== */}
-
         <Route
           path="/search"
           element={<SearchResults />}
         />
-
-
-        {/* ==================================================
-            PRODUCT DETAILS
-        ================================================== */}
 
         <Route
           path="/product/:id"
           element={<ProductDetails />}
         />
 
-
-        {/* ==================================================
-            WISHLIST
-        ================================================== */}
-
         <Route
           path="/wishlist"
           element={<Wishlist />}
         />
-
-
-        {/* ==================================================
-            CART
-        ================================================== */}
 
         <Route
           path="/cart"
           element={<Cart />}
         />
 
-
-        {/* ==================================================
-            CHECKOUT
-        ================================================== */}
-
         <Route
           path="/checkout"
           element={<Checkout />}
         />
-
-
-        {/* ==================================================
-            CONTACT
-        ================================================== */}
 
         <Route
           path="/contact"
           element={<Contact />}
         />
 
-
-        {/* ==================================================
-            LOGIN
-        ================================================== */}
-
         <Route
           path="/login"
           element={<Login />}
         />
 
-
-        {/* ==================================================
-            REGISTER
-        ================================================== */}
-
         <Route
           path="/register"
           element={<Register />}
         />
-
-
-        {/* ==================================================
-            FORGOT PASSWORD
-        ================================================== */}
 
         <Route
           path="/forgot-password"
@@ -243,37 +175,15 @@ export default function App() {
       {/* ======================================================
           CUSTOMER PROTECTED SYSTEM
       ====================================================== */}
-      {/*
-          Only authenticated customers can access these routes.
-
-          Not logged in:
-              → /login
-
-          Customer:
-              → allowed
-
-          Admin:
-              → /admin
-      */}
 
       <Route
         element={<ProtectedCustomerRoute />}
       >
 
-
-        {/* ==================================================
-            CUSTOMER DASHBOARD
-        ================================================== */}
-
         <Route
           path="/dashboard"
           element={<CustomerDashboard />}
         />
-
-
-        {/* ==================================================
-            CUSTOMER ORDER TRACKING
-        ================================================== */}
 
         <Route
           path="/order-tracking"
@@ -286,113 +196,92 @@ export default function App() {
       {/* ======================================================
           ADMIN PROTECTED SYSTEM
       ====================================================== */}
-      {/*
-          Only authenticated administrators can access these
-          routes.
-
-          Not logged in:
-              → /login
-
-          Customer:
-              → /dashboard
-
-          Admin:
-              → allowed
-      */}
 
       <Route
         element={<ProtectedAdminRoute />}
       >
 
-
         {/* ==================================================
-            ADMIN DASHBOARD
+            ADMIN LAYOUT
         ================================================== */}
 
         <Route
           path="/admin"
-          element={<AdminDashboard />}
-        />
+          element={<AdminLayout />}
+        >
+
+          {/* DASHBOARD */}
+
+          <Route
+            index
+            element={<AdminDashboard />}
+          />
 
 
-        {/* ==================================================
-            ADMIN ORDERS
-        ================================================== */}
+          {/* ORDERS */}
 
-        <Route
-          path="/admin/orders"
-          element={<AdminOrders />}
-        />
+          <Route
+            path="orders"
+            element={<AdminOrders />}
+          />
 
 
-        {/* ==================================================
-            ADMIN INVENTORY
-        ================================================== */}
+          {/* INVENTORY */}
 
-        <Route
-          path="/admin/inventory"
-          element={<AdminInventory />}
-        />
+          <Route
+            path="inventory"
+            element={<AdminInventory />}
+          />
 
 
-        {/* ==================================================
-            ADMIN CUSTOMERS
-        ================================================== */}
+          {/* CUSTOMERS */}
 
-        <Route
-          path="/admin/customers"
-          element={<AdminCustomers />}
-        />
+          <Route
+            path="customers"
+            element={<AdminCustomers />}
+          />
 
 
-        {/* ==================================================
-            ADMIN PRODUCTS
-        ================================================== */}
+          {/* PRODUCTS */}
 
-        <Route
-          path="/admin/products"
-          element={<AdminProducts />}
-        />
+          <Route
+            path="products"
+            element={<AdminProducts />}
+          />
 
 
-        {/* ==================================================
-            ADMIN CATEGORIES
-        ================================================== */}
+          {/* CATEGORIES */}
 
-        <Route
-          path="/admin/categories"
-          element={<AdminCategories />}
-        />
+          <Route
+            path="categories"
+            element={<AdminCategories />}
+          />
 
 
-        {/* ==================================================
-            ADMIN NOTIFICATIONS
-        ================================================== */}
+          {/* NOTIFICATIONS */}
 
-        <Route
-          path="/admin/notifications"
-          element={<AdminNotifications />}
-        />
+          <Route
+            path="notifications"
+            element={<AdminNotifications />}
+          />
 
 
-        {/* ==================================================
-            ADMIN REPORTS
-        ================================================== */}
+          {/* REPORTS */}
 
-        <Route
-          path="/admin/reports"
-          element={<AdminReports />}
-        />
+          <Route
+            path="reports"
+            element={<AdminReports />}
+          />
 
 
-        {/* ==================================================
-            ADMIN SETTINGS
-        ================================================== */}
+          {/* SETTINGS */}
 
-        <Route
-          path="/admin/settings"
-          element={<AdminSettings />}
-        />
+          <Route
+            path="settings"
+            element={<AdminSettings />}
+          />
+
+        </Route>
 
       </Route>
 

@@ -1,4 +1,7 @@
-import { supabase } from '../config/supabase.js';
+import {
+  supabaseAdmin,
+  supabaseAuth,
+} from '../config/supabase.js';
 
 
 // ============================================================
@@ -9,16 +12,42 @@ import { supabase } from '../config/supabase.js';
 // Handles:
 //
 // 1. requireAuth
-//    Verifies the Supabase access token.
+//    Verifies Supabase access token.
 //
 // 2. requireAdmin
-//    Verifies that the authenticated user's profile has
-//    role = "admin".
+//    Allows only:
+//      admin
+//      administrator
+//
+// 3. requireCustomer
+//    Allows only:
+//      customer
 //
 // IMPORTANT:
-// This file runs ONLY on the backend.
-// Never expose the Supabase service-role key to the frontend.
+//
+// supabaseAuth
+//   → token verification
+//
+// supabaseAdmin
+//   → profiles table / role verification
+//
+// NEVER expose SUPABASE_SERVICE_ROLE_KEY to React/Vite.
 // ============================================================
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function normalizeRole(value) {
+
+  return String(
+    value ?? ''
+  )
+    .trim()
+    .toLowerCase();
+
+}
 
 
 // ============================================================
@@ -38,23 +67,94 @@ function getBearerToken(req) {
   }
 
 
+  const authHeader =
+    String(
+      authorization
+    ).trim();
+
+
   if (
-    authorization
+    authHeader
       .toLowerCase()
       .startsWith('bearer ')
   ) {
 
-    return authorization
-      .slice(7)
-      .trim();
+    const token =
+      authHeader
+        .slice(7)
+        .trim();
+
+
+    return token || null;
 
   }
 
 
-  // Also allow a raw token, although the frontend
-  // should normally send "Bearer <token>".
+  // ========================================================
+  // RAW TOKENS ARE NOT ACCEPTED
+  // ========================================================
+  //
+  // Frontend should send:
+  //
+  // Authorization: Bearer <token>
+  //
+  // ========================================================
 
-  return authorization.trim();
+  return null;
+
+}
+
+
+// ============================================================
+// LOAD PROFILE
+// ============================================================
+
+async function loadProfile(
+  userId
+) {
+
+  if (!userId) {
+
+    return {
+      profile: null,
+      error: new Error(
+        'User ID is missing.'
+      ),
+    };
+
+  }
+
+
+  const {
+    data,
+    error,
+  } =
+    await supabaseAdmin
+      .from('profiles')
+      .select(`
+        id,
+        name,
+        company,
+        email,
+        role,
+        member_since
+      `)
+      .eq(
+        'id',
+        userId
+      )
+      .maybeSingle();
+
+
+  return {
+
+    profile:
+      data || null,
+
+    error:
+      error || null,
+
+  };
 
 }
 
@@ -72,69 +172,94 @@ export async function requireAuth(
   try {
 
     // ========================================================
-    // GET TOKEN
+    // GET ACCESS TOKEN
     // ========================================================
 
     const token =
-      getBearerToken(req);
+      getBearerToken(
+        req
+      );
 
 
     if (!token) {
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Authentication required.',
+          message:
+            'Authentication required.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // VERIFY TOKEN WITH SUPABASE
+    // VERIFY TOKEN
+    // ========================================================
+    //
+    // IMPORTANT:
+    //
+    // Use supabaseAuth here.
+    //
+    // This validates the access token against Supabase Auth.
+    //
     // ========================================================
 
     const {
       data,
       error,
     } =
-      await supabase.auth.getUser(
-        token
-      );
+      await supabaseAuth
+        .auth
+        .getUser(
+          token
+        );
 
+
+    // ========================================================
+    // INVALID TOKEN
+    // ========================================================
 
     if (
       error ||
-      !data?.user
+      !data?.user?.id
     ) {
 
       console.error(
         '[AUTH TOKEN INVALID]',
-        error?.message || 'Unknown authentication error'
+        error?.message ||
+        'User not returned by Supabase.'
       );
 
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Invalid or expired authentication token.',
+          message:
+            'Invalid or expired authentication token.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // ATTACH AUTH USER
+    // ATTACH AUTH INFORMATION
     // ========================================================
 
     req.user =
       data.user;
+
+
+    req.accessToken =
+      token;
 
 
     // ========================================================
@@ -142,6 +267,7 @@ export async function requireAuth(
     // ========================================================
 
     return next();
+
 
   } catch (error) {
 
@@ -151,14 +277,16 @@ export async function requireAuth(
     );
 
 
-    return res.status(401).json({
+    return res
+      .status(401)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Authentication failed.',
+        message:
+          'Authentication failed.',
 
-    });
+      });
 
   }
 
@@ -169,16 +297,10 @@ export async function requireAuth(
 // REQUIRE ADMIN
 // ============================================================
 //
-// IMPORTANT:
-//
-// This middleware should normally be used AFTER:
-//
-// requireAuth
-//
-// Example:
+// Usage:
 //
 // router.get(
-//   '/admin',
+//   '/something',
 //   requireAuth,
 //   requireAdmin,
 //   controller
@@ -195,45 +317,40 @@ export async function requireAdmin(
   try {
 
     // ========================================================
-    // AUTHENTICATION CHECK
+    // AUTH USER CHECK
     // ========================================================
 
     if (!req.user?.id) {
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Authentication required.',
+          message:
+            'Authentication required.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // LOAD USER ROLE
+    // LOAD PROFILE
     // ========================================================
 
     const {
-      data: profile,
+      profile,
       error,
     } =
-      await supabase
-        .from('profiles')
-        .select(
-          'id, role'
-        )
-        .eq(
-          'id',
-          req.user.id
-        )
-        .maybeSingle();
+      await loadProfile(
+        req.user.id
+      );
 
 
     // ========================================================
-    // PROFILE ERROR
+    // PROFILE QUERY ERROR
     // ========================================================
 
     if (error) {
@@ -244,14 +361,16 @@ export async function requireAdmin(
       );
 
 
-      return res.status(500).json({
+      return res
+        .status(500)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Unable to verify administrator account.',
+          message:
+            'Unable to verify administrator account.',
 
-      });
+        });
 
     }
 
@@ -262,45 +381,87 @@ export async function requireAdmin(
 
     if (!profile) {
 
-      return res.status(403).json({
+      console.error(
+        '[ADMIN PROFILE NOT FOUND]',
+        req.user.id
+      );
 
-        success: false,
 
-        message:
-          'User profile not found.',
+      return res
+        .status(403)
+        .json({
 
-      });
+          success: false,
+
+          message:
+            'User profile not found.',
+
+        });
 
     }
+
+
+    // ========================================================
+    // NORMALIZE ROLE
+    // ========================================================
+
+    const role =
+      normalizeRole(
+        profile.role
+      );
 
 
     // ========================================================
     // ADMIN CHECK
     // ========================================================
 
-    if (
-      profile.role !== 'admin' &&
-      profile.role !== 'administrator'
-    ) {
+    const isAdmin =
+      role === 'admin' ||
+      role === 'administrator';
 
-      return res.status(403).json({
 
-        success: false,
+    if (!isAdmin) {
 
-        message:
-          'Administrator access required.',
+      console.warn(
+        '[ADMIN ACCESS DENIED]',
+        {
+          userId:
+            req.user.id,
 
-      });
+          role,
+        }
+      );
+
+
+      return res
+        .status(403)
+        .json({
+
+          success: false,
+
+          message:
+            'Administrator access required.',
+
+        });
 
     }
 
 
     // ========================================================
-    // ATTACH ROLE
+    // ATTACH PROFILE INFORMATION
     // ========================================================
 
+    req.profile = {
+
+      ...profile,
+
+      role,
+
+    };
+
+
     req.userRole =
-      profile.role;
+      role;
 
 
     // ========================================================
@@ -308,6 +469,7 @@ export async function requireAdmin(
     // ========================================================
 
     return next();
+
 
   } catch (error) {
 
@@ -317,14 +479,16 @@ export async function requireAdmin(
     );
 
 
-    return res.status(403).json({
+    return res
+      .status(500)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Administrator authorization failed.',
+        message:
+          'Administrator authorization failed.',
 
-    });
+      });
 
   }
 
@@ -332,11 +496,17 @@ export async function requireAdmin(
 
 
 // ============================================================
-// OPTIONAL CUSTOMER CHECK
+// REQUIRE CUSTOMER
 // ============================================================
 //
-// Useful later for routes that should only be accessible
-// to normal customers.
+// Usage:
+//
+// router.get(
+//   '/customer-route',
+//   requireAuth,
+//   requireCustomer,
+//   controller
+// );
 //
 // ============================================================
 
@@ -348,35 +518,42 @@ export async function requireCustomer(
 
   try {
 
+    // ========================================================
+    // AUTH USER CHECK
+    // ========================================================
+
     if (!req.user?.id) {
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Authentication required.',
+          message:
+            'Authentication required.',
 
-      });
+        });
 
     }
 
 
+    // ========================================================
+    // LOAD PROFILE
+    // ========================================================
+
     const {
-      data: profile,
+      profile,
       error,
     } =
-      await supabase
-        .from('profiles')
-        .select(
-          'id, role'
-        )
-        .eq(
-          'id',
-          req.user.id
-        )
-        .maybeSingle();
+      await loadProfile(
+        req.user.id
+      );
 
+
+    // ========================================================
+    // PROFILE QUERY ERROR
+    // ========================================================
 
     if (error) {
 
@@ -386,53 +563,112 @@ export async function requireCustomer(
       );
 
 
-      return res.status(500).json({
+      return res
+        .status(500)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Unable to verify customer account.',
+          message:
+            'Unable to verify customer account.',
 
-      });
+        });
 
     }
 
+
+    // ========================================================
+    // PROFILE NOT FOUND
+    // ========================================================
 
     if (!profile) {
 
-      return res.status(403).json({
+      console.error(
+        '[CUSTOMER PROFILE NOT FOUND]',
+        req.user.id
+      );
 
-        success: false,
 
-        message:
-          'User profile not found.',
+      return res
+        .status(403)
+        .json({
 
-      });
+          success: false,
+
+          message:
+            'User profile not found.',
+
+        });
 
     }
 
+
+    // ========================================================
+    // NORMALIZE ROLE
+    // ========================================================
+
+    const role =
+      normalizeRole(
+        profile.role
+      );
+
+
+    // ========================================================
+    // CUSTOMER CHECK
+    // ========================================================
 
     if (
-      profile.role !== 'customer'
+      role !== 'customer'
     ) {
 
-      return res.status(403).json({
+      console.warn(
+        '[CUSTOMER ACCESS DENIED]',
+        {
+          userId:
+            req.user.id,
 
-        success: false,
+          role,
+        }
+      );
 
-        message:
-          'Customer access required.',
 
-      });
+      return res
+        .status(403)
+        .json({
+
+          success: false,
+
+          message:
+            'Customer access required.',
+
+        });
 
     }
+
+
+    // ========================================================
+    // ATTACH PROFILE INFORMATION
+    // ========================================================
+
+    req.profile = {
+
+      ...profile,
+
+      role,
+
+    };
 
 
     req.userRole =
-      profile.role;
+      role;
 
+
+    // ========================================================
+    // CONTINUE
+    // ========================================================
 
     return next();
+
 
   } catch (error) {
 
@@ -442,14 +678,16 @@ export async function requireCustomer(
     );
 
 
-    return res.status(403).json({
+    return res
+      .status(500)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Customer authorization failed.',
+        message:
+          'Customer authorization failed.',
 
-    });
+      });
 
   }
 

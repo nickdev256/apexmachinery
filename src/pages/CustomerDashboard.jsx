@@ -1,150 +1,64 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom';
+
 import Icon from '../components/Icon';
 import { ProgressBar } from '../components/Timeline';
 import { useAuth } from '../context/AuthContext';
+
+import {
+  getCustomerDashboard,
+  updateCustomerProfile,
+  addCustomerAddress,
+  removeCustomerAddress,
+  makeDefaultAddress,
+  deleteWishlistItem,
+  markCustomerNotificationRead,
+  markCustomerNotificationsRead,
+  saveCustomerPreferences,
+  updateCustomerPassword,
+  submitCreditTopup,
+} from '../services/customerApi';
+
 import './CustomerDashboard.css';
 
 
 // ============================================================
-// INITIAL DATA
+// DEFAULTS
 // ============================================================
 
-const initialOrders = [
-  {
-    id: 'APX-8829',
-    items: '3 Items',
-    status: 'Delivered',
-    total: 'UGX 16,850,000',
-    date: '2026-05-12',
-  },
-  {
-    id: 'APX-9930',
-    items: '1 Item',
-    status: 'In Transit',
-    total: 'UGX 82,500,000',
-    date: '2026-05-08',
-  },
-  {
-    id: 'APX-9918',
-    items: '5 Items',
-    status: 'Processing',
-    total: 'UGX 24,600,000',
-    date: '2026-05-04',
-  },
-  {
-    id: 'APX-9902',
-    items: '2 Items',
-    status: 'Pending',
-    total: 'UGX 9,800,000',
-    date: '2026-04-29',
-  },
-];
+const emptyAddress = {
+  title: '',
+  name: '',
+  company: '',
+  address: '',
+  city: '',
+  phone: '',
+};
 
 
-const initialNotifications = [
-  {
-    id: 1,
-    title: 'New Login Detected',
-    time: '2h ago',
-    text: 'A new login from Chrome on Windows was detected.',
-    read: false,
-    type: 'security',
-  },
-  {
-    id: 2,
-    title: 'Stock Update',
-    time: 'Yesterday',
-    text: 'An item in your wishlist is back in stock.',
-    read: false,
-    type: 'inventory',
-  },
-  {
-    id: 3,
-    title: 'Invoice Due Soon',
-    time: '3 days ago',
-    text: 'Invoice #INV-4021 is due in 3 days.',
-    read: true,
-    type: 'billing',
-  },
-];
+const emptyPasswordForm = {
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+};
 
 
-const initialAddresses = [
-  {
-    id: 1,
-    title: 'Main Office',
-    name: 'Apex Customer',
-    company: 'Industrial Procurement Ltd',
-    address: 'Kampala Industrial Area',
-    city: 'Kampala',
-    phone: '+256 700 000000',
-    default: true,
-  },
-  {
-    id: 2,
-    title: 'Warehouse',
-    name: 'Procurement Department',
-    company: 'Industrial Procurement Ltd',
-    address: 'Namanve Industrial Park',
-    city: 'Mukono',
-    phone: '+256 700 000001',
-    default: false,
-  },
-];
-
-
-const initialWishlist = [
-  {
-    id: 1,
-    name: 'Industrial Diesel Generator 250 kVA',
-    category: 'Generators',
-    price: 'UGX 185,000,000',
-    stock: 'In Stock',
-  },
-  {
-    id: 2,
-    name: 'Heavy Duty Air Compressor',
-    category: 'Industrial Equipment',
-    price: 'UGX 24,500,000',
-    stock: 'Low Stock',
-  },
-  {
-    id: 3,
-    name: 'Rotary Hammer SDS-Plus Pro',
-    category: 'Power Tools',
-    price: 'UGX 2,850,000',
-    stock: 'In Stock',
-  },
-];
-
-
-const initialInvoices = [
-  {
-    id: 'INV-4021',
-    order: 'APX-9930',
-    amount: 'UGX 82,500,000',
-    date: '2026-05-08',
-    due: '2026-05-20',
-    status: 'Due Soon',
-  },
-  {
-    id: 'INV-4018',
-    order: 'APX-9918',
-    amount: 'UGX 24,600,000',
-    date: '2026-05-04',
-    due: '2026-05-18',
-    status: 'Pending',
-  },
-  {
-    id: 'INV-3989',
-    order: 'APX-8829',
-    amount: 'UGX 16,850,000',
-    date: '2026-05-12',
-    due: '2026-05-12',
-    status: 'Paid',
-  },
-];
+const defaultPreferences = {
+  orderUpdates: true,
+  inventoryAlerts: true,
+  invoiceReminders: true,
+  marketing: false,
+};
 
 
 // ============================================================
@@ -191,61 +105,697 @@ const sidebarItems = [
 
 
 // ============================================================
+// HELPERS
+// ============================================================
+
+function formatMoney(value) {
+  const amount =
+    Number(value || 0);
+
+  return `UGX ${amount.toLocaleString(
+    'en-UG',
+    {
+      maximumFractionDigits: 0,
+    }
+  )}`;
+}
+
+
+function formatDate(value) {
+  if (!value) {
+    return '—';
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(
+    'en-UG',
+    {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }
+  ).format(date);
+}
+
+
+function formatMemberSince(value) {
+  if (!value) {
+    return 'Recently';
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(value);
+  }
+
+  return new Intl.DateTimeFormat(
+    'en-UG',
+    {
+      month: 'long',
+      year: 'numeric',
+    }
+  ).format(date);
+}
+
+
+function formatRelativeTime(value) {
+  if (!value) {
+    return '';
+  }
+
+  const timestamp =
+    new Date(value).getTime();
+
+  if (
+    Number.isNaN(timestamp)
+  ) {
+    return '';
+  }
+
+  const difference =
+    Date.now() -
+    timestamp;
+
+  const minutes =
+    Math.floor(
+      difference /
+      60000
+    );
+
+  const hours =
+    Math.floor(
+      difference /
+      3600000
+    );
+
+  const days =
+    Math.floor(
+      difference /
+      86400000
+    );
+
+  if (minutes < 1) {
+    return 'Just now';
+  }
+
+  if (minutes < 60) {
+    return `${minutes}m ago`;
+  }
+
+  if (hours < 24) {
+    return `${hours}h ago`;
+  }
+
+  if (days === 1) {
+    return 'Yesterday';
+  }
+
+  if (days < 7) {
+    return `${days} days ago`;
+  }
+
+  return formatDate(value);
+}
+
+
+function getTrackingIndex(status) {
+  switch (
+    String(status)
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'pending':
+      return 0;
+
+    case 'processing':
+      return 1;
+
+    case 'in transit':
+    case 'in_transit':
+      return 2;
+
+    case 'delivered':
+      return 3;
+
+    default:
+      return 0;
+  }
+}
+
+
+// ============================================================
 // CUSTOMER DASHBOARD
 // ============================================================
 
 export default function CustomerDashboard() {
 
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout,
+    refreshUser,
+  } =
+    useAuth();
 
-  const navigate = useNavigate();
 
-  const [active, setActive] =
-    useState('overview');
+  const navigate =
+    useNavigate();
 
-  const [orders] =
-    useState(initialOrders);
 
-  const [notifications, setNotifications] =
-    useState(initialNotifications);
+  const toastTimerRef =
+    useRef(null);
 
-  const [addresses, setAddresses] =
-    useState(initialAddresses);
 
-  const [wishlist, setWishlist] =
-    useState(initialWishlist);
-
-  const [invoices] =
-    useState(initialInvoices);
-
-  const [showAddressForm, setShowAddressForm] =
-    useState(false);
-
-  const [editingProfile, setEditingProfile] =
-    useState(false);
-
-  const [message, setMessage] =
-    useState('');
-
-  const [profile, setProfile] = useState({
-    name: user?.name || 'Valued Customer',
-    company: user?.company || '',
-    email: user?.email || '',
-    phone: '',
-  });
-
-  const [newAddress, setNewAddress] = useState({
-    title: '',
-    name: '',
-    company: '',
-    address: '',
-    city: '',
-    phone: '',
-  });
+  const pageTopRef =
+    useRef(null);
 
 
   // ==========================================================
-  // USER NAME
+  // GENERAL STATE
+  // ==========================================================
+
+  const [
+    active,
+    setActive,
+  ] =
+    useState('overview');
+
+
+  const [
+    loadingDashboard,
+    setLoadingDashboard,
+  ] =
+    useState(true);
+
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] =
+    useState(false);
+
+
+  const [
+    dashboardError,
+    setDashboardError,
+  ] =
+    useState('');
+
+
+  const [
+    message,
+    setMessage,
+  ] =
+    useState('');
+
+
+  const [
+    messageType,
+    setMessageType,
+  ] =
+    useState('success');
+
+
+  const [
+    loggingOut,
+    setLoggingOut,
+  ] =
+    useState(false);
+
+
+  // ==========================================================
+  // DATABASE DATA
+  // ==========================================================
+
+  const [
+    profile,
+    setProfile,
+  ] =
+    useState({
+      name:
+        user?.name || '',
+      company:
+        user?.company || '',
+      email:
+        user?.email || '',
+      phone: '',
+    });
+
+
+  const [
+    orders,
+    setOrders,
+  ] =
+    useState([]);
+
+
+  const [
+    invoices,
+    setInvoices,
+  ] =
+    useState([]);
+
+
+  const [
+    addresses,
+    setAddresses,
+  ] =
+    useState([]);
+
+
+  const [
+    wishlist,
+    setWishlist,
+  ] =
+    useState([]);
+
+
+  const [
+    notifications,
+    setNotifications,
+  ] =
+    useState([]);
+
+
+  const [
+    preferences,
+    setPreferences,
+  ] =
+    useState(
+      defaultPreferences
+    );
+
+
+  const [
+    enterpriseBalance,
+    setEnterpriseBalance,
+  ] =
+    useState(0);
+
+
+  // ==========================================================
+  // FORM / ACTION STATE
+  // ==========================================================
+
+  const [
+    editingProfile,
+    setEditingProfile,
+  ] =
+    useState(false);
+
+
+  const [
+    savingProfile,
+    setSavingProfile,
+  ] =
+    useState(false);
+
+
+  const [
+    showAddressForm,
+    setShowAddressForm,
+  ] =
+    useState(false);
+
+
+  const [
+    newAddress,
+    setNewAddress,
+  ] =
+    useState(
+      emptyAddress
+    );
+
+
+  const [
+    savingAddress,
+    setSavingAddress,
+  ] =
+    useState(false);
+
+
+  const [
+    deletingAddressId,
+    setDeletingAddressId,
+  ] =
+    useState(null);
+
+
+  const [
+    defaultAddressId,
+    setDefaultAddressId,
+  ] =
+    useState(null);
+
+
+  const [
+    removingWishlistId,
+    setRemovingWishlistId,
+  ] =
+    useState(null);
+
+
+  const [
+    selectedOrder,
+    setSelectedOrder,
+  ] =
+    useState(null);
+
+
+  const [
+    selectedInvoice,
+    setSelectedInvoice,
+  ] =
+    useState(null);
+
+
+  const [
+    passwordForm,
+    setPasswordForm,
+  ] =
+    useState(
+      emptyPasswordForm
+    );
+
+
+  const [
+    changingPassword,
+    setChangingPassword,
+  ] =
+    useState(false);
+
+
+  const [
+    preferenceSaving,
+    setPreferenceSaving,
+  ] =
+    useState(false);
+
+
+  const [
+    toppingUp,
+    setToppingUp,
+  ] =
+    useState(false);
+
+
+  // ==========================================================
+  // TOAST
+  // ==========================================================
+
+  const showMessage =
+    useCallback(
+      (
+        text,
+        type = 'success'
+      ) => {
+
+        if (
+          toastTimerRef.current
+        ) {
+          clearTimeout(
+            toastTimerRef.current
+          );
+        }
+
+
+        setMessageType(type);
+
+        setMessage(text);
+
+
+        toastTimerRef.current =
+          setTimeout(
+            () => {
+
+              setMessage('');
+
+              toastTimerRef.current =
+                null;
+
+            },
+            3500
+          );
+
+      },
+      []
+    );
+
+
+  useEffect(
+    () => {
+
+      return () => {
+
+        if (
+          toastTimerRef.current
+        ) {
+          clearTimeout(
+            toastTimerRef.current
+          );
+        }
+
+      };
+
+    },
+    []
+  );
+
+
+  // ==========================================================
+  // APPLY DATABASE DASHBOARD DATA
+  // ==========================================================
+
+  const applyDashboardData =
+    useCallback(
+      (data) => {
+
+        if (!data) {
+          return;
+        }
+
+
+        const dbProfile =
+          data.profile || {};
+
+
+        setProfile({
+          name:
+            dbProfile.name ||
+            user?.name ||
+            '',
+
+          company:
+            dbProfile.company ||
+            user?.company ||
+            '',
+
+          email:
+            dbProfile.email ||
+            user?.email ||
+            '',
+
+          phone:
+            dbProfile.phone ||
+            '',
+        });
+
+
+        setOrders(
+          Array.isArray(
+            data.orders
+          )
+            ? data.orders
+            : []
+        );
+
+
+        setInvoices(
+          Array.isArray(
+            data.invoices
+          )
+            ? data.invoices
+            : []
+        );
+
+
+        setAddresses(
+          Array.isArray(
+            data.addresses
+          )
+            ? data.addresses
+            : []
+        );
+
+
+        setWishlist(
+          Array.isArray(
+            data.wishlist
+          )
+            ? data.wishlist
+            : []
+        );
+
+
+        setNotifications(
+          Array.isArray(
+            data.notifications
+          )
+            ? data.notifications
+            : []
+        );
+
+
+        setEnterpriseBalance(
+          Number(
+            data.credit
+              ?.balance ||
+            0
+          )
+        );
+
+
+        setPreferences({
+          orderUpdates:
+            data.preferences
+              ?.order_updates ??
+            true,
+
+          inventoryAlerts:
+            data.preferences
+              ?.inventory_alerts ??
+            true,
+
+          invoiceReminders:
+            data.preferences
+              ?.invoice_reminders ??
+            true,
+
+          marketing:
+            data.preferences
+              ?.marketing ??
+            false,
+        });
+
+      },
+      [
+        user?.name,
+        user?.company,
+        user?.email,
+      ]
+    );
+
+
+  // ==========================================================
+  // LOAD CUSTOMER DASHBOARD
+  // ==========================================================
+
+  const loadDashboard =
+    useCallback(
+      async ({
+        silent = false,
+      } = {}) => {
+
+        try {
+
+          if (silent) {
+            setRefreshing(true);
+          } else {
+            setLoadingDashboard(
+              true
+            );
+          }
+
+
+          setDashboardError('');
+
+
+          const data =
+            await getCustomerDashboard();
+
+
+          applyDashboardData(
+            data
+          );
+
+        } catch (error) {
+
+          console.error(
+            'Customer dashboard load failed:',
+            error
+          );
+
+
+          const errorMessage =
+            error.response
+              ?.data
+              ?.message ||
+            'Unable to load your customer account.';
+
+
+          setDashboardError(
+            errorMessage
+          );
+
+
+          if (silent) {
+
+            showMessage(
+              errorMessage,
+              'error'
+            );
+
+          }
+
+        } finally {
+
+          setLoadingDashboard(
+            false
+          );
+
+          setRefreshing(
+            false
+          );
+
+        }
+
+      },
+      [
+        applyDashboardData,
+        showMessage,
+      ]
+    );
+
+
+  useEffect(
+    () => {
+
+      loadDashboard();
+
+    },
+    [
+      loadDashboard,
+    ]
+  );
+
+
+  // ==========================================================
+  // DERIVED VALUES
   // ==========================================================
 
   const name =
@@ -256,343 +806,1211 @@ export default function CustomerDashboard() {
 
   const firstName =
     name
-      .split(' ')[0];
+      .trim()
+      .split(/\s+/)[0] ||
+    'Customer';
 
-
-  // ==========================================================
-  // NOTIFICATION COUNT
-  // ==========================================================
 
   const unreadNotifications =
     useMemo(
       () =>
         notifications.filter(
-          (item) => !item.read
+          (notification) =>
+            !notification.read
         ).length,
-      [notifications]
+      [
+        notifications,
+      ]
+    );
+
+
+  const ongoingOrders =
+    useMemo(
+      () =>
+        orders.filter(
+          (order) =>
+            order.status ===
+              'Processing' ||
+            order.status ===
+              'In Transit'
+        ).length,
+      [
+        orders,
+      ]
+    );
+
+
+  const unpaidInvoices =
+    useMemo(
+      () =>
+        invoices.filter(
+          (invoice) =>
+            invoice.status !==
+            'Paid' &&
+            invoice.status !==
+            'Cancelled'
+        ).length,
+      [
+        invoices,
+      ]
+    );
+
+
+  const paidInvoices =
+    useMemo(
+      () =>
+        invoices.filter(
+          (invoice) =>
+            invoice.status ===
+            'Paid'
+        ).length,
+      [
+        invoices,
+      ]
+    );
+
+
+  const activeShipment =
+    useMemo(
+      () => {
+
+        return (
+          orders.find(
+            (order) =>
+              order.status ===
+              'In Transit'
+          ) ||
+          orders.find(
+            (order) =>
+              order.status ===
+              'Processing'
+          ) ||
+          null
+        );
+
+      },
+      [
+        orders,
+      ]
     );
 
 
   // ==========================================================
-  // SHOW MESSAGE
+  // SECTION NAVIGATION
   // ==========================================================
 
-  const showMessage = (text) => {
-
-    setMessage(text);
-
-    setTimeout(() => {
-      setMessage('');
-    }, 3000);
-
-  };
-
-
-  // ==========================================================
-  // NAVIGATION
-  // ==========================================================
-
-  const changeSection = (section) => {
+  function changeSection(
+    section
+  ) {
 
     setActive(section);
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    setSelectedOrder(null);
 
-  };
+    setSelectedInvoice(null);
+
+
+    requestAnimationFrame(
+      () => {
+
+        if (
+          pageTopRef.current
+        ) {
+
+          pageTopRef.current
+            .scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+
+        } else {
+
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          });
+
+        }
+
+      }
+    );
+
+  }
 
 
   // ==========================================================
   // LOGOUT
   // ==========================================================
 
-  const handleLogout = () => {
+  async function handleLogout() {
+
+    if (loggingOut) {
+      return;
+    }
+
 
     const confirmed =
       window.confirm(
         'Are you sure you want to log out of your customer account?'
       );
 
+
     if (!confirmed) {
       return;
     }
 
-    logout();
 
-    navigate('/login');
+    try {
 
-  };
+      setLoggingOut(true);
+
+      await logout();
+
+    } catch (error) {
+
+      console.error(
+        'Logout failed:',
+        error
+      );
+
+    } finally {
+
+      navigate(
+        '/login',
+        {
+          replace: true,
+        }
+      );
+
+    }
+
+  }
 
 
   // ==========================================================
-  // PROFILE CHANGE
+  // PROFILE
   // ==========================================================
 
-  const handleProfileChange = (e) => {
+  function handleProfileChange(
+    event
+  ) {
 
     const {
-      name,
+      name: fieldName,
       value,
-    } = e.target;
-
-    setProfile((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-
-  };
+    } =
+      event.target;
 
 
-  // ==========================================================
-  // SAVE PROFILE
-  // ==========================================================
-
-  const saveProfile = (e) => {
-
-    e.preventDefault();
-
-    setEditingProfile(false);
-
-    showMessage(
-      'Your profile information has been updated successfully.'
-    );
-
-  };
-
-
-  // ==========================================================
-  // MARK NOTIFICATION READ
-  // ==========================================================
-
-  const markNotificationRead = (id) => {
-
-    setNotifications(
-      (previous) =>
-        previous.map(
-          (notification) =>
-            notification.id === id
-              ? {
-                  ...notification,
-                  read: true,
-                }
-              : notification
-        )
-    );
-
-  };
-
-
-  // ==========================================================
-  // MARK ALL READ
-  // ==========================================================
-
-  const markAllNotificationsRead = () => {
-
-    setNotifications(
-      (previous) =>
-        previous.map(
-          (notification) => ({
-            ...notification,
-            read: true,
-          })
-        )
-    );
-
-    showMessage(
-      'All notifications marked as read.'
-    );
-
-  };
-
-
-  // ==========================================================
-  // REMOVE WISHLIST
-  // ==========================================================
-
-  const removeWishlist = (id) => {
-
-    setWishlist(
-      (previous) =>
-        previous.filter(
-          (item) =>
-            item.id !== id
-        )
-    );
-
-    showMessage(
-      'Item removed from your wishlist.'
-    );
-
-  };
-
-
-  // ==========================================================
-  // ADD ADDRESS
-  // ==========================================================
-
-  const handleAddressChange = (e) => {
-
-    const {
-      name,
-      value,
-    } = e.target;
-
-    setNewAddress(
+    setProfile(
       (previous) => ({
         ...previous,
-        [name]: value,
+
+        [fieldName]:
+          value,
       })
     );
 
-  };
+  }
 
 
-  const addAddress = (e) => {
+  async function saveProfile(
+    event
+  ) {
 
-    e.preventDefault();
+    event.preventDefault();
+
+
+    const cleanName =
+      profile.name.trim();
+
 
     if (
-      !newAddress.title ||
-      !newAddress.name ||
-      !newAddress.address ||
-      !newAddress.city
+      cleanName.length < 2
     ) {
 
       showMessage(
-        'Please complete all required address fields.'
+        'Please enter your full name.',
+        'error'
       );
 
       return;
     }
 
-    const address = {
-      id: Date.now(),
-      ...newAddress,
-      default: addresses.length === 0,
+
+    try {
+
+      setSavingProfile(
+        true
+      );
+
+
+      const result =
+        await updateCustomerProfile({
+          name:
+            cleanName,
+
+          company:
+            profile.company
+              .trim(),
+
+          phone:
+            profile.phone
+              .trim(),
+        });
+
+
+      const updated =
+        result.profile || {};
+
+
+      setProfile(
+        (previous) => ({
+          ...previous,
+
+          name:
+            updated.name ||
+            cleanName,
+
+          company:
+            updated.company ||
+            '',
+
+          phone:
+            updated.phone ||
+            '',
+        })
+      );
+
+
+      if (refreshUser) {
+
+        try {
+
+          await refreshUser();
+
+        } catch (error) {
+
+          console.warn(
+            'Auth user refresh failed:',
+            error
+          );
+
+        }
+
+      }
+
+
+      setEditingProfile(
+        false
+      );
+
+
+      showMessage(
+        'Profile updated successfully.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Profile update failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to update your profile.',
+        'error'
+      );
+
+    } finally {
+
+      setSavingProfile(
+        false
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // ADDRESS FORM
+  // ==========================================================
+
+  function handleAddressChange(
+    event
+  ) {
+
+    const {
+      name: fieldName,
+      value,
+    } =
+      event.target;
+
+
+    setNewAddress(
+      (previous) => ({
+        ...previous,
+
+        [fieldName]:
+          value,
+      })
+    );
+
+  }
+
+
+  async function addAddress(
+    event
+  ) {
+
+    event.preventDefault();
+
+
+    const payload = {
+      title:
+        newAddress.title.trim(),
+
+      name:
+        newAddress.name.trim(),
+
+      company:
+        newAddress.company.trim(),
+
+      address:
+        newAddress.address.trim(),
+
+      city:
+        newAddress.city.trim(),
+
+      phone:
+        newAddress.phone.trim(),
     };
 
-    setAddresses(
-      (previous) => [
-        ...previous,
-        address,
-      ]
-    );
 
-    setNewAddress({
-      title: '',
-      name: '',
-      company: '',
-      address: '',
-      city: '',
-      phone: '',
-    });
+    if (
+      !payload.title ||
+      !payload.name ||
+      !payload.address ||
+      !payload.city
+    ) {
 
-    setShowAddressForm(false);
+      showMessage(
+        'Please complete all required address fields.',
+        'error'
+      );
 
-    showMessage(
-      'New address added successfully.'
-    );
+      return;
+    }
 
-  };
+
+    try {
+
+      setSavingAddress(
+        true
+      );
+
+
+      await addCustomerAddress(
+        payload
+      );
+
+
+      setNewAddress(
+        emptyAddress
+      );
+
+
+      setShowAddressForm(
+        false
+      );
+
+
+      await loadDashboard({
+        silent: true,
+      });
+
+
+      showMessage(
+        'Delivery address saved successfully.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Address creation failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to save the address.',
+        'error'
+      );
+
+    } finally {
+
+      setSavingAddress(
+        false
+      );
+
+    }
+
+  }
 
 
   // ==========================================================
   // DELETE ADDRESS
   // ==========================================================
 
-  const deleteAddress = (id) => {
+  async function deleteAddress(
+    id
+  ) {
+
+    if (
+      deletingAddressId
+    ) {
+      return;
+    }
+
+
+    const address =
+      addresses.find(
+        (item) =>
+          item.id === id
+      );
+
 
     const confirmed =
       window.confirm(
-        'Delete this saved address?'
+        `Delete ${
+          address?.title
+            ? `"${address.title}"`
+            : 'this address'
+        }?`
       );
+
 
     if (!confirmed) {
       return;
     }
 
-    setAddresses(
-      (previous) =>
-        previous.filter(
-          (address) =>
-            address.id !== id
-        )
-    );
 
-    showMessage(
-      'Address removed successfully.'
-    );
+    try {
 
-  };
+      setDeletingAddressId(
+        id
+      );
 
 
-  // ==========================================================
-  // SET DEFAULT ADDRESS
-  // ==========================================================
-
-  const setDefaultAddress = (id) => {
-
-    setAddresses(
-      (previous) =>
-        previous.map(
-          (address) => ({
-            ...address,
-            default:
-              address.id === id,
-          })
-        )
-    );
-
-    showMessage(
-      'Default delivery address updated.'
-    );
-
-  };
+      await removeCustomerAddress(
+        id
+      );
 
 
-  // ==========================================================
-  // TOP UP
-  // ==========================================================
-
-  const handleTopUp = () => {
-
-    showMessage(
-      'Credit top-up request started. Payment options will be available shortly.'
-    );
-
-  };
+      await loadDashboard({
+        silent: true,
+      });
 
 
-  // ==========================================================
-  // ORDER STATUS
-  // ==========================================================
+      showMessage(
+        'Address deleted successfully.'
+      );
 
-  const getOrderBadge = (status) => {
+    } catch (error) {
 
-    if (status === 'Delivered') {
-      return 'badge-instock';
+      console.error(
+        'Address delete failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to delete the address.',
+        'error'
+      );
+
+    } finally {
+
+      setDeletingAddressId(
+        null
+      );
+
     }
 
-    if (status === 'Pending') {
-      return 'badge-limited';
+  }
+
+
+  // ==========================================================
+  // DEFAULT ADDRESS
+  // ==========================================================
+
+  async function setDefaultAddress(
+    id
+  ) {
+
+    if (
+      defaultAddressId
+    ) {
+      return;
     }
 
-    if (status === 'Cancelled') {
-      return 'badge-outofstock';
+
+    try {
+
+      setDefaultAddressId(
+        id
+      );
+
+
+      await makeDefaultAddress(
+        id
+      );
+
+
+      setAddresses(
+        (previous) =>
+          previous.map(
+            (address) => ({
+              ...address,
+
+              default:
+                address.id === id,
+            })
+          )
+      );
+
+
+      showMessage(
+        'Default delivery address updated.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Default address update failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to update the default address.',
+        'error'
+      );
+
+    } finally {
+
+      setDefaultAddressId(
+        null
+      );
+
     }
 
-    return 'badge-navy';
+  }
 
-  };
+
+  // ==========================================================
+  // WISHLIST
+  // ==========================================================
+
+  async function removeWishlist(
+    id
+  ) {
+
+    if (
+      removingWishlistId
+    ) {
+      return;
+    }
+
+
+    try {
+
+      setRemovingWishlistId(
+        id
+      );
+
+
+      await deleteWishlistItem(
+        id
+      );
+
+
+      setWishlist(
+        (previous) =>
+          previous.filter(
+            (item) =>
+              item.id !== id
+          )
+      );
+
+
+      showMessage(
+        'Item removed from your wishlist.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Wishlist removal failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to remove the wishlist item.',
+        'error'
+      );
+
+    } finally {
+
+      setRemovingWishlistId(
+        null
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // NOTIFICATIONS
+  // ==========================================================
+
+  async function markNotificationRead(
+    id
+  ) {
+
+    try {
+
+      await markCustomerNotificationRead(
+        id
+      );
+
+
+      setNotifications(
+        (previous) =>
+          previous.map(
+            (notification) =>
+              notification.id === id
+                ? {
+                    ...notification,
+                    read: true,
+                  }
+                : notification
+          )
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Notification update failed:',
+        error
+      );
+
+
+      showMessage(
+        'Unable to update the notification.',
+        'error'
+      );
+
+    }
+
+  }
+
+
+  async function markAllNotificationsRead() {
+
+    if (
+      unreadNotifications === 0
+    ) {
+      return;
+    }
+
+
+    try {
+
+      await markCustomerNotificationsRead();
+
+
+      setNotifications(
+        (previous) =>
+          previous.map(
+            (notification) => ({
+              ...notification,
+              read: true,
+            })
+          )
+      );
+
+
+      showMessage(
+        'All notifications marked as read.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Mark all notifications failed:',
+        error
+      );
+
+
+      showMessage(
+        'Unable to update notifications.',
+        'error'
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // PASSWORD
+  // ==========================================================
+
+  function handlePasswordChange(
+    event
+  ) {
+
+    const {
+      name: fieldName,
+      value,
+    } =
+      event.target;
+
+
+    setPasswordForm(
+      (previous) => ({
+        ...previous,
+
+        [fieldName]:
+          value,
+      })
+    );
+
+  }
+
+
+  async function submitPasswordChange(
+    event
+  ) {
+
+    event.preventDefault();
+
+
+    if (
+      !passwordForm.currentPassword
+    ) {
+
+      showMessage(
+        'Enter your current password.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    if (
+      passwordForm.newPassword.length <
+      6
+    ) {
+
+      showMessage(
+        'New password must contain at least 6 characters.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    if (
+      passwordForm.newPassword !==
+      passwordForm.confirmPassword
+    ) {
+
+      showMessage(
+        'New passwords do not match.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    if (
+      passwordForm.currentPassword ===
+      passwordForm.newPassword
+    ) {
+
+      showMessage(
+        'Your new password must be different from the current password.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setChangingPassword(
+        true
+      );
+
+
+      await updateCustomerPassword({
+        currentPassword:
+          passwordForm.currentPassword,
+
+        newPassword:
+          passwordForm.newPassword,
+      });
+
+
+      setPasswordForm(
+        emptyPasswordForm
+      );
+
+
+      showMessage(
+        'Password changed successfully.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Password change failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to change your password.',
+        'error'
+      );
+
+    } finally {
+
+      setChangingPassword(
+        false
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // PREFERENCES
+  // ==========================================================
+
+  async function changePreference(
+    event
+  ) {
+
+    const {
+      name: fieldName,
+      checked,
+    } =
+      event.target;
+
+
+    if (
+      preferenceSaving
+    ) {
+      return;
+    }
+
+
+    const previous =
+      preferences;
+
+
+    const next = {
+      ...preferences,
+
+      [fieldName]:
+        checked,
+    };
+
+
+    setPreferences(
+      next
+    );
+
+
+    try {
+
+      setPreferenceSaving(
+        true
+      );
+
+
+      await saveCustomerPreferences(
+        next
+      );
+
+
+      showMessage(
+        'Communication preferences saved.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Preference update failed:',
+        error
+      );
+
+
+      setPreferences(
+        previous
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to save your preferences.',
+        'error'
+      );
+
+    } finally {
+
+      setPreferenceSaving(
+        false
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // CREDIT TOP-UP REQUEST
+  // ==========================================================
+
+  async function handleTopUp() {
+
+    if (toppingUp) {
+      return;
+    }
+
+
+    const input =
+      window.prompt(
+        'Enter the credit amount you want to request in UGX:'
+      );
+
+
+    if (input === null) {
+      return;
+    }
+
+
+    const amount =
+      Number(
+        String(input)
+          .replace(
+            /,/g,
+            ''
+          )
+          .trim()
+      );
+
+
+    if (
+      !Number.isFinite(
+        amount
+      ) ||
+      amount <= 0
+    ) {
+
+      showMessage(
+        'Please enter a valid amount.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    try {
+
+      setToppingUp(
+        true
+      );
+
+
+      const result =
+        await submitCreditTopup(
+          amount
+        );
+
+
+      const reference =
+        result.transaction
+          ?.reference;
+
+
+      showMessage(
+        reference
+          ? `Credit request ${reference} submitted to the administrator.`
+          : 'Credit top-up request submitted to the administrator.'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Credit top-up request failed:',
+        error
+      );
+
+
+      showMessage(
+        error.response
+          ?.data
+          ?.message ||
+        'Unable to submit the credit request.',
+        'error'
+      );
+
+    } finally {
+
+      setToppingUp(
+        false
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // ORDER STATUS BADGE
+  // ==========================================================
+
+  function getOrderBadge(
+    status
+  ) {
+
+    switch (status) {
+
+      case 'Delivered':
+        return 'badge-instock';
+
+      case 'Pending':
+        return 'badge-limited';
+
+      case 'Cancelled':
+        return 'badge-outofstock';
+
+      case 'In Transit':
+        return 'badge-gold';
+
+      default:
+        return 'badge-navy';
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // INVOICE BADGE
+  // ==========================================================
+
+  function getInvoiceBadge(
+    status
+  ) {
+
+    switch (status) {
+
+      case 'Paid':
+        return 'badge-instock';
+
+      case 'Cancelled':
+        return 'badge-outofstock';
+
+      case 'Overdue':
+        return 'badge-outofstock';
+
+      default:
+        return 'badge-limited';
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // ORDER OPEN
+  // ==========================================================
+
+  function openOrder(
+    order
+  ) {
+
+    if (
+      order.status ===
+      'In Transit'
+    ) {
+
+      navigate(
+        '/order-tracking',
+        {
+          state: {
+            orderId:
+              order.databaseId ||
+              order.id,
+
+            orderNumber:
+              order.id,
+          },
+        }
+      );
+
+      return;
+
+    }
+
+
+    setSelectedOrder(
+      order
+    );
+
+  }
 
 
   // ==========================================================
   // RENDER ACTIVE CONTENT
   // ==========================================================
 
-  const renderContent = () => {
+  function renderContent() {
 
     switch (active) {
 
@@ -603,12 +2021,12 @@ export default function CustomerDashboard() {
       case 'overview':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
 
               <div>
+
                 <span className="eyebrow">
                   Account Overview
                 </span>
@@ -620,17 +2038,21 @@ export default function CustomerDashboard() {
                 <p>
                   Manage your customer and procurement profile.
                 </p>
+
               </div>
+
 
               <button
                 type="button"
                 className="btn btn-outline-navy"
                 onClick={() =>
                   setEditingProfile(
-                    (value) => !value
+                    (value) =>
+                      !value
                   )
                 }
               >
+
                 <Icon
                   name="edit"
                   size={16}
@@ -639,6 +2061,7 @@ export default function CustomerDashboard() {
                 {editingProfile
                   ? 'Cancel'
                   : 'Edit Profile'}
+
               </button>
 
             </div>
@@ -655,13 +2078,16 @@ export default function CustomerDashboard() {
 
                   <div className="field">
 
-                    <label>
+                    <label htmlFor="profile-name">
                       Full Name
                     </label>
 
                     <input
+                      id="profile-name"
                       name="name"
-                      value={profile.name}
+                      value={
+                        profile.name
+                      }
                       onChange={
                         handleProfileChange
                       }
@@ -673,13 +2099,16 @@ export default function CustomerDashboard() {
 
                   <div className="field">
 
-                    <label>
+                    <label htmlFor="profile-company">
                       Company
                     </label>
 
                     <input
+                      id="profile-company"
                       name="company"
-                      value={profile.company}
+                      value={
+                        profile.company
+                      }
                       onChange={
                         handleProfileChange
                       }
@@ -690,32 +2119,38 @@ export default function CustomerDashboard() {
 
                   <div className="field">
 
-                    <label>
+                    <label htmlFor="profile-email">
                       Email
                     </label>
 
                     <input
+                      id="profile-email"
                       type="email"
-                      name="email"
-                      value={profile.email}
-                      onChange={
-                        handleProfileChange
+                      value={
+                        profile.email
                       }
-                      required
+                      readOnly
                     />
+
+                    <small>
+                      Email changes require account verification.
+                    </small>
 
                   </div>
 
 
                   <div className="field">
 
-                    <label>
+                    <label htmlFor="profile-phone">
                       Phone Number
                     </label>
 
                     <input
+                      id="profile-phone"
                       name="phone"
-                      value={profile.phone}
+                      value={
+                        profile.phone
+                      }
                       onChange={
                         handleProfileChange
                       }
@@ -730,8 +2165,33 @@ export default function CustomerDashboard() {
                 <div className="customer-form-actions">
 
                   <button
+                    type="button"
+                    className="btn btn-outline-navy"
+                    disabled={
+                      savingProfile
+                    }
+                    onClick={() => {
+
+                      setEditingProfile(
+                        false
+                      );
+
+                      loadDashboard({
+                        silent: true,
+                      });
+
+                    }}
+                  >
+                    Cancel
+                  </button>
+
+
+                  <button
                     type="submit"
                     className="btn btn-primary"
+                    disabled={
+                      savingProfile
+                    }
                   >
 
                     <Icon
@@ -739,7 +2199,9 @@ export default function CustomerDashboard() {
                       size={16}
                     />
 
-                    Save Changes
+                    {savingProfile
+                      ? 'Saving...'
+                      : 'Save Changes'}
 
                   </button>
 
@@ -786,7 +2248,21 @@ export default function CustomerDashboard() {
 
                   <strong>
                     {profile.email ||
-                      user?.email}
+                      'Not provided'}
+                  </strong>
+
+                </div>
+
+
+                <div className="card customer-info-card">
+
+                  <span>
+                    Phone Number
+                  </span>
+
+                  <strong>
+                    {profile.phone ||
+                      'Not provided'}
                   </strong>
 
                 </div>
@@ -804,12 +2280,24 @@ export default function CustomerDashboard() {
 
                 </div>
 
+
+                <div className="card customer-info-card">
+
+                  <span>
+                    Account Status
+                  </span>
+
+                  <strong>
+                    Active
+                  </strong>
+
+                </div>
+
               </div>
 
             )}
 
           </>
-
         );
 
 
@@ -820,7 +2308,6 @@ export default function CustomerDashboard() {
       case 'orders':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -836,10 +2323,11 @@ export default function CustomerDashboard() {
                 </h2>
 
                 <p>
-                  Track and review all your machinery orders.
+                  Track and review your Apex Machinery orders.
                 </p>
 
               </div>
+
 
               <Link
                 to="/shop"
@@ -858,113 +2346,237 @@ export default function CustomerDashboard() {
             </div>
 
 
-            <div className="card customer-panel">
+            {selectedOrder && (
 
-              <div className="customer-table-wrapper">
+              <div className="card customer-panel customer-selection-card">
 
-                <table className="customer-table">
+                <div>
 
-                  <thead>
+                  <span className="eyebrow">
+                    Order Details
+                  </span>
 
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Items</th>
-                      <th>Date</th>
-                      <th>Status</th>
-                      <th>Total</th>
-                      <th>Action</th>
-                    </tr>
+                  <h3>
+                    #{selectedOrder.id}
+                  </h3>
 
-                  </thead>
+                  <p>
+                    {selectedOrder.items}
+                    {' · '}
+                    {formatDate(
+                      selectedOrder.date
+                    )}
+                  </p>
 
-                  <tbody>
+                </div>
 
-                    {orders.map(
-                      (order) => (
 
-                        <tr key={order.id}>
+                <div>
 
-                          <td>
-                            <strong>
-                              #{order.id}
-                            </strong>
-                          </td>
+                  <strong>
+                    {formatMoney(
+                      selectedOrder.total
+                    )}
+                  </strong>
 
-                          <td>
-                            {order.items}
-                          </td>
+                  <span
+                    className={`badge ${getOrderBadge(
+                      selectedOrder.status
+                    )}`}
+                  >
+                    {selectedOrder.status}
+                  </span>
 
-                          <td>
-                            {order.date}
-                          </td>
+                </div>
 
-                          <td>
 
-                            <span
-                              className={`badge ${getOrderBadge(
-                                order.status
-                              )}`}
-                            >
-                              {order.status}
-                            </span>
+                {selectedOrder.orderItems
+                  ?.length > 0 && (
 
-                          </td>
+                  <div className="customer-order-items">
 
-                          <td>
-                            <strong>
-                              {order.total}
-                            </strong>
-                          </td>
+                    {selectedOrder.orderItems.map(
+                      (item) => (
 
-                          <td>
+                        <div key={item.id}>
 
-                            <button
-                              type="button"
-                              className="customer-table-action"
-                              onClick={() => {
+                          <span>
+                            {item.product_name}
+                          </span>
 
-                                if (
-                                  order.status ===
-                                  'In Transit'
-                                ) {
-                                  navigate(
-                                    '/order-tracking'
-                                  );
-                                } else {
-                                  showMessage(
-                                    `Order ${order.id} selected.`
-                                  );
-                                }
+                          <strong>
+                            {item.quantity}
+                            {' × '}
+                            {formatMoney(
+                              item.unit_price
+                            )}
+                          </strong>
 
-                              }}
-                            >
-
-                              <Icon
-                                name="eye"
-                                size={15}
-                              />
-
-                              View
-
-                            </button>
-
-                          </td>
-
-                        </tr>
+                        </div>
 
                       )
                     )}
 
-                  </tbody>
+                  </div>
 
-                </table>
+                )}
+
+
+                <button
+                  type="button"
+                  className="btn btn-outline-navy btn-sm"
+                  onClick={() =>
+                    setSelectedOrder(
+                      null
+                    )
+                  }
+                >
+                  Close
+                </button>
 
               </div>
 
-            </div>
+            )}
+
+
+            {orders.length === 0 ? (
+
+              <div className="card customer-empty">
+
+                <Icon
+                  name="package"
+                  size={36}
+                />
+
+                <h3>
+                  No orders yet
+                </h3>
+
+                <p>
+                  Your machinery orders will appear here once you place an order.
+                </p>
+
+                <Link
+                  to="/shop"
+                  className="btn btn-primary"
+                >
+                  Browse Products
+                </Link>
+
+              </div>
+
+            ) : (
+
+              <div className="card customer-panel">
+
+                <div className="customer-table-wrapper">
+
+                  <table className="customer-table">
+
+                    <thead>
+
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Items</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                      </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                      {orders.map(
+                        (order) => (
+
+                          <tr
+                            key={
+                              order.databaseId ||
+                              order.id
+                            }
+                          >
+
+                            <td>
+                              <strong>
+                                #{order.id}
+                              </strong>
+                            </td>
+
+                            <td>
+                              {order.items}
+                            </td>
+
+                            <td>
+                              {formatDate(
+                                order.date
+                              )}
+                            </td>
+
+                            <td>
+
+                              <span
+                                className={`badge ${getOrderBadge(
+                                  order.status
+                                )}`}
+                              >
+                                {order.status}
+                              </span>
+
+                            </td>
+
+                            <td>
+                              <strong>
+                                {formatMoney(
+                                  order.total
+                                )}
+                              </strong>
+                            </td>
+
+                            <td>
+
+                              <button
+                                type="button"
+                                className="customer-table-action"
+                                onClick={() =>
+                                  openOrder(
+                                    order
+                                  )
+                                }
+                              >
+
+                                <Icon
+                                  name="eye"
+                                  size={15}
+                                />
+
+                                {order.status ===
+                                'In Transit'
+                                  ? 'Track'
+                                  : 'View'}
+
+                              </button>
+
+                            </td>
+
+                          </tr>
+
+                        )
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </div>
+
+            )}
 
           </>
-
         );
 
 
@@ -975,7 +2587,6 @@ export default function CustomerDashboard() {
       case 'addresses':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -1002,7 +2613,8 @@ export default function CustomerDashboard() {
                 className="btn btn-primary"
                 onClick={() =>
                   setShowAddressForm(
-                    (value) => !value
+                    (value) =>
+                      !value
                   )
                 }
               >
@@ -1030,17 +2642,20 @@ export default function CustomerDashboard() {
                   Add New Address
                 </h3>
 
+
                 <div className="customer-form-grid">
 
                   <div className="field">
 
                     <label>
-                      Address Title
+                      Address Title *
                     </label>
 
                     <input
                       name="title"
-                      value={newAddress.title}
+                      value={
+                        newAddress.title
+                      }
                       onChange={
                         handleAddressChange
                       }
@@ -1054,12 +2669,14 @@ export default function CustomerDashboard() {
                   <div className="field">
 
                     <label>
-                      Contact Name
+                      Contact Name *
                     </label>
 
                     <input
                       name="name"
-                      value={newAddress.name}
+                      value={
+                        newAddress.name
+                      }
                       onChange={
                         handleAddressChange
                       }
@@ -1077,7 +2694,9 @@ export default function CustomerDashboard() {
 
                     <input
                       name="company"
-                      value={newAddress.company}
+                      value={
+                        newAddress.company
+                      }
                       onChange={
                         handleAddressChange
                       }
@@ -1094,10 +2713,13 @@ export default function CustomerDashboard() {
 
                     <input
                       name="phone"
-                      value={newAddress.phone}
+                      value={
+                        newAddress.phone
+                      }
                       onChange={
                         handleAddressChange
                       }
+                      placeholder="+256..."
                     />
 
                   </div>
@@ -1106,12 +2728,14 @@ export default function CustomerDashboard() {
                   <div className="field">
 
                     <label>
-                      Address
+                      Address *
                     </label>
 
                     <input
                       name="address"
-                      value={newAddress.address}
+                      value={
+                        newAddress.address
+                      }
                       onChange={
                         handleAddressChange
                       }
@@ -1124,12 +2748,14 @@ export default function CustomerDashboard() {
                   <div className="field">
 
                     <label>
-                      City
+                      City *
                     </label>
 
                     <input
                       name="city"
-                      value={newAddress.city}
+                      value={
+                        newAddress.city
+                      }
                       onChange={
                         handleAddressChange
                       }
@@ -1146,18 +2772,35 @@ export default function CustomerDashboard() {
                   <button
                     type="button"
                     className="btn btn-outline-navy"
-                    onClick={() =>
-                      setShowAddressForm(false)
+                    disabled={
+                      savingAddress
                     }
+                    onClick={() => {
+
+                      setNewAddress(
+                        emptyAddress
+                      );
+
+                      setShowAddressForm(
+                        false
+                      );
+
+                    }}
                   >
                     Cancel
                   </button>
 
+
                   <button
                     type="submit"
                     className="btn btn-primary"
+                    disabled={
+                      savingAddress
+                    }
                   >
-                    Save Address
+                    {savingAddress
+                      ? 'Saving...'
+                      : 'Save Address'}
                   </button>
 
                 </div>
@@ -1167,103 +2810,149 @@ export default function CustomerDashboard() {
             )}
 
 
-            <div className="customer-address-grid">
+            {addresses.length === 0 ? (
 
-              {addresses.map(
-                (address) => (
+              <div className="card customer-empty">
 
-                  <div
-                    key={address.id}
-                    className="card customer-address-card"
-                  >
+                <Icon
+                  name="location"
+                  size={36}
+                />
 
-                    <div className="customer-address-header">
+                <h3>
+                  No saved addresses
+                </h3>
 
-                      <div>
+                <p>
+                  Add your first delivery address for future machinery orders.
+                </p>
 
-                        <h3>
-                          {address.title}
-                        </h3>
+              </div>
 
-                        {address.default && (
+            ) : (
 
-                          <span className="badge badge-instock">
-                            Default
-                          </span>
+              <div className="customer-address-grid">
 
-                        )}
+                {addresses.map(
+                  (address) => (
+
+                    <div
+                      key={address.id}
+                      className="card customer-address-card"
+                    >
+
+                      <div className="customer-address-header">
+
+                        <div>
+
+                          <h3>
+                            {address.title}
+                          </h3>
+
+                          {address.default && (
+
+                            <span className="badge badge-instock">
+                              Default
+                            </span>
+
+                          )}
+
+                        </div>
+
+
+                        <Icon
+                          name="location"
+                          size={20}
+                        />
 
                       </div>
 
-                      <Icon
-                        name="location"
-                        size={20}
-                      />
 
-                    </div>
+                      <strong>
+                        {address.name}
+                      </strong>
 
 
-                    <strong>
-                      {address.name}
-                    </strong>
-
-                    <span>
-                      {address.company}
-                    </span>
-
-                    <span>
-                      {address.address}
-                    </span>
-
-                    <span>
-                      {address.city}
-                    </span>
-
-                    <span>
-                      {address.phone}
-                    </span>
+                      {address.company && (
+                        <span>
+                          {address.company}
+                        </span>
+                      )}
 
 
-                    <div className="customer-address-actions">
+                      <span>
+                        {address.address}
+                      </span>
 
-                      {!address.default && (
+
+                      <span>
+                        {address.city}
+                      </span>
+
+
+                      {address.phone && (
+                        <span>
+                          {address.phone}
+                        </span>
+                      )}
+
+
+                      <div className="customer-address-actions">
+
+                        {!address.default && (
+
+                          <button
+                            type="button"
+                            disabled={
+                              defaultAddressId ===
+                              address.id
+                            }
+                            onClick={() =>
+                              setDefaultAddress(
+                                address.id
+                              )
+                            }
+                          >
+                            {defaultAddressId ===
+                            address.id
+                              ? 'Updating...'
+                              : 'Set Default'}
+                          </button>
+
+                        )}
+
 
                         <button
                           type="button"
+                          className="danger"
+                          disabled={
+                            deletingAddressId ===
+                            address.id
+                          }
                           onClick={() =>
-                            setDefaultAddress(
+                            deleteAddress(
                               address.id
                             )
                           }
                         >
-                          Set Default
+                          {deletingAddressId ===
+                          address.id
+                            ? 'Deleting...'
+                            : 'Delete'}
                         </button>
 
-                      )}
-
-                      <button
-                        type="button"
-                        className="danger"
-                        onClick={() =>
-                          deleteAddress(
-                            address.id
-                          )
-                        }
-                      >
-                        Delete
-                      </button>
+                      </div>
 
                     </div>
 
-                  </div>
+                  )
+                )}
 
-                )
-              )}
+              </div>
 
-            </div>
+            )}
 
           </>
-
         );
 
 
@@ -1274,7 +2963,6 @@ export default function CustomerDashboard() {
       case 'billing':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -1290,17 +2978,25 @@ export default function CustomerDashboard() {
                 </h2>
 
                 <p>
-                  Review invoices and payment status.
+                  Review your invoices, balances and payment status.
                 </p>
 
               </div>
 
+
               <button
                 type="button"
                 className="btn btn-gold"
-                onClick={handleTopUp}
+                disabled={
+                  toppingUp
+                }
+                onClick={
+                  handleTopUp
+                }
               >
-                Top Up Credit
+                {toppingUp
+                  ? 'Submitting...'
+                  : 'Request Credit'}
               </button>
 
             </div>
@@ -1315,7 +3011,9 @@ export default function CustomerDashboard() {
                 </span>
 
                 <strong>
-                  UGX 42,500,000
+                  {formatMoney(
+                    enterpriseBalance
+                  )}
                 </strong>
 
               </div>
@@ -1324,11 +3022,11 @@ export default function CustomerDashboard() {
               <div className="card">
 
                 <span>
-                  Outstanding
+                  Outstanding Invoices
                 </span>
 
                 <strong>
-                  UGX 107,100,000
+                  {unpaidInvoices}
                 </strong>
 
               </div>
@@ -1341,7 +3039,7 @@ export default function CustomerDashboard() {
                 </span>
 
                 <strong>
-                  18
+                  {paidInvoices}
                 </strong>
 
               </div>
@@ -1349,108 +3047,200 @@ export default function CustomerDashboard() {
             </div>
 
 
-            <div className="card customer-panel">
+            {selectedInvoice && (
 
-              <div className="customer-table-wrapper">
+              <div className="card customer-panel customer-selection-card">
 
-                <table className="customer-table">
+                <div>
 
-                  <thead>
+                  <span className="eyebrow">
+                    Invoice Details
+                  </span>
 
-                    <tr>
-                      <th>Invoice</th>
-                      <th>Order</th>
-                      <th>Amount</th>
-                      <th>Date</th>
-                      <th>Due</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
+                  <h3>
+                    {selectedInvoice.id}
+                  </h3>
 
-                  </thead>
+                </div>
 
-                  <tbody>
 
-                    {invoices.map(
-                      (invoice) => (
+                <div>
 
-                        <tr key={invoice.id}>
-
-                          <td>
-                            <strong>
-                              {invoice.id}
-                            </strong>
-                          </td>
-
-                          <td>
-                            {invoice.order}
-                          </td>
-
-                          <td>
-                            {invoice.amount}
-                          </td>
-
-                          <td>
-                            {invoice.date}
-                          </td>
-
-                          <td>
-                            {invoice.due}
-                          </td>
-
-                          <td>
-
-                            <span
-                              className={`badge ${
-                                invoice.status ===
-                                'Paid'
-                                  ? 'badge-instock'
-                                  : 'badge-limited'
-                              }`}
-                            >
-                              {invoice.status}
-                            </span>
-
-                          </td>
-
-                          <td>
-
-                            <button
-                              type="button"
-                              className="customer-table-action"
-                              onClick={() =>
-                                showMessage(
-                                  `Invoice ${invoice.id} opened.`
-                                )
-                              }
-                            >
-
-                              <Icon
-                                name="eye"
-                                size={15}
-                              />
-
-                              View
-
-                            </button>
-
-                          </td>
-
-                        </tr>
-
-                      )
+                  <strong>
+                    {formatMoney(
+                      selectedInvoice.amount
                     )}
+                  </strong>
 
-                  </tbody>
+                  <span
+                    className={`badge ${getInvoiceBadge(
+                      selectedInvoice.status
+                    )}`}
+                  >
+                    {selectedInvoice.status}
+                  </span>
 
-                </table>
+                </div>
+
+
+                <p>
+                  Issued:{' '}
+                  {formatDate(
+                    selectedInvoice.date
+                  )}
+                  {' · '}
+                  Due:{' '}
+                  {formatDate(
+                    selectedInvoice.due
+                  )}
+                </p>
+
+
+                <button
+                  type="button"
+                  className="btn btn-outline-navy btn-sm"
+                  onClick={() =>
+                    setSelectedInvoice(
+                      null
+                    )
+                  }
+                >
+                  Close
+                </button>
 
               </div>
 
-            </div>
+            )}
+
+
+            {invoices.length === 0 ? (
+
+              <div className="card customer-empty">
+
+                <Icon
+                  name="package"
+                  size={36}
+                />
+
+                <h3>
+                  No invoices
+                </h3>
+
+                <p>
+                  Your Apex Machinery invoices will appear here.
+                </p>
+
+              </div>
+
+            ) : (
+
+              <div className="card customer-panel">
+
+                <div className="customer-table-wrapper">
+
+                  <table className="customer-table">
+
+                    <thead>
+
+                      <tr>
+                        <th>Invoice</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Due</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                      {invoices.map(
+                        (invoice) => (
+
+                          <tr
+                            key={
+                              invoice.databaseId ||
+                              invoice.id
+                            }
+                          >
+
+                            <td>
+                              <strong>
+                                {invoice.id}
+                              </strong>
+                            </td>
+
+                            <td>
+                              {formatMoney(
+                                invoice.amount
+                              )}
+                            </td>
+
+                            <td>
+                              {formatDate(
+                                invoice.date
+                              )}
+                            </td>
+
+                            <td>
+                              {formatDate(
+                                invoice.due
+                              )}
+                            </td>
+
+                            <td>
+
+                              <span
+                                className={`badge ${getInvoiceBadge(
+                                  invoice.status
+                                )}`}
+                              >
+                                {invoice.status}
+                              </span>
+
+                            </td>
+
+                            <td>
+
+                              <button
+                                type="button"
+                                className="customer-table-action"
+                                onClick={() =>
+                                  setSelectedInvoice(
+                                    invoice
+                                  )
+                                }
+                              >
+
+                                <Icon
+                                  name="eye"
+                                  size={15}
+                                />
+
+                                View
+
+                              </button>
+
+                            </td>
+
+                          </tr>
+
+                        )
+                      )}
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              </div>
+
+            )}
 
           </>
-
         );
 
 
@@ -1461,7 +3251,6 @@ export default function CustomerDashboard() {
       case 'wishlist':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -1477,10 +3266,11 @@ export default function CustomerDashboard() {
                 </h2>
 
                 <p>
-                  Machinery and equipment you saved for later.
+                  Machinery and equipment saved for future procurement.
                 </p>
 
               </div>
+
 
               <Link
                 to="/shop"
@@ -1506,7 +3296,7 @@ export default function CustomerDashboard() {
                 </h3>
 
                 <p>
-                  Save products you may want to purchase later.
+                  Products you save will appear here.
                 </p>
 
                 <Link
@@ -1541,7 +3331,8 @@ export default function CustomerDashboard() {
 
 
                       <span>
-                        {item.category}
+                        {item.category ||
+                          'Machinery'}
                       </span>
 
 
@@ -1551,7 +3342,9 @@ export default function CustomerDashboard() {
 
 
                       <strong>
-                        {item.price}
+                        {formatMoney(
+                          item.price
+                        )}
                       </strong>
 
 
@@ -1560,10 +3353,14 @@ export default function CustomerDashboard() {
                           item.stock ===
                           'In Stock'
                             ? 'badge-instock'
+                            : item.stock ===
+                              'Out of Stock'
+                            ? 'badge-outofstock'
                             : 'badge-limited'
                         }`}
                       >
-                        {item.stock}
+                        {item.stock ||
+                          'Stock Unknown'}
                       </span>
 
 
@@ -1576,9 +3373,15 @@ export default function CustomerDashboard() {
                           View Product
                         </Link>
 
+
                         <button
                           type="button"
                           className="customer-icon-action danger"
+                          disabled={
+                            removingWishlistId ===
+                            item.id
+                          }
+                          aria-label={`Remove ${item.name} from wishlist`}
                           title="Remove from wishlist"
                           onClick={() =>
                             removeWishlist(
@@ -1586,10 +3389,12 @@ export default function CustomerDashboard() {
                             )
                           }
                         >
+
                           <Icon
                             name="trash"
                             size={16}
                           />
+
                         </button>
 
                       </div>
@@ -1604,7 +3409,6 @@ export default function CustomerDashboard() {
             )}
 
           </>
-
         );
 
 
@@ -1615,7 +3419,6 @@ export default function CustomerDashboard() {
       case 'notifications':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -1631,7 +3434,7 @@ export default function CustomerDashboard() {
                 </h2>
 
                 <p>
-                  Security, billing and procurement updates.
+                  Order, inventory, billing and security updates.
                 </p>
 
               </div>
@@ -1640,13 +3443,15 @@ export default function CustomerDashboard() {
               <button
                 type="button"
                 className="btn btn-outline-navy"
+                disabled={
+                  unreadNotifications ===
+                  0
+                }
                 onClick={
                   markAllNotificationsRead
                 }
-                disabled={
-                  unreadNotifications === 0
-                }
               >
+
                 <Icon
                   name="check"
                   size={16}
@@ -1659,84 +3464,115 @@ export default function CustomerDashboard() {
             </div>
 
 
-            <div className="card customer-notification-list">
+            {notifications.length === 0 ? (
 
-              {notifications.map(
-                (notification) => (
+              <div className="card customer-empty">
 
-                  <div
-                    key={notification.id}
-                    className={`customer-notification ${
-                      notification.read
-                        ? 'read'
-                        : 'unread'
-                    }`}
-                  >
+                <Icon
+                  name="clock"
+                  size={35}
+                />
 
-                    <div className="customer-notification-icon">
+                <h3>
+                  No notifications
+                </h3>
 
-                      <Icon
-                        name={
-                          notification.type ===
-                          'security'
-                            ? 'settings'
-                            : notification.type ===
-                              'billing'
-                            ? 'package'
-                            : 'clock'
-                        }
-                        size={18}
-                      />
+                <p>
+                  New account and procurement updates will appear here.
+                </p>
 
-                    </div>
+              </div>
 
+            ) : (
 
-                    <div className="customer-notification-content">
+              <div className="card customer-notification-list">
 
-                      <div>
+                {notifications.map(
+                  (notification) => (
 
-                        <strong>
-                          {notification.title}
-                        </strong>
+                    <div
+                      key={
+                        notification.id
+                      }
+                      className={`customer-notification ${
+                        notification.read
+                          ? 'read'
+                          : 'unread'
+                      }`}
+                    >
 
-                        <span>
-                          {notification.time}
-                        </span>
+                      <div className="customer-notification-icon">
+
+                        <Icon
+                          name={
+                            notification.type ===
+                            'security'
+                              ? 'settings'
+                              : notification.type ===
+                                'billing'
+                              ? 'package'
+                              : notification.type ===
+                                'order'
+                              ? 'truck'
+                              : 'clock'
+                          }
+                          size={18}
+                        />
 
                       </div>
 
 
-                      <p>
-                        {notification.text}
-                      </p>
+                      <div className="customer-notification-content">
+
+                        <div>
+
+                          <strong>
+                            {
+                              notification.title
+                            }
+                          </strong>
+
+                          <span>
+                            {formatRelativeTime(
+                              notification.createdAt
+                            )}
+                          </span>
+
+                        </div>
 
 
-                      {!notification.read && (
+                        <p>
+                          {notification.text}
+                        </p>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            markNotificationRead(
-                              notification.id
-                            )
-                          }
-                        >
-                          Mark as read
-                        </button>
 
-                      )}
+                        {!notification.read && (
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              markNotificationRead(
+                                notification.id
+                              )
+                            }
+                          >
+                            Mark as read
+                          </button>
+
+                        )}
+
+                      </div>
 
                     </div>
 
-                  </div>
+                  )
+                )}
 
-                )
-              )}
+              </div>
 
-            </div>
+            )}
 
           </>
-
         );
 
 
@@ -1747,7 +3583,6 @@ export default function CustomerDashboard() {
       case 'settings':
 
         return (
-
           <>
 
             <div className="customer-page-heading">
@@ -1763,7 +3598,7 @@ export default function CustomerDashboard() {
                 </h2>
 
                 <p>
-                  Manage your security and account preferences.
+                  Manage your security and communication preferences.
                 </p>
 
               </div>
@@ -1773,11 +3608,17 @@ export default function CustomerDashboard() {
 
             <div className="customer-settings-grid">
 
-              <div className="card customer-panel">
+              <form
+                className="card customer-panel"
+                onSubmit={
+                  submitPasswordChange
+                }
+              >
 
                 <h3>
                   Password & Security
                 </h3>
+
 
                 <div className="field">
 
@@ -1787,7 +3628,16 @@ export default function CustomerDashboard() {
 
                   <input
                     type="password"
+                    name="currentPassword"
+                    value={
+                      passwordForm.currentPassword
+                    }
+                    onChange={
+                      handlePasswordChange
+                    }
+                    autoComplete="current-password"
                     placeholder="Current password"
+                    required
                   />
 
                 </div>
@@ -1801,7 +3651,17 @@ export default function CustomerDashboard() {
 
                   <input
                     type="password"
+                    name="newPassword"
+                    value={
+                      passwordForm.newPassword
+                    }
+                    onChange={
+                      handlePasswordChange
+                    }
+                    autoComplete="new-password"
                     placeholder="New password"
+                    minLength={6}
+                    required
                   />
 
                 </div>
@@ -1815,25 +3675,35 @@ export default function CustomerDashboard() {
 
                   <input
                     type="password"
+                    name="confirmPassword"
+                    value={
+                      passwordForm.confirmPassword
+                    }
+                    onChange={
+                      handlePasswordChange
+                    }
+                    autoComplete="new-password"
                     placeholder="Confirm password"
+                    minLength={6}
+                    required
                   />
 
                 </div>
 
 
                 <button
-                  type="button"
+                  type="submit"
                   className="btn btn-primary"
-                  onClick={() =>
-                    showMessage(
-                      'Password update request submitted.'
-                    )
+                  disabled={
+                    changingPassword
                   }
                 >
-                  Update Password
+                  {changingPassword
+                    ? 'Updating Password...'
+                    : 'Update Password'}
                 </button>
 
-              </div>
+              </form>
 
 
               <div className="card customer-panel">
@@ -1847,7 +3717,16 @@ export default function CustomerDashboard() {
 
                   <input
                     type="checkbox"
-                    defaultChecked
+                    name="orderUpdates"
+                    checked={
+                      preferences.orderUpdates
+                    }
+                    disabled={
+                      preferenceSaving
+                    }
+                    onChange={
+                      changePreference
+                    }
                   />
 
                   <span>
@@ -1861,7 +3740,16 @@ export default function CustomerDashboard() {
 
                   <input
                     type="checkbox"
-                    defaultChecked
+                    name="inventoryAlerts"
+                    checked={
+                      preferences.inventoryAlerts
+                    }
+                    disabled={
+                      preferenceSaving
+                    }
+                    onChange={
+                      changePreference
+                    }
                   />
 
                   <span>
@@ -1875,7 +3763,16 @@ export default function CustomerDashboard() {
 
                   <input
                     type="checkbox"
-                    defaultChecked
+                    name="invoiceReminders"
+                    checked={
+                      preferences.invoiceReminders
+                    }
+                    disabled={
+                      preferenceSaving
+                    }
+                    onChange={
+                      changePreference
+                    }
                   />
 
                   <span>
@@ -1889,6 +3786,16 @@ export default function CustomerDashboard() {
 
                   <input
                     type="checkbox"
+                    name="marketing"
+                    checked={
+                      preferences.marketing
+                    }
+                    disabled={
+                      preferenceSaving
+                    }
+                    onChange={
+                      changePreference
+                    }
                   />
 
                   <span>
@@ -1920,7 +3827,12 @@ export default function CustomerDashboard() {
               <button
                 type="button"
                 className="btn btn-outline-danger"
-                onClick={handleLogout}
+                disabled={
+                  loggingOut
+                }
+                onClick={
+                  handleLogout
+                }
               >
 
                 <Icon
@@ -1928,14 +3840,15 @@ export default function CustomerDashboard() {
                   size={16}
                 />
 
-                Logout
+                {loggingOut
+                  ? 'Logging Out...'
+                  : 'Logout'}
 
               </button>
 
             </div>
 
           </>
-
         );
 
 
@@ -1944,16 +3857,110 @@ export default function CustomerDashboard() {
 
     }
 
-  };
+  }
 
 
   // ==========================================================
-  // RENDER
+  // INITIAL LOADING
+  // ==========================================================
+
+  if (
+    loadingDashboard
+  ) {
+
+    return (
+
+      <div className="customer-dashboard-page">
+
+        <div className="container">
+
+          <div className="customer-dashboard-loading">
+
+            <div className="customer-loading-spinner" />
+
+            <h2>
+              Loading your account
+            </h2>
+
+            <p>
+              Retrieving your latest Apex Machinery information...
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // INITIAL ERROR
+  // ==========================================================
+
+  if (
+    dashboardError &&
+    !profile.name &&
+    orders.length === 0 &&
+    addresses.length === 0
+  ) {
+
+    return (
+
+      <div className="customer-dashboard-page">
+
+        <div className="container">
+
+          <div className="card customer-dashboard-error">
+
+            <Icon
+              name="settings"
+              size={34}
+            />
+
+            <h2>
+              Unable to load customer dashboard
+            </h2>
+
+            <p>
+              {dashboardError}
+            </p>
+
+
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() =>
+                loadDashboard()
+              }
+            >
+              Try Again
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // MAIN RENDER
   // ==========================================================
 
   return (
 
-    <div className="customer-dashboard-page">
+    <div
+      className="customer-dashboard-page"
+      ref={pageTopRef}
+    >
 
 
       {/* ====================================================
@@ -1962,10 +3969,24 @@ export default function CustomerDashboard() {
 
       {message && (
 
-        <div className="customer-toast">
+        <div
+          className={`customer-toast ${
+            messageType ===
+            'error'
+              ? 'customer-toast-error'
+              : ''
+          }`}
+          role="status"
+          aria-live="polite"
+        >
 
           <Icon
-            name="check"
+            name={
+              messageType ===
+              'error'
+                ? 'settings'
+                : 'check'
+            }
             size={17}
           />
 
@@ -1979,10 +4000,24 @@ export default function CustomerDashboard() {
 
 
       {/* ====================================================
-          PAGE HEADER
+          REFRESH INDICATOR
       ==================================================== */}
 
+      {refreshing && (
+
+        <div className="customer-refresh-indicator">
+          Updating account information...
+        </div>
+
+      )}
+
+
       <div className="container">
+
+
+        {/* ==================================================
+            DASHBOARD HEADER
+        ================================================== */}
 
         <div className="customer-dashboard-header">
 
@@ -1992,9 +4027,11 @@ export default function CustomerDashboard() {
               Customer Portal
             </span>
 
+
             <h1>
               Welcome back, {firstName}
             </h1>
+
 
             <p>
               Manage your procurement account,
@@ -2004,18 +4041,50 @@ export default function CustomerDashboard() {
           </div>
 
 
-          <div className="customer-member">
+          <div className="customer-dashboard-header-actions">
 
-            <Icon
-              name="user"
-              size={18}
-            />
+            <button
+              type="button"
+              className="customer-refresh-button"
+              disabled={
+                refreshing
+              }
+              onClick={() =>
+                loadDashboard({
+                  silent: true,
+                })
+              }
+            >
 
-            <span>
-              Member since{' '}
-              {user?.memberSince ||
-                'August 2026'}
-            </span>
+              <Icon
+                name="clock"
+                size={16}
+              />
+
+              {refreshing
+                ? 'Refreshing...'
+                : 'Refresh'}
+
+            </button>
+
+
+            <div className="customer-member">
+
+              <Icon
+                name="user"
+                size={18}
+              />
+
+              <span>
+                Member since{' '}
+                {formatMemberSince(
+                  user?.memberSince ||
+                  user?.member_since ||
+                  user?.created_at
+                )}
+              </span>
+
+            </div>
 
           </div>
 
@@ -2023,7 +4092,7 @@ export default function CustomerDashboard() {
 
 
         {/* ==================================================
-            LAYOUT
+            DASHBOARD LAYOUT
         ================================================== */}
 
         <div className="dashboard-layout">
@@ -2036,8 +4105,6 @@ export default function CustomerDashboard() {
           <aside className="dashboard-sidebar card">
 
 
-            {/* PROFILE */}
-
             <div className="dashboard-profile">
 
               <div className="dashboard-avatar">
@@ -2049,93 +4116,111 @@ export default function CustomerDashboard() {
 
               </div>
 
+
               <strong>
                 {name}
               </strong>
 
+
               <span>
-                Procurement Manager
+                {profile.company ||
+                  'Apex Machinery Customer'}
               </span>
 
             </div>
 
 
-            {/* NAVIGATION */}
-
             <nav className="customer-sidebar-nav">
 
               {sidebarItems.map(
-                (item) => (
+                (item) => {
 
-                  <button
-                    key={item.key}
-                    type="button"
-                    className={
-                      active === item.key
-                        ? 'active'
-                        : ''
-                    }
-                    onClick={() =>
-                      changeSection(
+                  let badge = 0;
+
+
+                  if (
+                    item.key ===
+                    'notifications'
+                  ) {
+                    badge =
+                      unreadNotifications;
+                  }
+
+
+                  if (
+                    item.key ===
+                    'wishlist'
+                  ) {
+                    badge =
+                      wishlist.length;
+                  }
+
+
+                  if (
+                    item.key ===
+                    'orders'
+                  ) {
+                    badge =
+                      orders.length;
+                  }
+
+
+                  return (
+
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={
+                        active ===
                         item.key
-                      )
-                    }
-                  >
+                          ? 'active'
+                          : ''
+                      }
+                      onClick={() =>
+                        changeSection(
+                          item.key
+                        )
+                      }
+                    >
 
-                    <Icon
-                      name={item.icon}
-                      size={17}
-                    />
+                      <Icon
+                        name={
+                          item.icon
+                        }
+                        size={17}
+                      />
 
-                    <span>
-                      {item.label}
-                    </span>
 
-                    {item.key ===
-                      'notifications' &&
-                      unreadNotifications >
-                        0 && (
-
-                      <span className="dashboard-badge">
-                        {unreadNotifications}
+                      <span>
+                        {item.label}
                       </span>
 
-                    )}
 
-                    {item.key ===
-                      'wishlist' &&
-                      wishlist.length >
-                        0 && (
+                      {badge > 0 && (
 
-                      <span className="dashboard-badge">
-                        {wishlist.length}
-                      </span>
+                        <span className="dashboard-badge">
+                          {badge}
+                        </span>
 
-                    )}
+                      )}
 
-                    {item.key ===
-                      'orders' &&
-                      orders.length >
-                        0 && (
+                    </button>
 
-                      <span className="dashboard-badge">
-                        {orders.length}
-                      </span>
+                  );
 
-                    )}
-
-                  </button>
-
-                )
+                }
               )}
 
-
-              {/* LOGOUT */}
 
               <button
                 type="button"
                 className="dashboard-logout"
-                onClick={handleLogout}
+                disabled={
+                  loggingOut
+                }
+                onClick={
+                  handleLogout
+                }
               >
 
                 <Icon
@@ -2144,7 +4229,9 @@ export default function CustomerDashboard() {
                 />
 
                 <span>
-                  Logout
+                  {loggingOut
+                    ? 'Logging Out...'
+                    : 'Logout'}
                 </span>
 
               </button>
@@ -2152,24 +4239,33 @@ export default function CustomerDashboard() {
             </nav>
 
 
-            {/* BALANCE */}
-
             <div className="dashboard-balance">
 
               <span>
                 Enterprise Balance
               </span>
 
+
               <strong>
-                UGX 42,500,000
+                {formatMoney(
+                  enterpriseBalance
+                )}
               </strong>
+
 
               <button
                 type="button"
                 className="btn btn-gold btn-sm btn-block"
-                onClick={handleTopUp}
+                disabled={
+                  toppingUp
+                }
+                onClick={
+                  handleTopUp
+                }
               >
-                Top Up Credit
+                {toppingUp
+                  ? 'Submitting...'
+                  : 'Request Credit'}
               </button>
 
             </div>
@@ -2184,7 +4280,9 @@ export default function CustomerDashboard() {
           <main className="dashboard-main">
 
 
-            {/* STATS */}
+            {/* =================================================
+                STATISTICS
+            ================================================= */}
 
             <div className="customer-stats-grid">
 
@@ -2192,7 +4290,9 @@ export default function CustomerDashboard() {
                 type="button"
                 className="card dashboard-stat"
                 onClick={() =>
-                  changeSection('orders')
+                  changeSection(
+                    'orders'
+                  )
                 }
               >
 
@@ -2202,15 +4302,7 @@ export default function CustomerDashboard() {
                 />
 
                 <strong>
-                  {
-                    orders.filter(
-                      (order) =>
-                        order.status ===
-                          'In Transit' ||
-                        order.status ===
-                          'Processing'
-                    ).length
-                  }
+                  {ongoingOrders}
                 </strong>
 
                 <span>
@@ -2224,7 +4316,9 @@ export default function CustomerDashboard() {
                 type="button"
                 className="card dashboard-stat"
                 onClick={() =>
-                  changeSection('billing')
+                  changeSection(
+                    'billing'
+                  )
                 }
               >
 
@@ -2234,13 +4328,7 @@ export default function CustomerDashboard() {
                 />
 
                 <strong>
-                  {
-                    invoices.filter(
-                      (invoice) =>
-                        invoice.status !==
-                        'Paid'
-                    ).length
-                  }
+                  {unpaidInvoices}
                 </strong>
 
                 <span>
@@ -2254,7 +4342,9 @@ export default function CustomerDashboard() {
                 type="button"
                 className="card dashboard-stat"
                 onClick={() =>
-                  changeSection('wishlist')
+                  changeSection(
+                    'wishlist'
+                  )
                 }
               >
 
@@ -2276,60 +4366,126 @@ export default function CustomerDashboard() {
             </div>
 
 
-            {/* ACTIVE SHIPMENT */}
+            {/* =================================================
+                ACTIVE SHIPMENT
+            ================================================= */}
 
-            <div className="card dashboard-shipment">
+            {activeShipment ? (
 
-              <div className="dashboard-shipment-header">
+              <div className="card dashboard-shipment">
 
-                <div>
+                <div className="dashboard-shipment-header">
 
-                  <strong>
-                    Active Shipment
-                  </strong>
+                  <div>
 
-                  <span>
-                    Order #APX-9930 · In Transit
+                    <strong>
+                      Active Shipment
+                    </strong>
+
+                    <span>
+                      Order #
+                      {activeShipment.id}
+                      {' · '}
+                      {activeShipment.status}
+                    </span>
+
+                  </div>
+
+
+                  <span className="badge badge-gold">
+
+                    {activeShipment
+                      .estimatedDeliveryDate
+                      ? `Estimated ${formatDate(
+                          activeShipment
+                            .estimatedDeliveryDate
+                        )}`
+                      : 'Shipment Active'}
+
                   </span>
 
                 </div>
 
-                <span className="badge badge-gold">
-                  Est. Arrival: May 20
-                </span>
+
+                <ProgressBar
+                  steps={[
+                    'Ordered',
+                    'Processing',
+                    'In Transit',
+                    'Delivered',
+                  ]}
+                  activeIndex={
+                    getTrackingIndex(
+                      activeShipment.status
+                    )
+                  }
+                />
+
+
+                <button
+                  type="button"
+                  className="dashboard-track-link"
+                  onClick={() =>
+                    navigate(
+                      '/order-tracking',
+                      {
+                        state: {
+                          orderId:
+                            activeShipment.databaseId ||
+                            activeShipment.id,
+
+                          orderNumber:
+                            activeShipment.id,
+                        },
+                      }
+                    )
+                  }
+                >
+
+                  Track Details
+
+                  <Icon
+                    name="arrowRight"
+                    size={14}
+                  />
+
+                </button>
 
               </div>
 
+            ) : (
 
-              <ProgressBar
-                steps={[
-                  'Ordered',
-                  'Processing',
-                  'In Transit',
-                  'Delivered',
-                ]}
-                activeIndex={2}
-              />
+              <div className="card dashboard-shipment">
 
+                <div className="dashboard-shipment-header">
 
-              <Link
-                to="/order-tracking"
-                className="dashboard-track-link"
-              >
+                  <div>
 
-                Track Details
+                    <strong>
+                      Active Shipment
+                    </strong>
 
-                <Icon
-                  name="arrowRight"
-                  size={14}
-                />
+                    <span>
+                      You currently have no active shipment.
+                    </span>
 
-              </Link>
-
-            </div>
+                  </div>
 
 
-            {/* ACTIVE SECTION */}
+                  <span className="badge badge-instock">
+                    Up to Date
+                  </span>
+
+                </div>
+
+              </div>
+
+            )}
+
+
+            {/* =================================================
+                ACTIVE SECTION
+            ================================================= */}
 
             <section className="customer-active-section">
 

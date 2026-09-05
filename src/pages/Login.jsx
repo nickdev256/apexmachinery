@@ -1,17 +1,11 @@
 import { useState } from 'react';
-
 import {
   Link,
   useNavigate,
-  useSearchParams,
 } from 'react-router-dom';
 
 import Icon from '../components/Icon';
-
-import {
-  useAuth,
-} from '../context/AuthContext';
-
+import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpg';
 
 import './Auth.css';
@@ -22,24 +16,29 @@ import './Auth.css';
 // LOGIN PAGE
 // ============================================================
 //
-// Authentication flow:
+// ONE LOGIN FOR ALL EXISTING ACCOUNTS
 //
-// Frontend
-//    ↓
-// AuthContext
-//    ↓
+// Customer credentials
+//      ↓
 // POST /api/auth/login
-//    ↓
-// Node.js Backend
-//    ↓
-// Supabase Authentication
-//    ↓
-// profiles table
-//    ↓
-// role
+//      ↓
+// role = customer
+//      ↓
+// /dashboard
 //
-// customer → /dashboard
-// admin    → /admin
+//
+// Administrator credentials
+//      ↓
+// POST /api/auth/login
+//      ↓
+// role = admin
+//      ↓
+// /admin
+//
+// IMPORTANT:
+//
+// The frontend does NOT decide the user's role.
+// The role comes from the backend "profiles" table.
 //
 // ============================================================
 
@@ -69,15 +68,7 @@ export default function Login() {
 
 
   // ==========================================================
-  // URL PARAMETERS
-  // ==========================================================
-
-  const [searchParams] =
-    useSearchParams();
-
-
-  // ==========================================================
-  // AUTH CONTEXT
+  // AUTH
   // ==========================================================
 
   const {
@@ -96,18 +87,12 @@ export default function Login() {
 
 
   // ==========================================================
-  // ADMIN LOGIN MODE
-  // ==========================================================
-
-  const adminMode =
-    searchParams.get('admin') === 'true';
-
-
-  // ==========================================================
   // GET USER ROLE
   // ==========================================================
 
-  function getUserRole(authenticatedUser) {
+  function getUserRole(
+    authenticatedUser
+  ) {
 
     return String(
       authenticatedUser?.role || ''
@@ -119,15 +104,18 @@ export default function Login() {
 
 
   // ==========================================================
-  // CHECK ADMIN
+  // CHECK ADMIN ROLE
   // ==========================================================
 
-  function isAdminRole(authenticatedUser) {
+  function isAdminRole(
+    authenticatedUser
+  ) {
 
     const role =
       getUserRole(
         authenticatedUser
       );
+
 
     return (
       role === 'admin' ||
@@ -138,10 +126,12 @@ export default function Login() {
 
 
   // ==========================================================
-  // CHECK CUSTOMER
+  // CHECK CUSTOMER ROLE
   // ==========================================================
 
-  function isCustomerRole(authenticatedUser) {
+  function isCustomerRole(
+    authenticatedUser
+  ) {
 
     return (
       getUserRole(
@@ -153,16 +143,12 @@ export default function Login() {
 
 
   // ==========================================================
-  // REDIRECT AUTHENTICATED USER
+  // GET DASHBOARD
   // ==========================================================
 
-  function redirectAuthenticatedUser(
+  function getDashboard(
     authenticatedUser
   ) {
-
-    // --------------------------------------------------------
-    // ADMIN
-    // --------------------------------------------------------
 
     if (
       isAdminRole(
@@ -170,21 +156,10 @@ export default function Login() {
       )
     ) {
 
-      navigate(
-        '/admin',
-        {
-          replace: true,
-        }
-      );
-
-      return;
+      return '/admin';
 
     }
 
-
-    // --------------------------------------------------------
-    // CUSTOMER
-    // --------------------------------------------------------
 
     if (
       isCustomerRole(
@@ -192,25 +167,12 @@ export default function Login() {
       )
     ) {
 
-      navigate(
-        '/dashboard',
-        {
-          replace: true,
-        }
-      );
-
-      return;
+      return '/dashboard';
 
     }
 
 
-    // --------------------------------------------------------
-    // UNKNOWN ROLE
-    // --------------------------------------------------------
-
-    setError(
-      'Your account does not have a valid access role. Please contact Apex Machinery support.'
-    );
+    return null;
 
   }
 
@@ -224,27 +186,17 @@ export default function Login() {
     e.preventDefault();
 
 
-    // --------------------------------------------------------
-    // CLEAR PREVIOUS ERROR
-    // --------------------------------------------------------
+    if (loading) {
+      return;
+    }
+
 
     setError('');
 
 
-    // --------------------------------------------------------
-    // PREVENT DOUBLE SUBMISSION
-    // --------------------------------------------------------
-
-    if (loading) {
-
-      return;
-
-    }
-
-
-    // --------------------------------------------------------
+    // ========================================================
     // CLEAN INPUT
-    // --------------------------------------------------------
+    // ========================================================
 
     const cleanEmail =
       String(
@@ -263,7 +215,7 @@ export default function Login() {
     try {
 
       // ======================================================
-      // VALIDATE EMAIL
+      // EMAIL VALIDATION
       // ======================================================
 
       if (!cleanEmail) {
@@ -275,8 +227,25 @@ export default function Login() {
       }
 
 
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+      if (
+        !emailPattern.test(
+          cleanEmail
+        )
+      ) {
+
+        throw new Error(
+          'Please enter a valid email address.'
+        );
+
+      }
+
+
       // ======================================================
-      // VALIDATE PASSWORD
+      // PASSWORD VALIDATION
       // ======================================================
 
       if (!cleanPassword) {
@@ -289,33 +258,29 @@ export default function Login() {
 
 
       // ======================================================
-      // START LOADING
+      // START LOGIN
       // ======================================================
 
       setLoading(true);
 
 
       // ======================================================
-      // BACKEND LOGIN
+      // AUTHENTICATE
       // ======================================================
       //
-      // AuthContext calls:
+      // Same endpoint for customers and administrators.
       //
-      // POST http://localhost:5000/api/auth/login
-      //
-      // The backend authenticates against Supabase.
+      // POST /api/auth/login
       //
       // ======================================================
 
       const loggedInUser =
         await login({
-
           email:
             cleanEmail,
 
           password:
             cleanPassword,
-
         });
 
 
@@ -333,7 +298,7 @@ export default function Login() {
 
 
       // ======================================================
-      // GET ROLE
+      // GET ROLE FROM BACKEND RESPONSE
       // ======================================================
 
       const role =
@@ -357,73 +322,8 @@ export default function Login() {
 
 
       // ======================================================
-      // ADMIN LOGIN PAGE
-      // ======================================================
-
-      if (adminMode) {
-
-        // ----------------------------------------------------
-        // ADMIN ACCESS REQUIRED
-        // ----------------------------------------------------
-
-        if (
-          !isAdminRole(
-            loggedInUser
-          )
-        ) {
-
-          throw new Error(
-            'This account does not have administrator access.'
-          );
-
-        }
-
-
-        // ----------------------------------------------------
-        // ADMIN SUCCESS
-        // ----------------------------------------------------
-
-        navigate(
-          '/admin',
-          {
-            replace: true,
-          }
-        );
-
-        return;
-
-      }
-
-
-      // ======================================================
-      // NORMAL LOGIN
-      // ======================================================
-
-      // ------------------------------------------------------
-      // ADMIN
-      // ------------------------------------------------------
-
-      if (
-        isAdminRole(
-          loggedInUser
-        )
-      ) {
-
-        navigate(
-          '/admin',
-          {
-            replace: true,
-          }
-        );
-
-        return;
-
-      }
-
-
-      // ------------------------------------------------------
       // CUSTOMER
-      // ------------------------------------------------------
+      // ======================================================
 
       if (
         isCustomerRole(
@@ -444,18 +344,37 @@ export default function Login() {
 
 
       // ======================================================
-      // INVALID ROLE
+      // ADMINISTRATOR
+      // ======================================================
+
+      if (
+        isAdminRole(
+          loggedInUser
+        )
+      ) {
+
+        navigate(
+          '/admin',
+          {
+            replace: true,
+          }
+        );
+
+        return;
+
+      }
+
+
+      // ======================================================
+      // UNKNOWN ROLE
       // ======================================================
 
       throw new Error(
         `Your account role "${role || 'unknown'}" is not authorized to access this system.`
       );
 
-    } catch (err) {
 
-      // ======================================================
-      // ERROR HANDLING
-      // ======================================================
+    } catch (err) {
 
       console.error(
         '[Apex Login] Login failed:',
@@ -473,11 +392,8 @@ export default function Login() {
         'Unable to sign in. Please check your email and password.'
       );
 
-    } finally {
 
-      // ======================================================
-      // STOP LOADING
-      // ======================================================
+    } finally {
 
       setLoading(false);
 
@@ -489,26 +405,14 @@ export default function Login() {
   // ==========================================================
   // ALREADY AUTHENTICATED
   // ==========================================================
-  //
-  // IMPORTANT:
-  //
-  // We must NOT always redirect to /dashboard.
-  //
-  // Admin → /admin
-  // Customer → /dashboard
-  //
-  // ==========================================================
 
-  if (isAuthenticated && user) {
+  if (
+    isAuthenticated &&
+    user
+  ) {
 
-    const currentUserIsAdmin =
-      isAdminRole(
-        user
-      );
-
-
-    const currentUserIsCustomer =
-      isCustomerRole(
+    const destination =
+      getDashboard(
         user
       );
 
@@ -583,27 +487,27 @@ export default function Login() {
 
 
           {/* ==================================================
-              ADMIN DESTINATION
+              VALID ACCOUNT
           ================================================== */}
 
-          {currentUserIsAdmin && (
+          {destination && (
 
             <button
               type="button"
               className="btn btn-primary btn-block"
-              onClick={() => {
-
+              onClick={() =>
                 navigate(
-                  '/admin',
+                  destination,
                   {
                     replace: true,
                   }
-                );
-
-              }}
+                )
+              }
             >
 
-              Open Admin Dashboard
+              {isAdminRole(user)
+                ? 'Open Admin Dashboard'
+                : 'Go to Dashboard'}
 
               <Icon
                 name="arrowRight"
@@ -616,44 +520,10 @@ export default function Login() {
 
 
           {/* ==================================================
-              CUSTOMER DESTINATION
+              INVALID ROLE
           ================================================== */}
 
-          {currentUserIsCustomer && (
-
-            <button
-              type="button"
-              className="btn btn-primary btn-block"
-              onClick={() => {
-
-                navigate(
-                  '/dashboard',
-                  {
-                    replace: true,
-                  }
-                );
-
-              }}
-            >
-
-              Go to Customer Dashboard
-
-              <Icon
-                name="arrowRight"
-                size={16}
-              />
-
-            </button>
-
-          )}
-
-
-          {/* ==================================================
-              UNKNOWN ROLE
-          ================================================== */}
-
-          {!currentUserIsAdmin &&
-            !currentUserIsCustomer && (
+          {!destination && (
 
             <div
               className="auth-error"
@@ -666,8 +536,9 @@ export default function Login() {
               />
 
               <span>
-                Your account role is not recognized.
-                Please contact Apex Machinery support.
+                Your account does not have a recognized
+                access role. Please contact Apex Machinery
+                support.
               </span>
 
             </div>
@@ -702,15 +573,7 @@ export default function Login() {
 
   return (
 
-    <div
-      className={
-        `auth-page ${
-          adminMode
-            ? 'admin-auth-mode'
-            : ''
-        }`
-      }
-    >
+    <div className="auth-page">
 
       <div className="auth-card">
 
@@ -753,31 +616,19 @@ export default function Login() {
         <div className="auth-header">
 
           <span className="eyebrow">
-
-            {adminMode
-              ? 'Administrator Access'
-              : 'Account Access'}
-
+            Account Access
           </span>
 
 
           <h1>
-
-            {adminMode
-              ? 'Administrator Login'
-              : 'Welcome Back'}
-
+            Welcome Back
           </h1>
 
 
           <p>
-
-            {adminMode
-
-              ? 'Sign in with your administrator credentials to access the Apex Machinery control panel.'
-
-              : 'Sign in to manage your industrial procurement account, orders and quotations.'}
-
+            Sign in to access your Apex Machinery
+            account and continue managing your
+            operations.
           </p>
 
         </div>
@@ -816,7 +667,7 @@ export default function Login() {
 
         <form
           onSubmit={handleSubmit}
-          noValidate={false}
+          noValidate
         >
 
 
@@ -829,18 +680,13 @@ export default function Login() {
             <label
               htmlFor="login-email"
             >
-
-              {adminMode
-                ? 'Administrator Email'
-                : 'Email Address'}
-
+              Email Address
             </label>
 
 
             <input
               id="login-email"
               name="email"
-              required
               type="email"
               value={email}
               onChange={(e) => {
@@ -849,16 +695,13 @@ export default function Login() {
                   e.target.value
                 );
 
+
                 if (error) {
                   setError('');
                 }
 
               }}
-              placeholder={
-                adminMode
-                  ? 'admin@apexmachinery.com'
-                  : 'you@company.com'
-              }
+              placeholder="you@company.com"
               autoComplete="username"
               disabled={loading}
               maxLength={254}
@@ -884,7 +727,6 @@ export default function Login() {
             <input
               id="login-password"
               name="password"
-              required
               type="password"
               value={password}
               onChange={(e) => {
@@ -892,6 +734,7 @@ export default function Login() {
                 setPassword(
                   e.target.value
                 );
+
 
                 if (error) {
                   setError('');
@@ -907,39 +750,36 @@ export default function Login() {
 
 
           {/* ==================================================
-              CUSTOMER OPTIONS
+              LOGIN OPTIONS
           ================================================== */}
 
-          {!adminMode && (
+          <div className="auth-row">
 
-            <div className="auth-row">
+            <label
+              className="filters-checkbox"
+            >
 
-              <label
-                className="filters-checkbox"
-              >
-
-                <input
-                  type="checkbox"
-                  name="remember"
-                />
-
-
-                <span>
-                  Remember me
-                </span>
-
-              </label>
+              <input
+                type="checkbox"
+                name="remember"
+                disabled={loading}
+              />
 
 
-              <Link
-                to="/forgot-password"
-              >
-                Forgot password?
-              </Link>
+              <span>
+                Remember me
+              </span>
 
-            </div>
+            </label>
 
-          )}
+
+            <Link
+              to="/forgot-password"
+            >
+              Forgot password?
+            </Link>
+
+          </div>
 
 
           {/* ==================================================
@@ -954,18 +794,13 @@ export default function Login() {
 
             {loading ? (
 
-              <>
-                Authenticating...
-              </>
+              'Signing In...'
 
             ) : (
 
               <>
 
-                {adminMode
-                  ? 'Access Admin Dashboard'
-                  : 'Sign In'}
-
+                Sign In
 
                 <Icon
                   name="arrowRight"
@@ -985,50 +820,22 @@ export default function Login() {
             CUSTOMER REGISTRATION
         ================================================== */}
 
-        {!adminMode && (
+        <p className="auth-switch">
 
-          <p className="auth-switch">
+          Don&apos;t have an account?{' '}
 
-            Don&apos;t have an account?{' '}
+          <Link to="/register">
+            Create one
+          </Link>
 
-
-            <Link to="/register">
-              Create one
-            </Link>
-
-          </p>
-
-        )}
-
-
-        {/* ==================================================
-            ADMIN BACK LINK
-        ================================================== */}
-
-        {adminMode && (
-
-          <div
-            className="admin-login-back"
-          >
-
-            <Link to="/login">
-
-              ← Customer Login
-
-            </Link>
-
-          </div>
-
-        )}
+        </p>
 
 
         {/* ==================================================
             SECURITY MESSAGE
         ================================================== */}
 
-        <div
-          className="auth-security-note"
-        >
+        <div className="auth-security-note">
 
           <Icon
             name="shield"
@@ -1037,10 +844,8 @@ export default function Login() {
 
 
           <span>
-
             Secure authentication is handled through
             the Apex Machinery backend and Supabase.
-
           </span>
 
         </div>

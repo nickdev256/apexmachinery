@@ -1,22 +1,47 @@
-import { useState } from 'react';
+import {
+  Outlet,
+} from 'react-router-dom';
+
 import AdminSidebar from './AdminSidebar';
+
 import './AdminLayout.css';
 
-export default function AdminLayout({ children }) {
-  const [active, setActive] = useState('dashboard');
+
+// ============================================================
+// ADMIN LAYOUT
+// ============================================================
+
+export default function AdminLayout({
+  children,
+}) {
 
   return (
+
     <div className="admin-dashboard">
 
-      <AdminSidebar
-        active={active}
-        onChange={setActive}
-      />
+
+      {/* ====================================================
+          SIDEBAR
+      ==================================================== */}
+
+      <AdminSidebar />
+
+
+      {/* ====================================================
+          MAIN ADMIN CONTENT
+      ==================================================== */}
 
       <main className="admin-content">
-        {children}
+
+        {
+          children ||
+          <Outlet />
+        }
+
       </main>
 
     </div>
+
   );
+
 }

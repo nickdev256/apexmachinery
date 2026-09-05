@@ -1,7 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import {
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
+
 import Icon from '../Icon';
 import { useAuth } from '../../context/AuthContext';
+
 import './AdminLayout.css';
+
+
+// ============================================================
+// SIDEBAR ITEMS
+// ============================================================
 
 const sidebarItems = [
   {
@@ -10,48 +20,56 @@ const sidebarItems = [
     icon: 'settings',
     path: '/admin',
   },
+
   {
     key: 'orders',
     label: 'Orders',
     icon: 'cart',
     path: '/admin/orders',
   },
+
   {
     key: 'inventory',
     label: 'Inventory',
     icon: 'package',
     path: '/admin/inventory',
   },
+
   {
     key: 'customers',
     label: 'Customers',
     icon: 'user',
     path: '/admin/customers',
   },
+
   {
     key: 'products',
     label: 'Products',
     icon: 'tool',
     path: '/admin/products',
   },
+
   {
     key: 'categories',
     label: 'Categories',
     icon: 'grid',
     path: '/admin/categories',
   },
+
   {
     key: 'reports',
     label: 'Reports',
     icon: 'eye',
     path: '/admin/reports',
   },
+
   {
     key: 'notifications',
     label: 'Notifications',
     icon: 'clock',
     path: '/admin/notifications',
   },
+
   {
     key: 'settings',
     label: 'Settings',
@@ -60,53 +78,139 @@ const sidebarItems = [
   },
 ];
 
-export default function AdminSidebar({ active }) {
-  const navigate = useNavigate();
 
-  const { user, logout } = useAuth();
+// ============================================================
+// ADMIN SIDEBAR
+// ============================================================
+
+export default function AdminSidebar() {
+
+  const navigate =
+    useNavigate();
+
+  const location =
+    useLocation();
+
+  const {
+    user,
+    logout,
+  } =
+    useAuth();
+
+
+  // ==========================================================
+  // ADMIN DETAILS
+  // ==========================================================
+
+  const adminName =
+    user?.name ||
+    'Apex Administrator';
+
+
+  const adminEmail =
+    user?.email ||
+    'admin@apexmachinery.com';
+
+
+  const adminInitial =
+    adminName
+      .charAt(0)
+      .toUpperCase();
+
+
+  // ==========================================================
+  // ACTIVE ROUTE
+  // ==========================================================
+
+  function isActive(item) {
+
+    if (
+      item.path === '/admin'
+    ) {
+
+      return (
+        location.pathname ===
+        '/admin'
+      );
+
+    }
+
+
+    return (
+      location.pathname === item.path ||
+      location.pathname.startsWith(
+        `${item.path}/`
+      )
+    );
+
+  }
+
 
   // ==========================================================
   // LOGOUT
   // ==========================================================
 
-  function handleLogout() {
-    const confirmed = window.confirm(
-      'Are you sure you want to log out of the admin dashboard?'
-    );
+  async function handleLogout() {
+
+    const confirmed =
+      window.confirm(
+        'Are you sure you want to log out of the admin dashboard?'
+      );
+
 
     if (!confirmed) {
+
       return;
+
     }
 
-    logout();
 
-    navigate('/login', {
-      replace: true,
-    });
+    try {
+
+      await logout();
+
+    } catch (error) {
+
+      console.error(
+        '[ADMIN LOGOUT]',
+        error
+      );
+
+    } finally {
+
+      navigate(
+        '/login',
+        {
+          replace: true,
+        }
+      );
+
+    }
+
   }
 
-  // ==========================================================
-  // ADMIN NAME
-  // ==========================================================
 
-  const adminName =
-    user?.name || 'Apex Administrator';
-
-  const adminEmail =
-    user?.email || 'admin@apexmachinery.com';
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
+
     <aside className="admin-sidebar">
 
-      {/* ==================================================
+
+      {/* ====================================================
           PROFILE
-      ================================================== */}
+      ==================================================== */}
 
       <div className="admin-profile">
 
         <div className="admin-avatar">
-          {adminName.charAt(0).toUpperCase()}
+
+          {adminInitial}
+
         </div>
+
 
         <div className="admin-profile-info">
 
@@ -114,10 +218,9 @@ export default function AdminSidebar({ active }) {
             {adminName}
           </strong>
 
+
           <span>
-            {user?.role === 'admin'
-              ? 'System Administrator'
-              : 'Administrator'}
+            System Administrator
           </span>
 
         </div>
@@ -125,48 +228,62 @@ export default function AdminSidebar({ active }) {
       </div>
 
 
-      {/* ==================================================
+      {/* ====================================================
           NAVIGATION
-      ================================================== */}
+      ==================================================== */}
 
       <nav className="admin-nav">
 
-        {sidebarItems.map((item) => (
+        {sidebarItems.map(
+          (item) => {
 
-          <button
-            key={item.key}
-            type="button"
-            className={
-              active === item.key
-                ? 'active'
-                : ''
-            }
-            onClick={() =>
-              navigate(item.path)
-            }
-          >
+            const active =
+              isActive(item);
 
-            <Icon
-              name={item.icon}
-              size={18}
-            />
 
-            <span>
-              {item.label}
-            </span>
+            return (
 
-          </button>
+              <button
+                key={item.key}
+                type="button"
+                className={
+                  active
+                    ? 'active'
+                    : ''
+                }
+                onClick={() =>
+                  navigate(
+                    item.path
+                  )
+                }
+              >
 
-        ))}
+                <Icon
+                  name={item.icon}
+                  size={18}
+                />
+
+
+                <span>
+                  {item.label}
+                </span>
+
+              </button>
+
+            );
+
+          }
+        )}
 
       </nav>
 
 
-      {/* ==================================================
-          SIDEBAR BOTTOM
-      ================================================== */}
+      {/* ====================================================
+          BOTTOM
+      ==================================================== */}
 
       <div className="admin-sidebar-bottom">
+
 
         {/* SYSTEM STATUS */}
 
@@ -174,11 +291,13 @@ export default function AdminSidebar({ active }) {
 
           <span className="admin-status-dot" />
 
+
           <div>
 
             <strong>
               System Operational
             </strong>
+
 
             <small>
               All services running
@@ -189,9 +308,7 @@ export default function AdminSidebar({ active }) {
         </div>
 
 
-        {/* ==================================================
-            LOGOUT
-        ================================================== */}
+        {/* LOGOUT */}
 
         <button
           type="button"
@@ -205,6 +322,7 @@ export default function AdminSidebar({ active }) {
             size={18}
           />
 
+
           <span>
             Log Out
           </span>
@@ -214,5 +332,7 @@ export default function AdminSidebar({ active }) {
       </div>
 
     </aside>
+
   );
+
 }

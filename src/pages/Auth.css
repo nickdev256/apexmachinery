@@ -1,81 +1,745 @@
+/* ============================================================
+   APEX MACHINERY
+   AUTHENTICATION
+   Login / Register / Admin Authentication
+============================================================ */
+
+
+/* ============================================================
+   AUTH PAGE
+============================================================ */
+
 .auth-page {
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 140px);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-light);
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(15, 76, 129, 0.08),
+      transparent 35%
+    ),
+    var(--bg-light);
+
   padding: var(--space-7) var(--space-4);
 }
 
+
+/* ============================================================
+   AUTH CARD
+============================================================ */
+
 .auth-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 470px;
+
+  background: #ffffff;
+
   padding: var(--space-7);
+
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 50px rgba(15, 23, 42, 0.08),
+    0 4px 12px rgba(15, 23, 42, 0.04);
 }
+
+
+/* ============================================================
+   LOGO
+============================================================ */
 
 .auth-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+
+  gap: 12px;
+
+  margin-bottom: var(--space-6);
+
+  text-decoration: none;
+}
+
+
+.auth-logo img {
+  width: 44px;
+  height: 44px;
+
+  object-fit: contain;
+
+  border-radius: 8px;
+}
+
+
+.auth-logo > div {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+
+.auth-logo strong {
+  color: var(--navy);
+
+  font-size: 0.95rem;
+  font-weight: 800;
+
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+
+.auth-logo span {
+  margin-top: 3px;
+
+  color: var(--text-muted);
+
+  font-size: 0.72rem;
+  font-weight: 500;
+
+  line-height: 1.3;
+}
+
+
+/* ============================================================
+   AUTH HEADER
+============================================================ */
+
+.auth-header {
   margin-bottom: var(--space-6);
 }
-.auth-logo img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
+
+
+.auth-header .eyebrow {
+  display: inline-block;
+
+  margin-bottom: 8px;
+
+  color: var(--navy);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
-.auth-logo span {
+
+
+.auth-header h1 {
+  margin: 0 0 10px;
+
+  color: var(--navy);
+
+  font-size: 1.75rem;
+  font-weight: 800;
+
+  line-height: 1.2;
+}
+
+
+.auth-header p {
+  margin: 0;
+
+  color: var(--text-muted);
+
+  font-size: 0.9rem;
+
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   FORM
+============================================================ */
+
+.auth-card form {
+  width: 100%;
+}
+
+
+.auth-card .field {
+  margin-bottom: var(--space-4);
+}
+
+
+.auth-card .field label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: var(--navy);
+
+  font-size: 0.84rem;
   font-weight: 700;
+}
+
+
+.auth-card .field input,
+.auth-card .field select {
+  width: 100%;
+  min-height: 46px;
+
+  padding: 11px 13px;
+
+  background: #ffffff;
+
+  color: var(--text);
+
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+
+.auth-card .field input::placeholder {
+  color: #9aa4b2;
+}
+
+
+.auth-card .field input:hover,
+.auth-card .field select:hover {
+  border-color: #b5c0ce;
+}
+
+
+.auth-card .field input:focus,
+.auth-card .field select:focus {
+  border-color: var(--navy);
+
+  box-shadow:
+    0 0 0 3px rgba(15, 76, 129, 0.1);
+}
+
+
+.auth-card .field input:disabled,
+.auth-card .field select:disabled {
+  cursor: not-allowed;
+
+  background: #f3f5f7;
+
+  color: #7a8491;
+}
+
+
+/* ============================================================
+   ACCOUNT TYPE
+============================================================ */
+
+.account-type-selector {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 10px;
+
+  margin-bottom: var(--space-5);
+}
+
+
+.account-type-btn {
+  min-height: 48px;
+
+  padding: 10px 14px;
+
+  background: #ffffff;
+
+  color: var(--text-muted);
+
+  border: 1px solid #d8dee8;
+  border-radius: 9px;
+
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+.account-type-btn:hover {
+  color: var(--navy);
+
+  border-color: var(--navy);
+
+  transform: translateY(-1px);
+}
+
+
+.account-type-btn.active {
+  background: var(--navy);
+
+  color: #ffffff;
+
+  border-color: var(--navy);
+
+  box-shadow:
+    0 6px 18px rgba(15, 76, 129, 0.18);
+}
+
+
+/* ============================================================
+   ADMIN MODE
+============================================================ */
+
+.admin-auth-mode {
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(15, 76, 129, 0.12),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(15, 23, 42, 0.06),
+      transparent 35%
+    ),
+    var(--bg-light);
+}
+
+
+.admin-auth-mode .auth-card {
+  border-top: 4px solid var(--navy);
+}
+
+
+.admin-auth-mode .auth-header .eyebrow {
   color: var(--navy);
 }
 
-.auth-card h1 {
-  font-size: 1.5rem;
-  margin-bottom: 8px;
+
+/* ============================================================
+   ADMIN SETUP FIELD
+============================================================ */
+
+.admin-setup-field {
+  padding: 14px;
+
+  margin-bottom: var(--space-4);
+
+  background: rgba(15, 76, 129, 0.04);
+
+  border: 1px solid rgba(15, 76, 129, 0.12);
+  border-radius: 10px;
 }
-.auth-card > p {
-  color: var(--text-muted);
-  margin-bottom: var(--space-6);
-  font-size: 0.9rem;
+
+
+.admin-setup-field label {
+  color: var(--navy);
 }
+
+
+/* ============================================================
+   AUTH ROW
+============================================================ */
 
 .auth-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  gap: 15px;
+
   margin-bottom: var(--space-5);
-  font-size: 0.85rem;
+
+  font-size: 0.84rem;
 }
+
+
 .auth-row a {
   color: var(--navy);
+
   font-weight: 700;
+
+  text-decoration: none;
 }
+
+
+.auth-row a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   CHECKBOX
+============================================================ */
+
+.filters-checkbox {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  color: var(--text-muted);
+
+  font-size: 0.84rem;
+
+  cursor: pointer;
+}
+
+
+.filters-checkbox input {
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  accent-color: var(--navy);
+
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   TERMS
+============================================================ */
 
 .auth-terms {
   margin-bottom: var(--space-5);
-  font-size: 0.85rem;
+
+  color: var(--text-muted);
+
+  font-size: 0.82rem;
+
+  line-height: 1.5;
 }
 
-.auth-switch {
-  text-align: center;
-  margin-top: var(--space-5);
-  font-size: 0.9rem;
-  color: var(--text-muted);
+
+.auth-terms a {
+  color: var(--navy);
+
+  font-weight: 700;
+
+  text-decoration: none;
 }
+
+
+.auth-terms a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   BUTTON
+============================================================ */
+
+.auth-card .btn-block {
+  width: 100%;
+
+  min-height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  margin-top: 4px;
+
+  border-radius: 9px;
+
+  font-weight: 700;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+
+.auth-card .btn-block:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+
+.auth-card .btn-block:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.65;
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.auth-error {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-bottom: var(--space-5);
+
+  padding: 12px 14px;
+
+  background: #fff4f4;
+
+  color: #b42318;
+
+  border: 1px solid #ffd5d2;
+  border-radius: 9px;
+
+  font-size: 0.84rem;
+
+  line-height: 1.5;
+}
+
+
+.auth-error svg {
+  flex-shrink: 0;
+
+  margin-top: 2px;
+}
+
+
+/* ============================================================
+   SUCCESS
+============================================================ */
+
+.auth-success {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  margin-bottom: var(--space-5);
+
+  padding: 12px 14px;
+
+  background: #f0fff6;
+
+  color: #147a42;
+
+  border: 1px solid #c8f0d7;
+  border-radius: 9px;
+
+  font-size: 0.84rem;
+
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   SWITCH ACCOUNT / REGISTER
+============================================================ */
+
+.auth-switch {
+  margin: var(--space-5) 0 0;
+
+  text-align: center;
+
+  color: var(--text-muted);
+
+  font-size: 0.88rem;
+
+  line-height: 1.5;
+}
+
+
 .auth-switch a {
   color: var(--navy);
+
   font-weight: 700;
+
+  text-decoration: none;
 }
+
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+
+/* ============================================================
+   ADMIN LOGIN BACK
+============================================================ */
+
+.admin-login-back {
+  margin-top: var(--space-5);
+
+  text-align: center;
+}
+
+
+.admin-login-back > a {
+  display: inline-block;
+
+  margin-top: 10px;
+
+  color: var(--text-muted);
+
+  font-size: 0.84rem;
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+
+.admin-login-back > a:hover {
+  color: var(--navy);
+}
+
+
+/* ============================================================
+   SECURITY NOTE
+============================================================ */
+
+.auth-security-note {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 8px;
+
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+
+  color: var(--text-muted);
+
+  border-top: 1px solid #edf0f4;
+
+  font-size: 0.75rem;
+
+  line-height: 1.5;
+}
+
+
+.auth-security-note svg {
+  flex-shrink: 0;
+
+  margin-top: 1px;
+
+  color: var(--navy);
+}
+
+
+/* ============================================================
+   SENT / CONFIRMATION
+============================================================ */
 
 .auth-sent {
   text-align: center;
+
   color: var(--success);
 }
+
+
 .auth-sent h1 {
-  color: var(--navy);
   margin: var(--space-4) 0 8px;
+
+  color: var(--navy);
 }
+
+
 .auth-sent p {
-  color: var(--text-muted);
   margin-bottom: var(--space-6);
+
+  color: var(--text-muted);
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+  .auth-page {
+    min-height: 100vh;
+
+    align-items: flex-start;
+
+    padding:
+      var(--space-5)
+      var(--space-3);
+  }
+
+
+  .auth-card {
+    max-width: 100%;
+
+    padding: var(--space-5);
+
+    border-radius: 14px;
+  }
+
+
+  .auth-logo {
+    margin-bottom: var(--space-5);
+  }
+
+
+  .auth-logo img {
+    width: 40px;
+    height: 40px;
+  }
+
+
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+
+
+  .account-type-selector {
+    grid-template-columns: 1fr;
+  }
+
+
+  .auth-row {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+}
+
+
+/* ============================================================
+   VERY SMALL SCREENS
+============================================================ */
+
+@media (max-width: 380px) {
+
+  .auth-card {
+    padding: 20px 16px;
+  }
+
+
+  .auth-header h1 {
+    font-size: 1.35rem;
+  }
+
+
+  .auth-logo strong {
+    font-size: 0.85rem;
+  }
+
+
+  .auth-logo span {
+    font-size: 0.67rem;
+  }
+
 }

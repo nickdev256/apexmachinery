@@ -1,4 +1,7 @@
-import { supabase } from '../config/supabase.js';
+import {
+  supabaseAdmin,
+  supabaseAuth,
+} from '../config/supabase.js';
 
 
 // ============================================================
@@ -6,22 +9,21 @@ import { supabase } from '../config/supabase.js';
 // AUTH CONTROLLER
 // ============================================================
 //
-// Handles:
+// PUBLIC REGISTRATION:
+//   customer only
 //
-// POST /api/auth/register
-// POST /api/auth/login
-// POST /api/auth/logout
-// GET  /api/auth/me
+// LOGIN:
+//   customer + admin
 //
-// Authentication provider:
-// Supabase Auth
-//
-// User profile:
-// Supabase "profiles" table
+// customer → /dashboard
+// admin    → /admin
 //
 // IMPORTANT:
-// The Supabase SERVICE ROLE KEY must remain on the backend.
-// Never expose it to React/Vite.
+//
+// Public registration NEVER creates administrators.
+//
+// Admin accounts are created separately using createAdmin.js.
+//
 // ============================================================
 
 
@@ -43,6 +45,32 @@ function normalizeEmail(value) {
   return cleanString(
     value
   ).toLowerCase();
+
+}
+
+
+function normalizeRole(value) {
+
+  return cleanString(
+    value
+  ).toLowerCase();
+
+}
+
+
+function isAllowedLoginRole(role) {
+
+  const normalized =
+    normalizeRole(
+      role
+    );
+
+
+  return (
+    normalized === 'customer' ||
+    normalized === 'admin' ||
+    normalized === 'administrator'
+  );
 
 }
 
@@ -71,7 +99,9 @@ function formatUser(profile) {
       profile.email || '',
 
     role:
-      profile.role || 'customer',
+      normalizeRole(
+        profile.role
+      ),
 
     memberSince:
       profile.member_since || null,
@@ -84,82 +114,207 @@ function formatUser(profile) {
 // ============================================================
 // REGISTER
 // ============================================================
+//
+// CUSTOMER REGISTRATION ONLY
+//
+// Expected:
+//
+// {
+//   name,
+//   company,
+//   email,
+//   password
+// }
+//
+// Backend ALWAYS assigns:
+//
+// role = customer
+//
+// ============================================================
 
 export async function register(
   req,
   res
 ) {
 
+  let createdAuthUserId =
+    null;
+
+
   try {
+
+    // ========================================================
+    // REQUEST DATA
+    // ========================================================
 
     const {
       name,
       company,
       email,
       password,
-    } = req.body || {};
-
-
-    const cleanName =
-      cleanString(name);
-
-    const cleanCompany =
-      cleanString(company);
-
-    const cleanEmail =
-      normalizeEmail(email);
-
-    const cleanPassword =
-      String(password || '');
+    } =
+      req.body || {};
 
 
     // ========================================================
-    // VALIDATION
+    // CLEAN VALUES
+    // ========================================================
+
+    const cleanName =
+      cleanString(
+        name
+      );
+
+
+    const cleanCompany =
+      cleanString(
+        company
+      );
+
+
+    const cleanEmail =
+      normalizeEmail(
+        email
+      );
+
+
+    const cleanPassword =
+      String(
+        password || ''
+      );
+
+
+    // ========================================================
+    // NAME VALIDATION
     // ========================================================
 
     if (!cleanName) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter your full name.',
+          message:
+            'Please enter your full name.',
 
-      });
+        });
 
     }
 
+
+    if (
+      cleanName.length < 2
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Your name must contain at least 2 characters.',
+
+        });
+
+    }
+
+
+    if (
+      cleanName.length > 100
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Your name is too long.',
+
+        });
+
+    }
+
+
+    // ========================================================
+    // COMPANY VALIDATION
+    // ========================================================
 
     if (!cleanCompany) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter your company name.',
+          message:
+            'Please enter your company name.',
 
-      });
+        });
 
     }
 
+
+    if (
+      cleanCompany.length < 2
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Please enter a valid company name.',
+
+        });
+
+    }
+
+
+    if (
+      cleanCompany.length > 150
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Company name is too long.',
+
+        });
+
+    }
+
+
+    // ========================================================
+    // EMAIL VALIDATION
+    // ========================================================
 
     if (!cleanEmail) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter your email address.',
+          message:
+            'Please enter your email address.',
 
-      });
+        });
 
     }
 
-
-    // Basic email validation
 
     const emailPattern =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -171,14 +326,54 @@ export async function register(
       )
     ) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter a valid email address.',
+          message:
+            'Please enter a valid email address.',
 
-      });
+        });
+
+    }
+
+
+    if (
+      cleanEmail.length > 254
+    ) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Email address is too long.',
+
+        });
+
+    }
+
+
+    // ========================================================
+    // PASSWORD VALIDATION
+    // ========================================================
+
+    if (!cleanPassword) {
+
+      return res
+        .status(400)
+        .json({
+
+          success: false,
+
+          message:
+            'Please create a password.',
+
+        });
 
     }
 
@@ -187,14 +382,16 @@ export async function register(
       cleanPassword.length < 6
     ) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Password must contain at least 6 characters.',
+          message:
+            'Password must contain at least 6 characters.',
 
-      });
+        });
 
     }
 
@@ -206,14 +403,17 @@ export async function register(
     const {
       data: existingProfile,
       error: existingProfileError,
-    } = await supabase
-      .from('profiles')
-      .select('id,email')
-      .eq(
-        'email',
-        cleanEmail
-      )
-      .maybeSingle();
+    } =
+      await supabaseAdmin
+        .from('profiles')
+        .select(
+          'id,email'
+        )
+        .eq(
+          'email',
+          cleanEmail
+        )
+        .maybeSingle();
 
 
     if (existingProfileError) {
@@ -223,56 +423,78 @@ export async function register(
         existingProfileError
       );
 
+
+      return res
+        .status(500)
+        .json({
+
+          success: false,
+
+          message:
+            'Unable to check existing account.',
+
+        });
+
     }
 
 
     if (existingProfile) {
 
-      return res.status(409).json({
+      return res
+        .status(409)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'An account with this email already exists.',
+          message:
+            'An account with this email already exists.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // CREATE SUPABASE AUTH USER
+    // CREATE CUSTOMER AUTH USER
     // ========================================================
 
     const {
       data: authData,
       error: authError,
     } =
-      await supabase.auth.admin.createUser({
+      await supabaseAdmin
+        .auth
+        .admin
+        .createUser({
 
-        email:
-          cleanEmail,
+          email:
+            cleanEmail,
 
-        password:
-          cleanPassword,
+          password:
+            cleanPassword,
 
-        // We are explicitly confirming the account.
-        // If you later enable email verification,
-        // change this behaviour accordingly.
-        email_confirm: true,
+          email_confirm:
+            true,
 
-        user_metadata: {
+          user_metadata: {
 
-          name:
-            cleanName,
+            name:
+              cleanName,
 
-          company:
-            cleanCompany,
+            company:
+              cleanCompany,
 
-        },
+            role:
+              'customer',
 
-      });
+          },
 
+        });
+
+
+    // ========================================================
+    // AUTH CREATION FAILED
+    // ========================================================
 
     if (authError) {
 
@@ -282,67 +504,88 @@ export async function register(
       );
 
 
+      const authMessage =
+        String(
+          authError.message || ''
+        ).toLowerCase();
+
+
       let message =
-        authError.message ||
         'Unable to create account.';
 
 
-      // Friendlier duplicate message
-
       if (
-        String(
-          authError.message || ''
+        authMessage.includes(
+          'already registered'
+        ) ||
+        authMessage.includes(
+          'already exists'
         )
-          .toLowerCase()
-          .includes(
-            'already registered'
-          )
       ) {
 
         message =
           'An account with this email already exists.';
 
+      } else if (
+        authError.message
+      ) {
+
+        message =
+          authError.message;
+
       }
 
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message,
+          message,
 
-      });
-
-    }
-
-
-    const authUser =
-      authData?.user;
-
-
-    if (!authUser) {
-
-      return res.status(500).json({
-
-        success: false,
-
-        message:
-          'Supabase created the account but did not return a user.',
-
-      });
+        });
 
     }
 
 
     // ========================================================
-    // CREATE PROFILE
+    // AUTH USER
+    // ========================================================
+
+    const authUser =
+      authData?.user;
+
+
+    if (!authUser?.id) {
+
+      return res
+        .status(500)
+        .json({
+
+          success: false,
+
+          message:
+            'Authentication account could not be created.',
+
+        });
+
+    }
+
+
+    createdAuthUserId =
+      authUser.id;
+
+
+    // ========================================================
+    // CREATE CUSTOMER PROFILE
     // ========================================================
 
     const {
       data: profile,
       error: profileError,
     } =
-      await supabase
+      await supabaseAdmin
         .from('profiles')
         .insert({
 
@@ -367,7 +610,7 @@ export async function register(
 
 
     // ========================================================
-    // PROFILE FAILURE
+    // PROFILE CREATION FAILED
     // ========================================================
 
     if (profileError) {
@@ -378,13 +621,36 @@ export async function register(
       );
 
 
-      // Roll back Supabase Auth user
+      // ------------------------------------------------------
+      // ROLLBACK AUTH USER
+      // ------------------------------------------------------
 
       try {
 
-        await supabase.auth.admin.deleteUser(
-          authUser.id
-        );
+        const {
+          error: rollbackError,
+        } =
+          await supabaseAdmin
+            .auth
+            .admin
+            .deleteUser(
+              authUser.id
+            );
+
+
+        if (rollbackError) {
+
+          console.error(
+            '[PROFILE ROLLBACK]',
+            rollbackError
+          );
+
+        } else {
+
+          createdAuthUserId =
+            null;
+
+        }
 
       } catch (
         rollbackError
@@ -398,39 +664,49 @@ export async function register(
       }
 
 
-      return res.status(500).json({
+      return res
+        .status(500)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Account creation failed while creating your profile.',
+          message:
+            'Account creation failed while creating your customer profile.',
 
-      });
+        });
 
     }
 
 
+    // Profile successfully created
+
+    createdAuthUserId =
+      null;
+
+
     // ========================================================
-    // LOGIN AFTER REGISTRATION
+    // AUTO LOGIN AFTER REGISTRATION
     // ========================================================
 
     const {
       data: sessionData,
       error: sessionError,
     } =
-      await supabase.auth.signInWithPassword({
+      await supabaseAuth
+        .auth
+        .signInWithPassword({
 
-        email:
-          cleanEmail,
+          email:
+            cleanEmail,
 
-        password:
-          cleanPassword,
+          password:
+            cleanPassword,
 
-      });
+        });
 
 
     // ========================================================
-    // ACCOUNT CREATED BUT NO SESSION
+    // CREATED BUT AUTO LOGIN FAILED
     // ========================================================
 
     if (
@@ -438,20 +714,30 @@ export async function register(
       !sessionData?.session
     ) {
 
-      return res.status(201).json({
+      console.error(
+        '[REGISTER AUTO LOGIN]',
+        sessionError
+      );
 
-        success: true,
 
-        message:
-          'Account created successfully. Please log in.',
+      return res
+        .status(201)
+        .json({
 
-        user:
-          formatUser(profile),
+          success: true,
 
-        session:
-          null,
+          message:
+            'Customer account created successfully. Please sign in.',
 
-      });
+          user:
+            formatUser(
+              profile
+            ),
+
+          session:
+            null,
+
+        });
 
     }
 
@@ -460,29 +746,36 @@ export async function register(
     // SUCCESS
     // ========================================================
 
-    return res.status(201).json({
+    return res
+      .status(201)
+      .json({
 
-      success: true,
+        success: true,
 
-      message:
-        'Account created successfully.',
+        message:
+          'Customer account created successfully.',
 
-      user:
-        formatUser(profile),
+        user:
+          formatUser(
+            profile
+          ),
 
-      session: {
+        session: {
 
-        accessToken:
-          sessionData.session
-            .access_token,
+          accessToken:
+            sessionData
+              .session
+              .access_token,
 
-        refreshToken:
-          sessionData.session
-            .refresh_token,
+          refreshToken:
+            sessionData
+              .session
+              .refresh_token,
 
-      },
+        },
 
-    });
+      });
+
 
   } catch (error) {
 
@@ -492,14 +785,47 @@ export async function register(
     );
 
 
-    return res.status(500).json({
+    // ========================================================
+    // EMERGENCY ROLLBACK
+    // ========================================================
 
-      success: false,
+    if (
+      createdAuthUserId
+    ) {
 
-      message:
-        'An unexpected error occurred while creating your account.',
+      try {
 
-    });
+        await supabaseAdmin
+          .auth
+          .admin
+          .deleteUser(
+            createdAuthUserId
+          );
+
+      } catch (
+        rollbackError
+      ) {
+
+        console.error(
+          '[REGISTER EMERGENCY ROLLBACK]',
+          rollbackError
+        );
+
+      }
+
+    }
+
+
+    return res
+      .status(500)
+      .json({
+
+        success: false,
+
+        message:
+          'An unexpected error occurred while creating your account.',
+
+      });
 
   }
 
@@ -509,6 +835,15 @@ export async function register(
 // ============================================================
 // LOGIN
 // ============================================================
+//
+// SAME LOGIN PAGE FOR:
+//
+// customer
+// admin
+//
+// Role comes from profiles table.
+//
+// ============================================================
 
 export async function login(
   req,
@@ -517,17 +852,27 @@ export async function login(
 
   try {
 
+    // ========================================================
+    // REQUEST
+    // ========================================================
+
     const {
       email,
       password,
-    } = req.body || {};
+    } =
+      req.body || {};
 
 
     const cleanEmail =
-      normalizeEmail(email);
+      normalizeEmail(
+        email
+      );
+
 
     const cleanPassword =
-      String(password || '');
+      String(
+        password || ''
+      );
 
 
     // ========================================================
@@ -536,50 +881,66 @@ export async function login(
 
     if (!cleanEmail) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter your email address.',
+          message:
+            'Please enter your email address.',
 
-      });
+        });
 
     }
 
 
     if (!cleanPassword) {
 
-      return res.status(400).json({
+      return res
+        .status(400)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Please enter your password.',
+          message:
+            'Please enter your password.',
 
-      });
+        });
 
     }
 
 
+    console.log(
+      '[AUTH LOGIN] Attempt:',
+      cleanEmail
+    );
+
+
     // ========================================================
-    // SUPABASE LOGIN
+    // AUTHENTICATE USER
     // ========================================================
 
     const {
       data,
       error,
     } =
-      await supabase.auth.signInWithPassword({
+      await supabaseAuth
+        .auth
+        .signInWithPassword({
 
-        email:
-          cleanEmail,
+          email:
+            cleanEmail,
 
-        password:
-          cleanPassword,
+          password:
+            cleanPassword,
 
-      });
+        });
 
+
+    // ========================================================
+    // INVALID CREDENTIALS
+    // ========================================================
 
     if (error) {
 
@@ -589,14 +950,16 @@ export async function login(
       );
 
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Incorrect email or password.',
+          message:
+            'Incorrect email or password.',
 
-      });
+        });
 
     }
 
@@ -605,31 +968,54 @@ export async function login(
       data?.user;
 
 
-    if (!authUser) {
+    const session =
+      data?.session;
 
-      return res.status(401).json({
 
-        success: false,
+    if (
+      !authUser?.id ||
+      !session?.access_token
+    ) {
 
-        message:
-          'Authentication failed.',
+      return res
+        .status(401)
+        .json({
 
-      });
+          success: false,
+
+          message:
+            'Authentication failed.',
+
+        });
 
     }
 
 
+    console.log(
+      '[AUTH LOGIN] Authenticated user:',
+      authUser.id,
+      authUser.email
+    );
+
+
     // ========================================================
-    // LOAD PROFILE
+    // LOAD PROFILE USING ADMIN CLIENT
     // ========================================================
 
     const {
       data: profile,
       error: profileError,
     } =
-      await supabase
+      await supabaseAdmin
         .from('profiles')
-        .select('*')
+        .select(`
+          id,
+          name,
+          company,
+          email,
+          role,
+          member_since
+        `)
         .eq(
           'id',
           authUser.id
@@ -637,71 +1023,153 @@ export async function login(
         .maybeSingle();
 
 
+    // ========================================================
+    // PROFILE QUERY FAILED
+    // ========================================================
+
     if (profileError) {
 
       console.error(
-        '[PROFILE LOGIN]',
+        '[PROFILE LOGIN ERROR]',
         profileError
       );
 
 
-      return res.status(500).json({
+      return res
+        .status(500)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Account profile could not be loaded.',
+          message:
+            'Account profile could not be loaded.',
 
-      });
+        });
 
     }
 
 
+    console.log(
+      '[AUTH LOGIN] Profile:',
+      profile
+    );
+
+
     // ========================================================
-    // PROFILE DOES NOT EXIST
+    // PROFILE NOT FOUND
     // ========================================================
 
     if (!profile) {
 
-      return res.status(404).json({
+      console.error(
+        '[AUTH LOGIN] PROFILE NOT FOUND FOR:',
+        authUser.id
+      );
 
-        success: false,
 
-        message:
-          'Your authentication account exists, but your Apex Machinery profile was not found.',
+      return res
+        .status(404)
+        .json({
 
-      });
+          success: false,
+
+          message:
+            'Your authentication account exists, but your Apex Machinery profile was not found.',
+
+        });
 
     }
 
 
     // ========================================================
-    // RETURN SESSION
+    // ROLE
     // ========================================================
 
-    return res.json({
+    const role =
+      normalizeRole(
+        profile.role
+      );
 
-      success: true,
 
-      message:
-        'Login successful.',
+    // ========================================================
+    // VALIDATE ROLE
+    // ========================================================
 
-      user:
-        formatUser(profile),
+    if (
+      !isAllowedLoginRole(
+        role
+      )
+    ) {
 
-      session: {
+      console.error(
+        '[LOGIN INVALID ROLE]',
+        {
 
-        accessToken:
-          data.session?.access_token ||
-          null,
+          userId:
+            authUser.id,
 
-        refreshToken:
-          data.session?.refresh_token ||
-          null,
+          role:
+            profile.role,
 
-      },
+        }
+      );
 
-    });
+
+      return res
+        .status(403)
+        .json({
+
+          success: false,
+
+          message:
+            'Your account does not have a valid access role.',
+
+        });
+
+    }
+
+
+    profile.role =
+      role;
+
+
+    console.log(
+      '[AUTH LOGIN] LOGIN SUCCESS:',
+      profile.email,
+      role
+    );
+
+
+    // ========================================================
+    // SUCCESS
+    // ========================================================
+
+    return res
+      .status(200)
+      .json({
+
+        success: true,
+
+        message:
+          'Login successful.',
+
+        user:
+          formatUser(
+            profile
+          ),
+
+        session: {
+
+          accessToken:
+            session.access_token,
+
+          refreshToken:
+            session.refresh_token || null,
+
+        },
+
+      });
+
 
   } catch (error) {
 
@@ -711,14 +1179,16 @@ export async function login(
     );
 
 
-    return res.status(500).json({
+    return res
+      .status(500)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Unable to login at this time.',
+        message:
+          'Unable to login at this time.',
 
-    });
+      });
 
   }
 
@@ -728,13 +1198,6 @@ export async function login(
 // ============================================================
 // LOGOUT
 // ============================================================
-//
-// Supabase access tokens are JWTs and are normally short-lived.
-// The frontend removes its stored session after this request.
-//
-// The middleware has already verified the bearer token before
-// this controller runs.
-// ============================================================
 
 export async function logout(
   req,
@@ -743,14 +1206,17 @@ export async function logout(
 
   try {
 
-    return res.json({
+    return res
+      .status(200)
+      .json({
 
-      success: true,
+        success: true,
 
-      message:
-        'Logged out successfully.',
+        message:
+          'Logged out successfully.',
 
-    });
+      });
+
 
   } catch (error) {
 
@@ -760,14 +1226,16 @@ export async function logout(
     );
 
 
-    return res.status(500).json({
+    return res
+      .status(500)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Unable to logout.',
+        message:
+          'Unable to logout.',
 
-    });
+      });
 
   }
 
@@ -786,34 +1254,43 @@ export async function me(
   try {
 
     // ========================================================
-    // REQUIRE AUTHENTICATED USER
+    // REQUIRE AUTH
     // ========================================================
 
     if (!req.user?.id) {
 
-      return res.status(401).json({
+      return res
+        .status(401)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Not authenticated.',
+          message:
+            'Not authenticated.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // GET PROFILE
+    // LOAD PROFILE
     // ========================================================
 
     const {
       data: profile,
       error,
     } =
-      await supabase
+      await supabaseAdmin
         .from('profiles')
-        .select('*')
+        .select(`
+          id,
+          name,
+          company,
+          email,
+          role,
+          member_since
+        `)
         .eq(
           'id',
           req.user.id
@@ -829,44 +1306,87 @@ export async function me(
       );
 
 
-      return res.status(500).json({
+      return res
+        .status(500)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'Unable to load your account profile.',
+          message:
+            'Unable to load your account profile.',
 
-      });
+        });
 
     }
 
 
     if (!profile) {
 
-      return res.status(404).json({
+      return res
+        .status(404)
+        .json({
 
-        success: false,
+          success: false,
 
-        message:
-          'User profile not found.',
+          message:
+            'User profile not found.',
 
-      });
+        });
 
     }
 
 
     // ========================================================
-    // RETURN CURRENT USER
+    // ROLE
     // ========================================================
 
-    return res.json({
+    const role =
+      normalizeRole(
+        profile.role
+      );
 
-      success: true,
 
-      user:
-        formatUser(profile),
+    if (
+      !isAllowedLoginRole(
+        role
+      )
+    ) {
 
-    });
+      return res
+        .status(403)
+        .json({
+
+          success: false,
+
+          message:
+            'Your account does not have a valid access role.',
+
+        });
+
+    }
+
+
+    profile.role =
+      role;
+
+
+    // ========================================================
+    // SUCCESS
+    // ========================================================
+
+    return res
+      .status(200)
+      .json({
+
+        success: true,
+
+        user:
+          formatUser(
+            profile
+          ),
+
+      });
+
 
   } catch (error) {
 
@@ -876,14 +1396,16 @@ export async function me(
     );
 
 
-    return res.status(500).json({
+    return res
+      .status(500)
+      .json({
 
-      success: false,
+        success: false,
 
-      message:
-        'Unable to retrieve account information.',
+        message:
+          'Unable to retrieve account information.',
 
-    });
+      });
 
   }
 

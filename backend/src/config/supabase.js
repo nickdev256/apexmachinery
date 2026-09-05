@@ -1,10 +1,23 @@
-// ============================================================
-// APEX MACHINERY
-// SUPABASE SERVER CONFIGURATION
-// ============================================================
-
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+
+
+// ============================================================
+// APEX MACHINERY
+// SUPABASE CONFIGURATION
+// ============================================================
+//
+// IMPORTANT:
+//
+// supabaseAdmin
+//   → privileged backend database/admin operations
+//
+// supabaseAuth
+//   → normal email/password authentication
+//
+// Keep the SERVICE ROLE KEY on the backend only.
+// Never expose it in React/Vite.
+// ============================================================
 
 
 // ============================================================
@@ -23,45 +36,97 @@ const supabaseServiceRoleKey =
 // ============================================================
 
 if (!supabaseUrl) {
+
   throw new Error(
     'SUPABASE_URL is missing from backend/.env'
   );
+
 }
 
+
 if (!supabaseServiceRoleKey) {
+
   throw new Error(
     'SUPABASE_SERVICE_ROLE_KEY is missing from backend/.env'
   );
+
 }
 
 
 // ============================================================
-// SUPABASE SERVER CLIENT
+// SHARED OPTIONS
+// ============================================================
+
+const clientOptions = {
+
+  auth: {
+
+    autoRefreshToken: false,
+
+    persistSession: false,
+
+    detectSessionInUrl: false,
+
+  },
+
+};
+
+
+// ============================================================
+// ADMIN / DATABASE CLIENT
 // ============================================================
 //
-// IMPORTANT:
-// This client uses the SERVICE ROLE KEY.
+// Use for:
 //
-// NEVER put this key in the React/Vite frontend.
-// NEVER create VITE_SUPABASE_SERVICE_ROLE_KEY.
+// - profiles table
+// - admin.createUser()
+// - admin.deleteUser()
+// - privileged database operations
 //
+// This client must not be reused for normal user login sessions.
 // ============================================================
 
-export const supabase = createClient(
-  supabaseUrl,
-  supabaseServiceRoleKey,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-  }
-);
+export const supabaseAdmin =
+  createClient(
+    supabaseUrl,
+    supabaseServiceRoleKey,
+    clientOptions
+  );
 
 
 // ============================================================
-// EXPORT CONFIG
+// AUTH CLIENT
+// ============================================================
+//
+// Use for:
+//
+// - signInWithPassword()
+//
+// Keeping this separate prevents authenticated user sessions from
+// interfering with privileged database queries.
 // ============================================================
 
-export default supabase;
+export const supabaseAuth =
+  createClient(
+    supabaseUrl,
+    supabaseServiceRoleKey,
+    clientOptions
+  );
+
+
+// ============================================================
+// BACKWARD COMPATIBILITY
+// ============================================================
+//
+// Existing files importing:
+//
+// import { supabase } from ...
+//
+// will still use the privileged admin/database client.
+// ============================================================
+
+export const supabase =
+  supabaseAdmin;
+
+
+export default supabaseAdmin;

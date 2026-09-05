@@ -15,17 +15,12 @@ export default function Register() {
   // ==========================================================
 
   const [form, setForm] = useState({
-
     name: '',
-
     company: '',
-
     email: '',
-
     password: '',
-
     confirmPassword: '',
-
+    termsAccepted: false,
   });
 
 
@@ -33,14 +28,9 @@ export default function Register() {
   // UI STATE
   // ==========================================================
 
-  const [error, setError] =
-    useState('');
-
-  const [success, setSuccess] =
-    useState('');
-
-  const [loading, setLoading] =
-    useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
   // ==========================================================
@@ -50,6 +40,7 @@ export default function Register() {
   const {
     register,
     isAuthenticated,
+    user,
   } = useAuth();
 
 
@@ -57,43 +48,73 @@ export default function Register() {
   // NAVIGATION
   // ==========================================================
 
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
 
   // ==========================================================
   // UPDATE FORM
   // ==========================================================
 
-  function update(
-    key,
-    value
-  ) {
+  function update(key, value) {
 
-    setForm(
-      (previous) => ({
+    setForm((previous) => ({
+      ...previous,
+      [key]: value,
+    }));
 
-        ...previous,
 
-        [key]:
-          value,
+    // Clear old messages when the user starts editing again.
 
-      })
+    if (error) {
+      setError('');
+    }
+
+    if (success) {
+      setSuccess('');
+    }
+
+  }
+
+
+  // ==========================================================
+  // EMAIL VALIDATION
+  // ==========================================================
+
+  function isValidEmail(email) {
+
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+      email
     );
 
   }
 
 
   // ==========================================================
-  // VALIDATE EMAIL
+  // GET DASHBOARD
   // ==========================================================
 
-  function isValidEmail(
-    email
-  ) {
+  function getDashboard(role) {
 
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      .test(email);
+    const normalizedRole =
+      String(role || '')
+        .trim()
+        .toLowerCase();
+
+
+    // Registration is customer-only,
+    // but this protects the already-authenticated screen.
+
+    if (
+      normalizedRole === 'admin' ||
+      normalizedRole === 'administrator'
+    ) {
+
+      return '/admin';
+
+    }
+
+
+    return '/dashboard';
 
   }
 
@@ -102,50 +123,41 @@ export default function Register() {
   // SUBMIT REGISTRATION
   // ==========================================================
 
-  async function handleSubmit(
-    e
-  ) {
+  async function handleSubmit(e) {
 
     e.preventDefault();
 
 
-    // --------------------------------------------------------
-    // RESET MESSAGES
-    // --------------------------------------------------------
-
-    setError('');
-
-    setSuccess('');
-
-
-    // --------------------------------------------------------
-    // PREVENT DOUBLE SUBMISSION
-    // --------------------------------------------------------
-
     if (loading) {
-
       return;
-
     }
 
 
-    // --------------------------------------------------------
+    setError('');
+    setSuccess('');
+
+
+    // ========================================================
     // CLEAN VALUES
-    // --------------------------------------------------------
+    // ========================================================
 
     const name =
       form.name.trim();
 
+
     const company =
       form.company.trim();
+
 
     const email =
       form.email
         .trim()
         .toLowerCase();
 
+
     const password =
       form.password;
+
 
     const confirmPassword =
       form.confirmPassword;
@@ -154,7 +166,7 @@ export default function Register() {
     try {
 
       // ======================================================
-      // VALIDATION
+      // FULL NAME VALIDATION
       // ======================================================
 
       if (!name) {
@@ -175,6 +187,10 @@ export default function Register() {
       }
 
 
+      // ======================================================
+      // COMPANY VALIDATION
+      // ======================================================
+
       if (!company) {
 
         throw new Error(
@@ -193,10 +209,14 @@ export default function Register() {
       }
 
 
+      // ======================================================
+      // EMAIL VALIDATION
+      // ======================================================
+
       if (!email) {
 
         throw new Error(
-          'Please enter your work email.'
+          'Please enter your work email address.'
         );
 
       }
@@ -210,6 +230,10 @@ export default function Register() {
 
       }
 
+
+      // ======================================================
+      // PASSWORD VALIDATION
+      // ======================================================
 
       if (!password) {
 
@@ -229,10 +253,39 @@ export default function Register() {
       }
 
 
-      if (password !== confirmPassword) {
+      // ======================================================
+      // CONFIRM PASSWORD
+      // ======================================================
+
+      if (!confirmPassword) {
+
+        throw new Error(
+          'Please confirm your password.'
+        );
+
+      }
+
+
+      if (
+        password !==
+        confirmPassword
+      ) {
 
         throw new Error(
           'Passwords do not match.'
+        );
+
+      }
+
+
+      // ======================================================
+      // TERMS
+      // ======================================================
+
+      if (!form.termsAccepted) {
+
+        throw new Error(
+          'Please agree to the Terms of Service and Privacy Policy.'
         );
 
       }
@@ -246,40 +299,20 @@ export default function Register() {
 
 
       // ======================================================
-      // SEND TO BACKEND
-      // ======================================================
-      //
-      // AuthContext.register() sends:
-      //
-      // POST /api/auth/register
-      //
-      // with:
-      //
-      // {
-      //   name,
-      //   company,
-      //   email,
-      //   password
-      // }
-      //
+      // REGISTER CUSTOMER
       // ======================================================
 
       const newUser =
         await register({
-
           name,
-
           company,
-
           email,
-
           password,
-
         });
 
 
       // ======================================================
-      // SAFETY CHECK
+      // VERIFY RESPONSE
       // ======================================================
 
       if (!newUser) {
@@ -291,17 +324,47 @@ export default function Register() {
       }
 
 
+      const role =
+        String(
+          newUser.role || ''
+        )
+          .trim()
+          .toLowerCase();
+
+
       // ======================================================
-      // NEVER ACCEPT ADMIN ROLE FROM REGISTRATION
+      // SECURITY CHECK
+      // ======================================================
+      //
+      // Public registration must never create an administrator.
+      // The backend must also enforce role = customer.
+      //
       // ======================================================
 
       if (
-        newUser.role === 'admin' ||
-        newUser.role === 'administrator'
+        role === 'admin' ||
+        role === 'administrator'
+      ) {
+
+        console.error(
+          '[Apex Registration] Customer registration returned an administrator role.'
+        );
+
+
+        throw new Error(
+          'The account could not be created with the correct customer access.'
+        );
+
+      }
+
+
+      if (
+        role &&
+        role !== 'customer'
       ) {
 
         throw new Error(
-          'Administrator accounts cannot be created through customer registration.'
+          'The account was created with an invalid access role.'
         );
 
       }
@@ -317,29 +380,19 @@ export default function Register() {
 
 
       // ======================================================
-      // REDIRECT
-      // ======================================================
-      //
-      // The backend registration endpoint automatically signs
-      // the customer in when possible.
-      //
-      // AuthContext stores the returned authentication state.
-      //
+      // REDIRECT TO CUSTOMER DASHBOARD
       // ======================================================
 
-      setTimeout(
-        () => {
+      setTimeout(() => {
 
-          navigate(
-            '/dashboard',
-            {
-              replace: true,
-            }
-          );
+        navigate(
+          '/dashboard',
+          {
+            replace: true,
+          }
+        );
 
-        },
-        700
-      );
+      }, 700);
 
 
     } catch (err) {
@@ -349,10 +402,6 @@ export default function Register() {
         err
       );
 
-
-      // ------------------------------------------------------
-      // AXIOS / BACKEND ERROR
-      // ------------------------------------------------------
 
       const backendMessage =
         err?.response?.data?.message;
@@ -380,6 +429,12 @@ export default function Register() {
 
   if (isAuthenticated) {
 
+    const destination =
+      getDashboard(
+        user?.role
+      );
+
+
     return (
 
       <div className="auth-page">
@@ -392,9 +447,11 @@ export default function Register() {
               Account Active
             </span>
 
+
             <h1>
               You are already signed in
             </h1>
+
 
             <p>
               Your Apex Machinery account is already
@@ -409,7 +466,7 @@ export default function Register() {
             className="btn btn-primary btn-block"
             onClick={() =>
               navigate(
-                '/dashboard',
+                destination,
                 {
                   replace: true,
                 }
@@ -445,7 +502,7 @@ export default function Register() {
 
 
   // ==========================================================
-  // PAGE
+  // REGISTER PAGE
   // ==========================================================
 
   return (
@@ -502,9 +559,9 @@ export default function Register() {
 
 
           <p>
-            Register for certified pricing,
-            bulk quotes, procurement tools,
-            order tracking and account management.
+            Register for certified pricing, bulk quotes,
+            procurement tools, order tracking and account
+            management.
           </p>
 
         </div>
@@ -585,7 +642,6 @@ export default function Register() {
 
             <input
               id="register-name"
-              required
               type="text"
               value={form.name}
               onChange={(e) =>
@@ -618,7 +674,6 @@ export default function Register() {
 
             <input
               id="register-company"
-              required
               type="text"
               value={form.company}
               onChange={(e) =>
@@ -651,7 +706,6 @@ export default function Register() {
 
             <input
               id="register-email"
-              required
               type="email"
               value={form.email}
               onChange={(e) =>
@@ -684,9 +738,7 @@ export default function Register() {
 
             <input
               id="register-password"
-              required
               type="password"
-              minLength={6}
               value={form.password}
               onChange={(e) =>
                 update(
@@ -701,8 +753,7 @@ export default function Register() {
 
 
             <small>
-              Password must contain at least
-              6 characters.
+              Password must contain at least 6 characters.
             </small>
 
           </div>
@@ -723,10 +774,10 @@ export default function Register() {
 
             <input
               id="register-confirm-password"
-              required
               type="password"
-              minLength={6}
-              value={form.confirmPassword}
+              value={
+                form.confirmPassword
+              }
               onChange={(e) =>
                 update(
                   'confirmPassword',
@@ -751,7 +802,15 @@ export default function Register() {
 
             <input
               type="checkbox"
-              required
+              checked={
+                form.termsAccepted
+              }
+              onChange={(e) =>
+                update(
+                  'termsAccepted',
+                  e.target.checked
+                )
+              }
               disabled={loading}
             />
 
@@ -776,9 +835,7 @@ export default function Register() {
 
             {loading ? (
 
-              <>
-                Creating Account...
-              </>
+              'Creating Account...'
 
             ) : (
 
@@ -801,18 +858,15 @@ export default function Register() {
 
 
         {/* ==================================================
-            LOGIN LINK
+            LOGIN
         ================================================== */}
 
         <p className="auth-switch">
 
           Already have an account?{' '}
 
-
           <Link to="/login">
-
             Sign in
-
           </Link>
 
         </p>
@@ -822,19 +876,18 @@ export default function Register() {
             SECURITY NOTE
         ================================================== */}
 
-        <div
-          className="auth-security-note"
-        >
+        <div className="auth-security-note">
 
           <Icon
             name="shield"
             size={16}
           />
 
+
           <span>
-            Your account credentials are securely
-            processed through Apex Machinery's
-            backend authentication system.
+            Your account credentials are securely processed
+            through Apex Machinery&apos;s backend authentication
+            system.
           </span>
 
         </div>
