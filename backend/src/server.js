@@ -21,10 +21,37 @@ import {
 const app =
   express();
 
-
 const PORT =
   process.env.PORT ||
   5000;
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function cleanEnvUrl(
+  value
+) {
+
+  if (
+    !value
+  ) {
+
+    return null;
+
+  }
+
+  return String(
+    value
+  )
+    .trim()
+    .replace(
+      /\/+$/,
+      ''
+    );
+
+}
 
 
 // ============================================================
@@ -42,8 +69,14 @@ const allowedOrigins =
 
       'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
 
-      process.env.FRONTEND_URL,
-      process.env.CLIENT_URL,
+      cleanEnvUrl(
+        process.env.FRONTEND_URL
+      ),
+
+      cleanEnvUrl(
+        process.env.CLIENT_URL
+      ),
+
     ].filter(
       Boolean
     )
@@ -54,100 +87,114 @@ const allowedOrigins =
 // CORS
 // ============================================================
 
-app.use(
-  cors({
+const corsOptions = {
 
-    origin: (
-      origin,
-      callback
-    ) => {
+  origin: (
+    origin,
+    callback
+  ) => {
 
-      // ------------------------------------------------------
-      // Allow requests without Origin
-      // Postman, curl, server-to-server, etc.
-      // ------------------------------------------------------
+    // --------------------------------------------------------
+    // Allow requests without Origin
+    // curl, Postman, server-to-server, direct browser URL
+    // --------------------------------------------------------
 
-      if (
-        !origin
-      ) {
-
-        return callback(
-          null,
-          true
-        );
-
-      }
-
-
-      // ------------------------------------------------------
-      // Allow trusted frontend origins
-      // ------------------------------------------------------
-
-      if (
-        allowedOrigins.has(
-          origin
-        )
-      ) {
-
-        console.log(
-          `[CORS ALLOWED] ${origin}`
-        );
-
-
-        return callback(
-          null,
-          true
-        );
-
-      }
-
-
-      // ------------------------------------------------------
-      // Block unknown origins
-      // ------------------------------------------------------
-
-      console.warn(
-        `[CORS BLOCKED] ${origin}`
-      );
-
-
-      const error =
-        new Error(
-          `CORS blocked origin: ${origin}`
-        );
-
-
-      error.status =
-        403;
-
+    if (
+      !origin
+    ) {
 
       return callback(
-        error
+        null,
+        true
       );
 
-    },
+    }
 
 
-    credentials:
-      true,
+    const normalizedOrigin =
+      cleanEnvUrl(
+        origin
+      );
 
 
-    methods: [
-      'GET',
-      'POST',
-      'PUT',
-      'PATCH',
-      'DELETE',
-      'OPTIONS',
-    ],
+    // --------------------------------------------------------
+    // Allow trusted origins
+    // --------------------------------------------------------
+
+    if (
+      allowedOrigins.has(
+        normalizedOrigin
+      )
+    ) {
+
+      console.log(
+        `[CORS ALLOWED] ${normalizedOrigin}`
+      );
+
+      return callback(
+        null,
+        true
+      );
+
+    }
 
 
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-    ],
+    // --------------------------------------------------------
+    // Block unknown origins
+    // --------------------------------------------------------
 
-  })
+    console.warn(
+      `[CORS BLOCKED] ${normalizedOrigin}`
+    );
+
+
+    const error =
+      new Error(
+        `CORS blocked origin: ${normalizedOrigin}`
+      );
+
+
+    error.status =
+      403;
+
+
+    return callback(
+      error
+    );
+
+  },
+
+
+  credentials:
+    true,
+
+
+  methods: [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+  ],
+
+
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+  ],
+
+
+  optionsSuccessStatus:
+    204,
+
+};
+
+
+app.use(
+  cors(
+    corsOptions
+  )
 );
 
 
@@ -165,13 +212,11 @@ app.use(
 
 app.use(
   express.urlencoded({
-
     extended:
       true,
 
     limit:
       '10mb',
-
   })
 );
 
@@ -187,6 +232,10 @@ app.use(
     next
   ) => {
 
+    const startedAt =
+      Date.now();
+
+
     console.log(
       `[API] ${req.method} ${req.originalUrl}`
     );
@@ -197,6 +246,23 @@ app.use(
         req.headers.origin ||
         'none'
       }`
+    );
+
+
+    res.on(
+      'finish',
+      () => {
+
+        const duration =
+          Date.now() -
+          startedAt;
+
+
+        console.log(
+          `[API RESPONSE] ${req.method} ${req.originalUrl} ${res.statusCode} ${duration}ms`
+        );
+
+      }
     );
 
 
@@ -217,47 +283,56 @@ app.get(
     res
   ) => {
 
-    res.json({
+    return res
+      .status(
+        200
+      )
+      .json({
 
-      success:
-        true,
+        success:
+          true,
 
-      message:
-        'Apex Machinery API is running.',
+        message:
+          'Apex Machinery API is running.',
 
-      timestamp:
-        new Date()
-          .toISOString(),
+        timestamp:
+          new Date()
+            .toISOString(),
 
-      environment:
-        process.env.NODE_ENV ||
-        'development',
+        environment:
+          process.env.NODE_ENV ||
+          'development',
 
-      requestOrigin:
-        req.headers.origin ||
-        null,
+        requestOrigin:
+          req.headers.origin ||
+          null,
 
-      allowedOrigins:
-        Array.from(
-          allowedOrigins
-        ),
-
-      services: {
-
-        database:
-          Boolean(
-            process.env.SUPABASE_URL
+        allowedOrigins:
+          Array.from(
+            allowedOrigins
           ),
 
-        emailConfigured:
-          Boolean(
-            process.env.GMAIL_USER &&
-            process.env.GMAIL_APP_PASSWORD
-          ),
+        services: {
 
-      },
+          database:
+            Boolean(
+              process.env.SUPABASE_URL
+            ),
 
-    });
+          supabaseServiceRole:
+            Boolean(
+              process.env.SUPABASE_SERVICE_ROLE_KEY
+            ),
+
+          emailConfigured:
+            Boolean(
+              process.env.GMAIL_USER &&
+              process.env.GMAIL_APP_PASSWORD
+            ),
+
+        },
+
+      });
 
   }
 );
@@ -274,46 +349,53 @@ app.get(
     res
   ) => {
 
-    res.json({
+    return res
+      .status(
+        200
+      )
+      .json({
 
-      success:
-        true,
+        success:
+          true,
 
-      message:
-        'Welcome to the Apex Machinery API.',
+        message:
+          'Welcome to the Apex Machinery API.',
 
-      endpoints: {
+        endpoints: {
 
-        health:
-          '/api/health',
+          health:
+            '/api/health',
 
-        auth:
-          '/api/auth',
+          auth:
+            '/api/auth',
 
-        customer:
-          '/api/customer',
+          customer:
+            '/api/customer',
 
-        admin:
-          '/api/admin',
+          admin:
+            '/api/admin',
 
-        products:
-          '/api/products',
+          products:
+            '/api/products',
 
-        productCategories:
-          '/api/products/categories',
+          productCategories:
+            '/api/products/categories',
 
-        home:
-          '/api/home',
+          productExample:
+            '/api/products/industrial-reflective-safety-vest-93',
 
-        contact:
-          '/api/contact',
+          home:
+            '/api/home',
 
-        contactAdmin:
-          '/api/contact/admin',
+          contact:
+            '/api/contact',
 
-      },
+          contactAdmin:
+            '/api/contact/admin',
 
-    });
+        },
+
+      });
 
   }
 );
@@ -392,26 +474,21 @@ console.log(
   '✅ Auth routes mounted at /api/auth'
 );
 
-
 console.log(
   '✅ Customer routes mounted at /api/customer'
 );
-
 
 console.log(
   '✅ Admin routes mounted at /api/admin'
 );
 
-
 console.log(
   '✅ Product routes mounted at /api/products'
 );
 
-
 console.log(
   '✅ Home routes mounted at /api/home'
 );
-
 
 console.log(
   '✅ Contact routes mounted at /api/contact'
@@ -419,7 +496,7 @@ console.log(
 
 
 // ============================================================
-// 404
+// 404 HANDLER
 // ============================================================
 
 app.use(
@@ -428,7 +505,7 @@ app.use(
     res
   ) => {
 
-    res
+    return res
       .status(
         404
       )
@@ -447,7 +524,7 @@ app.use(
 
 
 // ============================================================
-// ERROR HANDLER
+// GLOBAL ERROR HANDLER
 // ============================================================
 
 app.use(
@@ -460,7 +537,20 @@ app.use(
 
     console.error(
       '[SERVER ERROR]',
-      error
+      {
+        message:
+          error?.message,
+
+        status:
+          error?.status ||
+          error?.statusCode,
+
+        stack:
+          process.env.NODE_ENV ===
+          'development'
+            ? error?.stack
+            : undefined,
+      }
     );
 
 
@@ -476,12 +566,14 @@ app.use(
 
 
     const status =
-      error.status ||
-      error.statusCode ||
-      500;
+      Number(
+        error?.status ||
+        error?.statusCode ||
+        500
+      );
 
 
-    res
+    return res
       .status(
         status
       )
@@ -491,7 +583,7 @@ app.use(
           false,
 
         message:
-          error.message ||
+          error?.message ||
           'Internal server error.',
 
       });
@@ -512,11 +604,9 @@ app.listen(
       '========================================'
     );
 
-
     console.log(
       '       APEX MACHINERY API'
     );
-
 
     console.log(
       '========================================'
@@ -567,36 +657,33 @@ app.listen(
       'Mounted API routes:'
     );
 
-
     console.log(
       ' - /api/health'
     );
-
 
     console.log(
       ' - /api/auth'
     );
 
-
     console.log(
       ' - /api/customer'
     );
-
 
     console.log(
       ' - /api/admin'
     );
 
-
     console.log(
       ' - /api/products'
     );
 
+    console.log(
+      ' - /api/products/categories'
+    );
 
     console.log(
       ' - /api/home'
     );
-
 
     console.log(
       ' - /api/contact'
@@ -609,8 +696,40 @@ app.listen(
 
 
     // ========================================================
+    // DATABASE CONFIGURATION STATUS
+    // ========================================================
+
+    console.log(
+      'Database configuration:'
+    );
+
+
+    console.log(
+      ` - Supabase URL configured: ${
+        process.env.SUPABASE_URL
+          ? 'YES'
+          : 'NO'
+      }`
+    );
+
+
+    console.log(
+      ` - Supabase service role configured: ${
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+          ? 'YES'
+          : 'NO'
+      }`
+    );
+
+
+    console.log(
+      '----------------------------------------'
+    );
+
+
+    // ========================================================
     // EMAIL CONFIGURATION STATUS
-    // Never print the actual App Password.
+    // NEVER PRINT THE REAL APP PASSWORD
     // ========================================================
 
     const gmailUser =
@@ -720,7 +839,6 @@ app.listen(
         );
 
       }
-
 
     } catch (
       error

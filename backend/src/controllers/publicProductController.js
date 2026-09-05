@@ -4,6 +4,43 @@ import {
 
 
 // ============================================================
+// HELPERS
+// ============================================================
+
+function cleanString(
+  value
+) {
+
+  return String(
+    value ??
+    ''
+  ).trim();
+
+}
+
+
+// ============================================================
+// UUID CHECK
+// ============================================================
+
+function isValidUuid(
+  value
+) {
+
+  const normalized =
+    cleanString(
+      value
+    );
+
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    normalized
+  );
+
+}
+
+
+// ============================================================
 // NORMALIZE PRODUCT
 // ============================================================
 
@@ -11,66 +48,165 @@ function normalizeProduct(
   product
 ) {
 
+  if (
+    !product
+  ) {
+
+    return null;
+
+  }
+
+
   const category =
-    product?.category ||
+    product.category ||
     null;
 
 
-  const stock =
+  const stockValue =
     Number(
-      product?.stock ||
+      product.stock ??
       0
     );
 
 
-  const price =
-    product?.price === null ||
-    product?.price === undefined
+  const stock =
+    Number.isFinite(
+      stockValue
+    )
+      ? stockValue
+      : 0;
+
+
+  const priceValue =
+    product.price === null ||
+    product.price === undefined ||
+    product.price === ''
       ? null
       : Number(
           product.price
         );
 
 
+  const price =
+    Number.isFinite(
+      priceValue
+    )
+      ? priceValue
+      : null;
+
+
+  const ratingValue =
+    Number(
+      product.rating ??
+      0
+    );
+
+
+  const rating =
+    Number.isFinite(
+      ratingValue
+    )
+      ? ratingValue
+      : 0;
+
+
+  const reviewCountValue =
+    Number(
+      product.review_count ??
+      0
+    );
+
+
+  const reviewCount =
+    Number.isFinite(
+      reviewCountValue
+    )
+      ? reviewCountValue
+      : 0;
+
+
+  const images =
+    Array.isArray(
+      product.images
+    )
+      ? product.images
+          .filter(
+            Boolean
+          )
+          .map(
+            (
+              image
+            ) =>
+              cleanString(
+                image
+              )
+          )
+          .filter(
+            Boolean
+          )
+      : [];
+
+
+  const primaryImage =
+    cleanString(
+      product.image_url
+    );
+
+
+  if (
+    primaryImage &&
+    !images.includes(
+      primaryImage
+    )
+  ) {
+
+    images.unshift(
+      primaryImage
+    );
+
+  }
+
+
   return {
 
     id:
-      product?.id,
+      product.id,
 
     name:
-      product?.name ||
-      '',
+      cleanString(
+        product.name
+      ),
 
     slug:
-      product?.slug ||
-      '',
+      cleanString(
+        product.slug
+      ),
 
     brand:
-      product?.brand ||
+      cleanString(
+        product.brand
+      ) ||
       'Apex Machinery',
 
     description:
-      product?.description ||
-      '',
+      cleanString(
+        product.description
+      ),
 
-    price:
-
-      Number.isFinite(
-        price
-      )
-        ? price
-        : null,
+    price,
 
     currency:
-      product?.currency ||
+      cleanString(
+        product.currency
+      ) ||
       'UGX',
 
     priceDisplay:
-      product?.price_display ||
+      cleanString(
+        product.price_display
+      ) ||
       (
-        Number.isFinite(
-          price
-        )
+        price !== null
           ? `UGX ${price.toLocaleString()}`
           : 'Request Quote'
       ),
@@ -78,57 +214,58 @@ function normalizeProduct(
     stock,
 
     status:
-      product?.status ||
+      cleanString(
+        product.status
+      ) ||
       (
         stock > 0
           ? 'In Stock'
           : 'Out of Stock'
       ),
 
-    rating:
-      Number(
-        product?.rating ||
-        0
-      ),
+    rating,
 
-    reviewCount:
-      Number(
-        product?.review_count ||
-        0
-      ),
+    reviewCount,
 
     image:
-      product?.image_url ||
+      primaryImage ||
+      images[0] ||
       '',
 
-    images:
-      Array.isArray(
-        product?.images
-      )
-        ? product.images
-        : [],
+    images,
 
     specifications:
-      product?.specifications &&
+      product.specifications &&
       typeof product.specifications ===
-        'object'
+        'object' &&
+      !Array.isArray(
+        product.specifications
+      )
         ? product.specifications
         : {},
 
     badges:
       Array.isArray(
-        product?.badges
+        product.badges
       )
         ? product.badges
+            .filter(
+              Boolean
+            )
         : [],
 
     isFeatured:
       Boolean(
-        product?.is_featured
+        product.is_featured
+      ),
+
+    isActive:
+      Boolean(
+        product.is_active
       ),
 
     categoryId:
-      product?.category_id ||
+      product.category_id ||
       category?.id ||
       '',
 
@@ -144,31 +281,22 @@ function normalizeProduct(
       category?.name ||
       'Uncategorized',
 
+    createdAt:
+      product.created_at ||
+      null,
+
+    updatedAt:
+      product.updated_at ||
+      null,
+
   };
 
 }
 
 
 // ============================================================
-// UUID CHECK
-// ============================================================
-
-function isValidUuid(
-  value
-) {
-
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    String(
-      value ||
-      ''
-    ).trim()
-  );
-
-}
-
-
-// ============================================================
 // GET PUBLIC PRODUCTS
+// GET /api/products
 // ============================================================
 
 export async function getProducts(
@@ -208,9 +336,54 @@ export async function getProducts(
         );
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
-      throw error;
+      console.error(
+        '[PUBLIC PRODUCTS] Supabase error:',
+        {
+          message:
+            error?.message,
+
+          code:
+            error?.code,
+
+          details:
+            error?.details,
+
+          hint:
+            error?.hint,
+        }
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          success:
+            false,
+
+          message:
+            error?.message ||
+            'Unable to load products.',
+
+          code:
+            error?.code ||
+            null,
+
+          details:
+            error?.details ||
+            null,
+
+          hint:
+            error?.hint ||
+            null,
+
+        });
 
     }
 
@@ -219,9 +392,13 @@ export async function getProducts(
       (
         data ||
         []
-      ).map(
-        normalizeProduct
-      );
+      )
+        .map(
+          normalizeProduct
+        )
+        .filter(
+          Boolean
+        );
 
 
     return res
@@ -245,16 +422,13 @@ export async function getProducts(
   ) {
 
     console.error(
-      '[PUBLIC PRODUCTS] Error:',
+      '[PUBLIC PRODUCTS] Unexpected error:',
       {
         message:
           error?.message,
 
-        code:
-          error?.code,
-
-        details:
-          error?.details,
+        stack:
+          error?.stack,
       }
     );
 
@@ -269,6 +443,7 @@ export async function getProducts(
           false,
 
         message:
+          error?.message ||
           'Unable to load products.',
 
       });
@@ -295,10 +470,9 @@ export async function getProduct(
   try {
 
     const identifier =
-      String(
-        req.params.id ||
-        ''
-      ).trim();
+      cleanString(
+        req.params.id
+      );
 
 
     // ========================================================
@@ -326,6 +500,23 @@ export async function getProduct(
     }
 
 
+    const lookupType =
+      isValidUuid(
+        identifier
+      )
+        ? 'id'
+        : 'slug';
+
+
+    console.log(
+      '[PUBLIC PRODUCT] Lookup:',
+      {
+        identifier,
+        lookupType,
+      }
+    );
+
+
     // ========================================================
     // BASE QUERY
     // ========================================================
@@ -351,13 +542,12 @@ export async function getProduct(
 
 
     // ========================================================
-    // LOOK UP BY UUID OR SLUG
+    // SAFE UUID OR SLUG LOOKUP
     // ========================================================
 
     if (
-      isValidUuid(
-        identifier
-      )
+      lookupType ===
+      'id'
     ) {
 
       query =
@@ -386,12 +576,71 @@ export async function getProduct(
       error,
     } =
       await query
+        .limit(
+          1
+        )
         .maybeSingle();
 
 
-    if (error) {
+    // ========================================================
+    // DATABASE ERROR
+    // ========================================================
 
-      throw error;
+    if (
+      error
+    ) {
+
+      console.error(
+        '[PUBLIC PRODUCT] Supabase error:',
+        {
+          identifier,
+          lookupType,
+
+          message:
+            error?.message,
+
+          code:
+            error?.code,
+
+          details:
+            error?.details,
+
+          hint:
+            error?.hint,
+        }
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          success:
+            false,
+
+          message:
+            error?.message ||
+            'Unable to load product.',
+
+          code:
+            error?.code ||
+            null,
+
+          details:
+            error?.details ||
+            null,
+
+          hint:
+            error?.hint ||
+            null,
+
+          identifier,
+
+          lookupType,
+
+        });
 
     }
 
@@ -404,6 +653,15 @@ export async function getProduct(
       !data
     ) {
 
+      console.warn(
+        '[PUBLIC PRODUCT] Not found:',
+        {
+          identifier,
+          lookupType,
+        }
+      );
+
+
       return res
         .status(
           404
@@ -415,6 +673,10 @@ export async function getProduct(
 
           message:
             'Product not found.',
+
+          identifier,
+
+          lookupType,
 
         });
 
@@ -429,6 +691,27 @@ export async function getProduct(
       normalizeProduct(
         data
       );
+
+
+    if (
+      !product
+    ) {
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          success:
+            false,
+
+          message:
+            'Product could not be normalized.',
+
+        });
+
+    }
 
 
     // ========================================================
@@ -456,7 +739,7 @@ export async function getProduct(
   ) {
 
     console.error(
-      '[PUBLIC PRODUCT] Error:',
+      '[PUBLIC PRODUCT] Unexpected error:',
       {
         identifier:
           req?.params?.id,
@@ -469,6 +752,12 @@ export async function getProduct(
 
         details:
           error?.details,
+
+        hint:
+          error?.hint,
+
+        stack:
+          error?.stack,
       }
     );
 
@@ -483,7 +772,20 @@ export async function getProduct(
           false,
 
         message:
+          error?.message ||
           'Unable to load product.',
+
+        code:
+          error?.code ||
+          null,
+
+        details:
+          error?.details ||
+          null,
+
+        hint:
+          error?.hint ||
+          null,
 
       });
 
@@ -494,6 +796,7 @@ export async function getProduct(
 
 // ============================================================
 // GET PUBLIC CATEGORIES
+// GET /api/products/categories
 // ============================================================
 
 export async function getCategories(
@@ -533,9 +836,54 @@ export async function getCategories(
         );
 
 
-    if (error) {
+    if (
+      error
+    ) {
 
-      throw error;
+      console.error(
+        '[PUBLIC CATEGORIES] Supabase error:',
+        {
+          message:
+            error?.message,
+
+          code:
+            error?.code,
+
+          details:
+            error?.details,
+
+          hint:
+            error?.hint,
+        }
+      );
+
+
+      return res
+        .status(
+          500
+        )
+        .json({
+
+          success:
+            false,
+
+          message:
+            error?.message ||
+            'Unable to load categories.',
+
+          code:
+            error?.code ||
+            null,
+
+          details:
+            error?.details ||
+            null,
+
+          hint:
+            error?.hint ||
+            null,
+
+        });
 
     }
 
@@ -594,7 +942,7 @@ export async function getCategories(
   ) {
 
     console.error(
-      '[PUBLIC CATEGORIES] Error:',
+      '[PUBLIC CATEGORIES] Unexpected error:',
       {
         message:
           error?.message,
@@ -604,6 +952,12 @@ export async function getCategories(
 
         details:
           error?.details,
+
+        hint:
+          error?.hint,
+
+        stack:
+          error?.stack,
       }
     );
 
@@ -618,6 +972,7 @@ export async function getCategories(
           false,
 
         message:
+          error?.message ||
           'Unable to load categories.',
 
       });
