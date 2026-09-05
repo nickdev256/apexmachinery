@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://apexmachinery256.com/sitemap.xml
+Sitemap: https://www.apexmachinery256.com/sitemap.xml
