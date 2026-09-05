@@ -25,43 +25,118 @@ const PORT =
 
 
 // ============================================================
-// ALLOWED FRONTEND ORIGINS
+// NORMALIZE ORIGIN
 // ============================================================
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-
-  'https://www.apexmachinery256.com',
-  'https://apexmachinery256.com',
-
-  'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
-];
-
-
-// Add Render environment frontend URL if provided
-if (
-  process.env.FRONTEND_URL &&
-  !allowedOrigins.includes(
-    process.env.FRONTEND_URL
-  )
+function normalizeOrigin(
+  value
 ) {
-  allowedOrigins.push(
-    process.env.FRONTEND_URL
-  );
+
+  if (
+    !value ||
+    typeof value !== 'string'
+  ) {
+
+    return null;
+
+  }
+
+
+  return value
+    .trim()
+    .replace(/\/+$/, '');
+
 }
 
 
-// Add optional CLIENT_URL too
-if (
-  process.env.CLIENT_URL &&
-  !allowedOrigins.includes(
-    process.env.CLIENT_URL
-  )
+// ============================================================
+// ALLOWED FRONTEND ORIGINS
+// ============================================================
+
+const allowedOrigins =
+  [
+    // --------------------------------------------------------
+    // LOCAL DEVELOPMENT
+    // --------------------------------------------------------
+
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+
+
+    // --------------------------------------------------------
+    // PRODUCTION DOMAIN
+    // --------------------------------------------------------
+
+    'https://www.apexmachinery256.com',
+    'https://apexmachinery256.com',
+
+
+    // --------------------------------------------------------
+    // VERCEL DEPLOYMENT
+    // --------------------------------------------------------
+
+    'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
+
+
+    // --------------------------------------------------------
+    // ENVIRONMENT CONFIGURATION
+    // --------------------------------------------------------
+
+    process.env.FRONTEND_URL,
+    process.env.CLIENT_URL,
+  ]
+    .map(
+      normalizeOrigin
+    )
+    .filter(Boolean)
+    .filter(
+      (
+        origin,
+        index,
+        array
+      ) =>
+        array.indexOf(
+          origin
+        ) === index
+    );
+
+
+// ============================================================
+// CORS CHECK
+// ============================================================
+
+function isAllowedOrigin(
+  origin
 ) {
-  allowedOrigins.push(
-    process.env.CLIENT_URL
+
+  /*
+   * Requests without an Origin header:
+   *
+   * - Postman
+   * - Render health checks
+   * - curl
+   * - server-to-server requests
+   */
+
+  if (
+    !origin
+  ) {
+
+    return true;
+
+  }
+
+
+  const normalizedOrigin =
+    normalizeOrigin(
+      origin
+    );
+
+
+  return allowedOrigins.includes(
+    normalizedOrigin
   );
+
 }
 
 
@@ -76,28 +151,8 @@ const corsOptions = {
     callback
   ) {
 
-    /*
-     * Requests without an Origin header are allowed.
-     *
-     * Examples:
-     * - direct browser navigation
-     * - Render health checks
-     * - Postman
-     * - server-to-server requests
-     */
-
     if (
-      !origin
-    ) {
-      return callback(
-        null,
-        true
-      );
-    }
-
-
-    if (
-      allowedOrigins.includes(
+      isAllowedOrigin(
         origin
       )
     ) {
@@ -111,22 +166,35 @@ const corsOptions = {
 
 
     console.warn(
-      `[CORS BLOCKED] ${origin}`
+      `[CORS BLOCKED] ${
+        origin ||
+        'Unknown origin'
+      }`
     );
 
 
-    return callback(
+    const error =
       new Error(
         `CORS blocked for origin: ${origin}`
-      )
+      );
+
+
+    error.status = 403;
+
+
+    return callback(
+      error
     );
 
   },
 
+
   credentials: true,
+
 
   methods: [
     'GET',
+    'HEAD',
     'POST',
     'PUT',
     'PATCH',
@@ -134,16 +202,23 @@ const corsOptions = {
     'OPTIONS',
   ],
 
+
   allowedHeaders: [
     'Content-Type',
     'Authorization',
+    'Accept',
+    'Origin',
+    'X-Requested-With',
   ],
+
+
+  optionsSuccessStatus: 204,
 
 };
 
 
 // ============================================================
-// MIDDLEWARE
+// CORS MIDDLEWARE
 // ============================================================
 
 app.use(
@@ -186,6 +261,18 @@ app.use(
     console.log(
       `[API] ${req.method} ${req.originalUrl}`
     );
+
+
+    if (
+      req.headers.origin
+    ) {
+
+      console.log(
+        `[ORIGIN] ${req.headers.origin}`
+      );
+
+    }
+
 
     next();
 
@@ -484,6 +571,11 @@ app.listen(
 
 
     console.log(
+      '----------------------------------------'
+    );
+
+
+    console.log(
       'Allowed frontend origins:'
     );
 
@@ -507,31 +599,36 @@ app.listen(
 
 
     console.log(
-      `Health: /api/health`
+      'API endpoints:'
+    );
+
+
+    console.log(
+      ' - /api/health'
     );
 
     console.log(
-      `Auth API: /api/auth`
+      ' - /api/auth'
     );
 
     console.log(
-      `Customer API: /api/customer`
+      ' - /api/customer'
     );
 
     console.log(
-      `Admin API: /api/admin`
+      ' - /api/admin'
     );
 
     console.log(
-      `Products API: /api/products`
+      ' - /api/products'
     );
 
     console.log(
-      `Product Categories API: /api/products/categories`
+      ' - /api/products/categories'
     );
 
     console.log(
-      `Home API: /api/home`
+      ' - /api/home'
     );
 
 
