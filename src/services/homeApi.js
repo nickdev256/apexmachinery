@@ -1,10 +1,18 @@
 import axios from 'axios';
 
 
+// ============================================================
+// API CONFIGURATION
+// ============================================================
+
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  'http://localhost:5000/api';
+  'https://apexmachinery.onrender.com/api';
 
+
+// ============================================================
+// HOME API INSTANCE
+// ============================================================
 
 const homeApi =
   axios.create({
@@ -12,11 +20,18 @@ const homeApi =
     baseURL:
       `${API_URL}/home`,
 
+    headers: {
+      'Content-Type':
+        'application/json',
+    },
+
+    timeout: 30000,
+
   });
 
 
 // ============================================================
-// UNWRAP
+// UNWRAP RESPONSE
 // ============================================================
 
 function unwrap(
@@ -37,17 +52,47 @@ function unwrap(
 
 export async function getHomePage() {
 
-  const response =
-    await homeApi.get(
-      '/'
+  try {
+
+    const response =
+      await homeApi.get('/');
+
+
+    return unwrap(
+      response
+    );
+
+  } catch (
+    error
+  ) {
+
+    console.error(
+      '[Home API] Failed to load homepage:',
+      {
+        message:
+          error?.message,
+
+        status:
+          error?.response?.status,
+
+        data:
+          error?.response?.data,
+
+        apiUrl:
+          `${API_URL}/home`,
+      }
     );
 
 
-  return unwrap(
-    response
-  );
+    throw error;
+
+  }
 
 }
 
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 export default homeApi;

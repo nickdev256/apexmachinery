@@ -2,60 +2,78 @@ import {
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 
-import {
-  useSearchParams,
-} from "react-router-dom";
+import { useSearchParams } from 'react-router-dom';
 
-import Breadcrumb from "../components/Breadcrumb";
-import Filters from "../components/Filters";
-import ProductCard from "../components/ProductCard";
-import Pagination from "../components/Pagination";
-import Icon from "../components/Icon";
+import Filters from '../components/Filters';
+import ProductCard from '../components/ProductCard';
 
 import {
   getProducts,
   getProductCategories,
-} from "../services/productApi";
+} from '../services/productApi';
 
-import "./Shop.css";
-
-
-// ============================================================
-// SETTINGS
-// ============================================================
-
-const PAGE_SIZE = 9;
+import './Shop.css';
 
 
 // ============================================================
-// CATEGORY ALIASES
+// HELPERS
 // ============================================================
 
-const CATEGORY_ALIASES = {
-  construction:
-    "construction-equipment",
+function getProductsArray(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
 
-  electrical:
-    "electrical-equipment",
-};
+  if (Array.isArray(data?.products)) {
+    return data.products;
+  }
+
+  if (Array.isArray(data?.data?.products)) {
+    return data.data.products;
+  }
+
+  return [];
+}
+
+
+function getCategoriesArray(data) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data?.categories)) {
+    return data.categories;
+  }
+
+  if (Array.isArray(data?.data?.categories)) {
+    return data.data.categories;
+  }
+
+  return [];
+}
+
+
+function getProductPrice(product) {
+  const price = Number(product?.price);
+
+  return Number.isFinite(price)
+    ? price
+    : 0;
+}
 
 
 // ============================================================
-// SHOP
+// SHOP PAGE
 // ============================================================
 
 export default function Shop({
-  presetCategory,
-  title,
-  subtitle,
-  heroImage,
+  title = 'Industrial Equipment',
+  initialCategory = '',
 }) {
-  const [
-    searchParams,
-    setSearchParams,
-  ] =
+
+  const [searchParams] =
     useSearchParams();
 
 
@@ -66,41 +84,25 @@ export default function Shop({
   const [
     products,
     setProducts,
-  ] =
-    useState([]);
+  ] = useState([]);
+
 
   const [
     categories,
     setCategories,
-  ] =
-    useState([]);
+  ] = useState([]);
+
 
   const [
     loading,
     setLoading,
-  ] =
-    useState(true);
+  ] = useState(true);
+
 
   const [
     error,
     setError,
-  ] =
-    useState("");
-
-
-  // ==========================================================
-  // CATEGORY FROM URL
-  // ==========================================================
-
-  const urlCategory =
-    searchParams.get(
-      "category"
-    );
-
-  const initialCategory =
-    presetCategory ||
-    urlCategory ||
-    "";
+  ] = useState('');
 
 
   // ==========================================================
@@ -110,125 +112,102 @@ export default function Shop({
   const [
     selectedCategories,
     setSelectedCategories,
-  ] =
-    useState(
-      initialCategory
-        ? [
-            CATEGORY_ALIASES[
-              initialCategory
-            ] ||
-              initialCategory,
-          ]
-        : []
-    );
+  ] = useState(
+    initialCategory
+      ? [initialCategory]
+      : []
+  );
 
 
   const [
     selectedBrands,
     setSelectedBrands,
-  ] =
-    useState(
-      searchParams.get(
-        "brand"
-      )
-        ? [
-            searchParams.get(
-              "brand"
-            ),
-          ]
-        : []
-    );
+  ] = useState([]);
 
 
   const [
     availability,
     setAvailability,
-  ] =
-    useState([]);
+  ] = useState([]);
 
 
   const [
     priceRange,
     setPriceRange,
-  ] =
-    useState(0);
+  ] = useState(0);
 
 
   const [
-    sort,
-    setSort,
-  ] =
-    useState("best");
-
-
-  const [
-    view,
-    setView,
-  ] =
-    useState("grid");
-
-
-  const [
-    page,
-    setPage,
-  ] =
-    useState(1);
+    sortBy,
+    setSortBy,
+  ] = useState('featured');
 
 
   // ==========================================================
-  // LOAD SHOP DATA
+  // SEARCH
   // ==========================================================
 
-  async function loadShop() {
+  const searchTerm =
+    (
+      searchParams.get('q') ||
+      searchParams.get('search') ||
+      ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  // ==========================================================
+  // LOAD PRODUCTS + CATEGORIES FROM BACKEND
+  // ==========================================================
+
+  async function loadCatalogue() {
+
     try {
-      setLoading(
-        true
-      );
 
-      setError(
-        ""
-      );
+      setLoading(true);
+      setError('');
+
 
       const [
-        productResult,
-        categoryResult,
-      ] =
-        await Promise.all([
-          getProducts(),
-          getProductCategories(),
-        ]);
+        productResponse,
+        categoryResponse,
+      ] = await Promise.all([
+        getProducts(),
+        getProductCategories(),
+      ]);
 
 
       const productList =
-        productResult
-          ?.products ||
-        [];
+        getProductsArray(
+          productResponse
+        );
 
 
       const categoryList =
-        categoryResult
-          ?.categories ||
-        [];
+        getCategoriesArray(
+          categoryResponse
+        );
 
 
       setProducts(
         productList
       );
 
+
       setCategories(
         categoryList
       );
 
 
+      // ----------------------------------------------
+      // Calculate highest product price
+      // ----------------------------------------------
+
       const prices =
         productList
           .map(
-            (
-              product
-            ) =>
-              Number(
-                product.price
-              ) || 0
+            getProductPrice
           )
           .filter(
             (
@@ -238,63 +217,154 @@ export default function Shop({
           );
 
 
-      const maximumPrice =
-        Math.max(
-          ...prices,
-          500000
-        );
+      const highestPrice =
+        prices.length
+          ? Math.max(
+              ...prices
+            )
+          : 0;
 
 
       setPriceRange(
-        maximumPrice
-      );
-    } catch (
-      requestError
-    ) {
-      console.error(
-        "Shop loading error:",
-        requestError
+        highestPrice
       );
 
+
+    } catch (
+      loadError
+    ) {
+
+      console.error(
+        'Shop loading error:',
+        loadError
+      );
+
+
       setError(
-        requestError
-          ?.response
-          ?.data
-          ?.message ||
-          "Unable to load products."
+        loadError?.response?.data?.message ||
+        loadError?.message ||
+        'Unable to load products.'
       );
+
+
+      setProducts([]);
+      setCategories([]);
+
     } finally {
-      setLoading(
-        false
-      );
+
+      setLoading(false);
+
     }
+
   }
 
 
   useEffect(
     () => {
-      loadShop();
+
+      loadCatalogue();
+
     },
     []
   );
 
 
   // ==========================================================
-  // MAX PRICE
+  // DATABASE BRANDS
   // ==========================================================
 
-  const MAX_PRICE =
+  const brands =
     useMemo(
       () => {
-        const prices =
+
+        const values =
           products
             .map(
               (
                 product
               ) =>
-                Number(
-                  product.price
-                ) || 0
+                product?.brand
+            )
+            .filter(Boolean)
+            .map(
+              (
+                brand
+              ) =>
+                String(
+                  brand
+                ).trim()
+            );
+
+
+        return [
+          ...new Set(
+            values
+          ),
+        ].sort(
+          (
+            a,
+            b
+          ) =>
+            a.localeCompare(
+              b
+            )
+        );
+
+      },
+      [products]
+    );
+
+
+  // ==========================================================
+  // DATABASE AVAILABILITY OPTIONS
+  // ==========================================================
+
+  const availabilityOptions =
+    useMemo(
+      () => {
+
+        const values =
+          products
+            .map(
+              (
+                product
+              ) =>
+                product?.status
+            )
+            .filter(Boolean)
+            .map(
+              (
+                status
+              ) =>
+                String(
+                  status
+                ).trim()
+            );
+
+
+        return [
+          ...new Set(
+            values
+          ),
+        ];
+
+      },
+      [products]
+    );
+
+
+  // ==========================================================
+  // MAX DATABASE PRICE
+  // ==========================================================
+
+  const maxPrice =
+    useMemo(
+      () => {
+
+        const prices =
+          products
+            .map(
+              getProductPrice
             )
             .filter(
               (
@@ -303,398 +373,166 @@ export default function Shop({
                 price > 0
             );
 
-        return Math.max(
-          ...prices,
-          500000
-        );
+
+        return prices.length
+          ? Math.max(
+              ...prices
+            )
+          : 0;
+
       },
-      [
-        products,
-      ]
+      [products]
     );
 
 
   // ==========================================================
-  // BRANDS
-  // ==========================================================
-
-  const ALL_BRANDS =
-    useMemo(
-      () =>
-        [
-          ...new Set(
-            products
-              .map(
-                (
-                  product
-                ) =>
-                  product.brand
-              )
-              .filter(
-                Boolean
-              )
-          ),
-        ].sort(),
-      [
-        products,
-      ]
-    );
-
-
-  // ==========================================================
-  // PAGE RESET
+  // KEEP PRICE RANGE VALID
   // ==========================================================
 
   useEffect(
     () => {
-      setPage(
-        1
-      );
-    },
-    [
-      selectedCategories,
-      selectedBrands,
-      availability,
-      priceRange,
-      sort,
-    ]
-  );
 
-
-  // ==========================================================
-  // FILTER PRODUCTS
-  // ==========================================================
-
-  const filtered =
-    useMemo(
-      () => {
-        let list =
-          products.filter(
-            (
-              product
-            ) => {
-
-              // CATEGORY
-              if (
-                selectedCategories.length >
-                  0 &&
-                !selectedCategories.includes(
-                  product.category
-                )
-              ) {
-                return false;
-              }
-
-
-              // BRAND
-              if (
-                selectedBrands.length >
-                  0 &&
-                !selectedBrands.includes(
-                  product.brand
-                )
-              ) {
-                return false;
-              }
-
-
-              // AVAILABILITY
-              if (
-                availability.length >
-                  0 &&
-                !availability.includes(
-                  product.status
-                )
-              ) {
-                return false;
-              }
-
-
-              // PRICE
-              if (
-                typeof product.price ===
-                  "number" &&
-                product.price >
-                  priceRange
-              ) {
-                return false;
-              }
-
-
-              return true;
-            }
-          );
-
-
-        // PRICE LOW → HIGH
-        if (
-          sort ===
-          "price-asc"
-        ) {
-          list =
-            [...list].sort(
-              (
-                a,
-                b
-              ) => {
-
-                if (
-                  a.price ===
-                  null
-                ) {
-                  return 1;
-                }
-
-                if (
-                  b.price ===
-                  null
-                ) {
-                  return -1;
-                }
-
-                return (
-                  Number(
-                    a.price
-                  ) -
-                  Number(
-                    b.price
-                  )
-                );
-              }
-            );
-        }
-
-
-        // PRICE HIGH → LOW
-        else if (
-          sort ===
-          "price-desc"
-        ) {
-          list =
-            [...list].sort(
-              (
-                a,
-                b
-              ) => {
-
-                if (
-                  a.price ===
-                  null
-                ) {
-                  return 1;
-                }
-
-                if (
-                  b.price ===
-                  null
-                ) {
-                  return -1;
-                }
-
-                return (
-                  Number(
-                    b.price
-                  ) -
-                  Number(
-                    a.price
-                  )
-                );
-              }
-            );
-        }
-
-
-        // RATING
-        else if (
-          sort ===
-          "rating"
-        ) {
-          list =
-            [...list].sort(
-              (
-                a,
-                b
-              ) =>
-                Number(
-                  b.rating ||
-                  0
-                ) -
-                Number(
-                  a.rating ||
-                  0
-                )
-            );
-        }
-
-
-        return list;
-      },
-      [
-        products,
-        selectedCategories,
-        selectedBrands,
-        availability,
-        priceRange,
-        sort,
-      ]
-    );
-
-
-  // ==========================================================
-  // PAGINATION
-  // ==========================================================
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filtered.length /
-          PAGE_SIZE
-      )
-    );
-
-
-  useEffect(
-    () => {
       if (
-        page >
-        totalPages
+        maxPrice > 0 &&
+        (
+          priceRange === 0 ||
+          priceRange > maxPrice
+        )
       ) {
-        setPage(
-          totalPages
+
+        setPriceRange(
+          maxPrice
         );
+
       }
+
     },
     [
-      page,
-      totalPages,
+      maxPrice,
     ]
   );
 
 
-  const startIndex =
-    (page - 1) *
-    PAGE_SIZE;
-
-
-  const endIndex =
-    page *
-    PAGE_SIZE;
-
-
-  const pageItems =
-    filtered.slice(
-      startIndex,
-      endIndex
-    );
-
-
   // ==========================================================
-  // CATEGORY
+  // TOGGLE CATEGORY
   // ==========================================================
 
   function toggleCategory(
-    categoryId
+    category
   ) {
-    const normalized =
-      CATEGORY_ALIASES[
-        categoryId
-      ] ||
-      categoryId;
-
 
     setSelectedCategories(
       (
-        previous
+        current
       ) => {
+
         if (
-          previous.includes(
-            normalized
+          current.includes(
+            category
           )
         ) {
-          return previous.filter(
+
+          return current.filter(
             (
               item
             ) =>
               item !==
-              normalized
+              category
           );
+
         }
 
+
         return [
-          ...previous,
-          normalized,
+          ...current,
+          category,
         ];
+
       }
     );
+
   }
 
 
   // ==========================================================
-  // BRAND
+  // TOGGLE BRAND
   // ==========================================================
 
   function toggleBrand(
     brand
   ) {
+
     setSelectedBrands(
       (
-        previous
+        current
       ) => {
+
         if (
-          previous.includes(
+          current.includes(
             brand
           )
         ) {
-          return previous.filter(
+
+          return current.filter(
             (
               item
             ) =>
               item !==
               brand
           );
+
         }
 
+
         return [
-          ...previous,
+          ...current,
           brand,
         ];
+
       }
     );
+
   }
 
 
   // ==========================================================
-  // AVAILABILITY
+  // TOGGLE AVAILABILITY
   // ==========================================================
 
   function toggleAvailability(
     status
   ) {
+
     setAvailability(
       (
-        previous
+        current
       ) => {
+
         if (
-          previous.includes(
+          current.includes(
             status
           )
         ) {
-          return previous.filter(
+
+          return current.filter(
             (
               item
             ) =>
               item !==
               status
           );
+
         }
 
+
         return [
-          ...previous,
+          ...current,
           status,
         ];
+
       }
     );
+
   }
 
 
@@ -703,106 +541,355 @@ export default function Shop({
   // ==========================================================
 
   function clearFilters() {
-    const targetCategory =
-      presetCategory
-        ? (
-            CATEGORY_ALIASES[
-              presetCategory
-            ] ||
-            presetCategory
-          )
-        : null;
-
 
     setSelectedCategories(
-      targetCategory
-        ? [
-            targetCategory,
-          ]
+      initialCategory
+        ? [initialCategory]
         : []
     );
 
-    setSelectedBrands(
-      []
-    );
+    setSelectedBrands([]);
 
-    setAvailability(
-      []
-    );
+    setAvailability([]);
 
     setPriceRange(
-      MAX_PRICE
+      maxPrice
     );
 
-    setPage(
-      1
+    setSortBy(
+      'featured'
     );
 
-
-    if (
-      targetCategory
-    ) {
-      setSearchParams({
-        category:
-          targetCategory,
-      });
-    } else {
-      setSearchParams(
-        {}
-      );
-    }
   }
 
 
   // ==========================================================
-  // CATEGORY LIST
+  // FILTER PRODUCTS
   // ==========================================================
 
-  const filterCategories =
-    presetCategory
+  const filteredProducts =
+    useMemo(
+      () => {
 
-      ? categories.filter(
-          (
-            category
-          ) => {
-            const normalized =
-              CATEGORY_ALIASES[
-                category.id
-              ] ||
-              category.id;
+        let result =
+          [...products];
 
-            const target =
-              CATEGORY_ALIASES[
-                presetCategory
-              ] ||
-              presetCategory;
 
-            return (
-              normalized ===
-              target
+        // ----------------------------------------------
+        // SEARCH
+        // ----------------------------------------------
+
+        if (
+          searchTerm
+        ) {
+
+          result =
+            result.filter(
+              (
+                product
+              ) => {
+
+                const searchable =
+                  [
+                    product?.name,
+                    product?.brand,
+                    product?.description,
+                    product?.category,
+                    product?.categoryName,
+                    product?.status,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')
+                    .toLowerCase();
+
+
+                return searchable.includes(
+                  searchTerm
+                );
+
+              }
             );
-          }
-        )
 
-      : categories;
-
-
-  // ==========================================================
-  // HERO
-  // ==========================================================
-
-  const heroStyle =
-    heroImage
-      ? {
-          backgroundImage: `
-            linear-gradient(
-              rgba(11, 31, 77, 0.85),
-              rgba(11, 31, 77, 0.85)
-            ),
-            url("${heroImage}")
-          `,
         }
-      : undefined;
+
+
+        // ----------------------------------------------
+        // CATEGORY
+        // ----------------------------------------------
+
+        if (
+          selectedCategories.length >
+          0
+        ) {
+
+          result =
+            result.filter(
+              (
+                product
+              ) => {
+
+                const possibleValues =
+                  [
+                    product?.category,
+                    product?.categoryId,
+                    product?.categorySlug,
+                    product?.categoryName,
+                  ].filter(Boolean);
+
+
+                return possibleValues.some(
+                  (
+                    value
+                  ) =>
+                    selectedCategories.includes(
+                      value
+                    )
+                );
+
+              }
+            );
+
+        }
+
+
+        // ----------------------------------------------
+        // BRAND
+        // ----------------------------------------------
+
+        if (
+          selectedBrands.length >
+          0
+        ) {
+
+          result =
+            result.filter(
+              (
+                product
+              ) =>
+                selectedBrands.includes(
+                  product?.brand
+                )
+            );
+
+        }
+
+
+        // ----------------------------------------------
+        // AVAILABILITY
+        // ----------------------------------------------
+
+        if (
+          availability.length >
+          0
+        ) {
+
+          result =
+            result.filter(
+              (
+                product
+              ) =>
+                availability.includes(
+                  product?.status
+                )
+            );
+
+        }
+
+
+        // ----------------------------------------------
+        // PRICE
+        // ----------------------------------------------
+
+        if (
+          priceRange > 0
+        ) {
+
+          result =
+            result.filter(
+              (
+                product
+              ) => {
+
+                const price =
+                  getProductPrice(
+                    product
+                  );
+
+
+                // Products without numeric prices remain
+                // visible because they may be quote-only.
+                if (
+                  price === 0
+                ) {
+                  return true;
+                }
+
+
+                return (
+                  price <=
+                  priceRange
+                );
+
+              }
+            );
+
+        }
+
+
+        // ----------------------------------------------
+        // SORT
+        // ----------------------------------------------
+
+        switch (
+          sortBy
+        ) {
+
+          case 'price-low':
+
+            result.sort(
+              (
+                a,
+                b
+              ) =>
+                getProductPrice(
+                  a
+                ) -
+                getProductPrice(
+                  b
+                )
+            );
+
+            break;
+
+
+          case 'price-high':
+
+            result.sort(
+              (
+                a,
+                b
+              ) =>
+                getProductPrice(
+                  b
+                ) -
+                getProductPrice(
+                  a
+                )
+            );
+
+            break;
+
+
+          case 'name':
+
+            result.sort(
+              (
+                a,
+                b
+              ) =>
+                String(
+                  a?.name ||
+                  ''
+                ).localeCompare(
+                  String(
+                    b?.name ||
+                    ''
+                  )
+                )
+            );
+
+            break;
+
+
+          case 'rating':
+
+            result.sort(
+              (
+                a,
+                b
+              ) =>
+                Number(
+                  b?.rating ||
+                  0
+                ) -
+                Number(
+                  a?.rating ||
+                  0
+                )
+            );
+
+            break;
+
+
+          case 'newest':
+
+            result.sort(
+              (
+                a,
+                b
+              ) =>
+                new Date(
+                  b?.createdAt ||
+                  b?.created_at ||
+                  0
+                ) -
+                new Date(
+                  a?.createdAt ||
+                  a?.created_at ||
+                  0
+                )
+            );
+
+            break;
+
+
+          case 'featured':
+          default:
+
+            result.sort(
+              (
+                a,
+                b
+              ) => {
+
+                const featuredA =
+                  a?.isFeatured
+                    ? 1
+                    : 0;
+
+
+                const featuredB =
+                  b?.isFeatured
+                    ? 1
+                    : 0;
+
+
+                return (
+                  featuredB -
+                  featuredA
+                );
+
+              }
+            );
+
+            break;
+
+        }
+
+
+        return result;
+
+      },
+      [
+        products,
+        searchTerm,
+        selectedCategories,
+        selectedBrands,
+        availability,
+        priceRange,
+        sortBy,
+      ]
+    );
 
 
   // ==========================================================
@@ -812,25 +899,34 @@ export default function Shop({
   if (
     loading
   ) {
+
     return (
-      <section className="shop-page">
 
-        <div className="shop-hero">
-          <div className="container">
-            <div className="shop-hero-content">
-              <h1>
-                Industrial Catalog
-              </h1>
+      <main className="shop-page">
 
-              <p>
-                Loading Apex Machinery products...
-              </p>
-            </div>
+        <div className="container">
+
+          <div className="shop-loading">
+
+            <div className="shop-spinner" />
+
+            <h3>
+              Loading equipment...
+            </h3>
+
+            <p>
+              Retrieving products from
+              Apex Machinery.
+            </p>
+
           </div>
+
         </div>
 
-      </section>
+      </main>
+
     );
+
   }
 
 
@@ -841,355 +937,313 @@ export default function Shop({
   if (
     error
   ) {
+
     return (
-      <section className="shop-page">
 
-        <section className="section">
-          <div className="container">
+      <main className="shop-page">
 
-            <div className="shop-empty">
-              <Icon
-                name="alert-circle"
-                size={40}
-              />
+        <div className="container">
 
-              <h3>
-                Unable to load catalog
-              </h3>
+          <div className="shop-error">
 
-              <p>
-                {error}
-              </p>
+            <h2>
+              Unable to load catalog
+            </h2>
 
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={
-                  loadShop
-                }
-              >
-                Try Again
-              </button>
-            </div>
+
+            <p>
+              {error}
+            </p>
+
+
+            <button
+              type="button"
+              className="btn btn-gold"
+              onClick={
+                loadCatalogue
+              }
+            >
+              Try Again
+            </button>
 
           </div>
-        </section>
 
-      </section>
+        </div>
+
+      </main>
+
     );
+
   }
 
 
   // ==========================================================
-  // RENDER
+  // PAGE
   // ==========================================================
 
   return (
-    <section className="shop-page">
 
-      <div
-        className="shop-hero"
-        style={
-          heroStyle
-        }
-      >
+    <main className="shop-page">
+
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
+      <section className="shop-hero">
 
         <div className="container">
 
-          <Breadcrumb
-            items={[
-              {
-                to:
-                  "/shop",
-
-                label:
-                  "Shop",
-              },
-
-              {
-                label:
-                  title ||
-                  "Catalog",
-              },
-            ]}
-          />
-
-
           <div className="shop-hero-content">
 
+            <span className="shop-eyebrow">
+              Apex Machinery
+            </span>
+
+
             <h1>
-              {title ||
-                "Industrial Catalog"}
+              {
+                searchTerm
+                  ? `Search results for "${searchParams.get('q') || searchParams.get('search')}"`
+                  : title
+              }
             </h1>
 
 
             <p>
-              {subtitle ||
-                "Certified industrial equipment, sourced and inspected for enterprise procurement."}
+
+              Browse industrial machinery,
+              equipment and professional
+              tools available through
+              Apex Machinery.
+
             </p>
 
           </div>
 
         </div>
 
-      </div>
+      </section>
 
 
-      <section className="section">
+      {/* ======================================================
+          SHOP CONTENT
+      ====================================================== */}
 
-        <div className="container shop-layout">
+      <section className="shop-section">
 
-          <Filters
-            categories={
-              filterCategories
-            }
+        <div className="container">
 
-            brands={
-              ALL_BRANDS
-            }
-
-            selectedCategories={
-              selectedCategories
-            }
-
-            selectedBrands={
-              selectedBrands
-            }
-
-            availability={
-              availability
-            }
-
-            priceRange={
-              priceRange
-            }
-
-            maxPrice={
-              MAX_PRICE
-            }
-
-            onToggleCategory={
-              toggleCategory
-            }
-
-            onToggleBrand={
-              toggleBrand
-            }
-
-            onToggleAvailability={
-              toggleAvailability
-            }
-
-            onPriceChange={
-              setPriceRange
-            }
-
-            onClear={
-              clearFilters
-            }
-          />
+          <div className="shop-layout">
 
 
-          <div className="shop-results">
+            {/* ==================================================
+                FILTERS
+            ================================================== */}
 
-            <div className="shop-toolbar">
+            <div className="shop-sidebar">
 
-              <span className="shop-count">
-
-                Showing{" "}
-
-                {pageItems.length >
-                0
-                  ? startIndex +
-                    1
-                  : 0}
-
-                –
-
-                {Math.min(
-                  endIndex,
-                  filtered.length
-                )}
-
-                {" "}of{" "}
-
-                {
-                  filtered.length
+              <Filters
+                categories={
+                  categories
                 }
-
-                {" "}products
-
-              </span>
-
-
-              <div className="shop-toolbar-actions">
-
-                <select
-                  value={
-                    sort
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    setSort(
-                      event
-                        .target
-                        .value
-                    )
-                  }
-                  aria-label="Sort products"
-                >
-
-                  <option value="best">
-                    Best Match
-                  </option>
-
-                  <option value="price-asc">
-                    Price: Low to High
-                  </option>
-
-                  <option value="price-desc">
-                    Price: High to Low
-                  </option>
-
-                  <option value="rating">
-                    Top Rated
-                  </option>
-
-                </select>
-
-
-                <div className="shop-view-toggle">
-
-                  <button
-                    type="button"
-                    className={
-                      view ===
-                      "grid"
-                        ? "active"
-                        : ""
-                    }
-                    onClick={() =>
-                      setView(
-                        "grid"
-                      )
-                    }
-                    aria-label="Grid view"
-                  >
-                    <Icon
-                      name="menu"
-                      size={16}
-                    />
-                  </button>
-
-
-                  <button
-                    type="button"
-                    className={
-                      view ===
-                      "list"
-                        ? "active"
-                        : ""
-                    }
-                    onClick={() =>
-                      setView(
-                        "list"
-                      )
-                    }
-                    aria-label="List view"
-                  >
-                    <Icon
-                      name="eye"
-                      size={16}
-                    />
-                  </button>
-
-                </div>
-
-              </div>
+                brands={
+                  brands
+                }
+                availabilityOptions={
+                  availabilityOptions
+                }
+                selectedCategories={
+                  selectedCategories
+                }
+                selectedBrands={
+                  selectedBrands
+                }
+                availability={
+                  availability
+                }
+                priceRange={
+                  priceRange
+                }
+                maxPrice={
+                  maxPrice
+                }
+                currency="UGX"
+                onToggleCategory={
+                  toggleCategory
+                }
+                onToggleBrand={
+                  toggleBrand
+                }
+                onToggleAvailability={
+                  toggleAvailability
+                }
+                onPriceChange={
+                  setPriceRange
+                }
+                onClear={
+                  clearFilters
+                }
+              />
 
             </div>
 
 
-            {pageItems.length ===
-            0 ? (
+            {/* ==================================================
+                PRODUCTS
+            ================================================== */}
 
-              <div className="shop-empty">
+            <div className="shop-main">
 
-                <div className="shop-empty-icon">
-                  <Icon
-                    name="search"
-                    size={40}
-                  />
+
+              {/* ================================================
+                  TOOLBAR
+              ================================================ */}
+
+              <div className="shop-toolbar">
+
+                <div className="shop-results-count">
+
+                  <strong>
+                    {
+                      filteredProducts.length
+                    }
+                  </strong>
+
+                  {' '}
+
+                  {
+                    filteredProducts.length ===
+                    1
+                      ? 'product'
+                      : 'products'
+                  }
+
                 </div>
 
-                <h3>
-                  No products found
-                </h3>
 
-                <p>
-                  No products match your current filters.
-                </p>
+                <div className="shop-sort">
 
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={
-                    clearFilters
-                  }
-                >
-                  Clear Filters
-                </button>
+                  <label
+                    htmlFor="shop-sort"
+                  >
+                    Sort by
+                  </label>
+
+
+                  <select
+                    id="shop-sort"
+                    value={
+                      sortBy
+                    }
+                    onChange={
+                      (
+                        event
+                      ) =>
+                        setSortBy(
+                          event.target.value
+                        )
+                    }
+                  >
+
+                    <option value="featured">
+                      Featured
+                    </option>
+
+                    <option value="newest">
+                      Newest
+                    </option>
+
+                    <option value="price-low">
+                      Price: Low to High
+                    </option>
+
+                    <option value="price-high">
+                      Price: High to Low
+                    </option>
+
+                    <option value="rating">
+                      Highest Rated
+                    </option>
+
+                    <option value="name">
+                      Name A-Z
+                    </option>
+
+                  </select>
+
+                </div>
 
               </div>
 
-            ) : (
 
-              <div
-                className={
-                  view ===
-                  "grid"
-                    ? "grid-3"
-                    : "shop-list"
-                }
-              >
+              {/* ================================================
+                  PRODUCT GRID
+              ================================================ */}
 
-                {pageItems.map(
-                  (
-                    product
-                  ) => (
-                    <ProductCard
-                      key={
-                        product.id
+              {
+                filteredProducts.length >
+                0
+                  ? (
+
+                    <div className="shop-grid">
+
+                      {
+                        filteredProducts.map(
+                          (
+                            product
+                          ) => (
+
+                            <ProductCard
+                              key={
+                                product.id
+                              }
+                              product={
+                                product
+                              }
+                            />
+
+                          )
+                        )
                       }
-                      product={
-                        product
-                      }
-                    />
+
+                    </div>
+
                   )
-                )}
+                  : (
 
-              </div>
+                    <div className="shop-empty">
 
-            )}
+                      <h3>
+                        No products found
+                      </h3>
 
 
-            {filtered.length >
-              0 && (
+                      <p>
 
-              <Pagination
-                page={
-                  page
-                }
-                totalPages={
-                  totalPages
-                }
-                onChange={
-                  setPage
-                }
-              />
+                        No products match
+                        your selected filters.
 
-            )}
+                      </p>
+
+
+                      <button
+                        type="button"
+                        className="btn btn-gold"
+                        onClick={
+                          clearFilters
+                        }
+                      >
+                        Clear Filters
+                      </button>
+
+                    </div>
+
+                  )
+              }
+
+
+            </div>
 
           </div>
 
@@ -1197,6 +1251,9 @@ export default function Shop({
 
       </section>
 
-    </section>
+
+    </main>
+
   );
+
 }

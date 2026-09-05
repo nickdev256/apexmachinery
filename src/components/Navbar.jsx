@@ -1,5 +1,15 @@
-import { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 
 import Icon from './Icon';
 
@@ -45,33 +55,148 @@ const links = [
 
 export default function Navbar() {
 
-  const [menuOpen, setMenuOpen] =
-    useState(false);
+  const [
+    menuOpen,
+    setMenuOpen,
+  ] = useState(false);
 
-  const [query, setQuery] =
-    useState('');
+  const [
+    query,
+    setQuery,
+  ] = useState('');
+
+
+  // ==========================================================
+  // ROUTER
+  // ==========================================================
+
+  const navigate =
+    useNavigate();
+
+  const location =
+    useLocation();
 
 
   // ==========================================================
   // CONTEXT
   // ==========================================================
 
-  const { itemCount } =
-    useCart();
-
-  const { items: wishlistItems } =
-    useWishlist();
-
-  const { user } =
-    useAuth();
+  const {
+    itemCount = 0,
+  } = useCart();
 
 
-  const navigate =
-    useNavigate();
+  const {
+    items: wishlistItems = [],
+  } = useWishlist();
+
+
+  const {
+    user,
+  } = useAuth();
 
 
   // ==========================================================
-  // TRIPLE TAP / CLICK ADMIN ACCESS
+  // CLOSE MOBILE MENU WHEN ROUTE CHANGES
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      setMenuOpen(false);
+
+    },
+    [
+      location.pathname,
+      location.search,
+    ]
+  );
+
+
+  // ==========================================================
+  // ESCAPE KEY CLOSES MENU
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      function handleKeyDown(
+        event
+      ) {
+
+        if (
+          event.key ===
+          'Escape'
+        ) {
+
+          setMenuOpen(false);
+
+        }
+
+      }
+
+
+      window.addEventListener(
+        'keydown',
+        handleKeyDown
+      );
+
+
+      return () => {
+
+        window.removeEventListener(
+          'keydown',
+          handleKeyDown
+        );
+
+      };
+
+    },
+    []
+  );
+
+
+  // ==========================================================
+  // PREVENT BACKGROUND SCROLL WHEN MOBILE MENU IS OPEN
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      if (
+        menuOpen
+      ) {
+
+        document.body.classList.add(
+          'navbar-menu-open'
+        );
+
+      } else {
+
+        document.body.classList.remove(
+          'navbar-menu-open'
+        );
+
+      }
+
+
+      return () => {
+
+        document.body.classList.remove(
+          'navbar-menu-open'
+        );
+
+      };
+
+    },
+    [
+      menuOpen,
+    ]
+  );
+
+
+  // ==========================================================
+  // LOGO TRIPLE CLICK ADMIN ACCESS
   // ==========================================================
 
   const logoClickCount =
@@ -81,105 +206,121 @@ export default function Navbar() {
     useRef(null);
 
 
-  function handleLogoTripleClick(e) {
+  function handleLogoClick(
+    event
+  ) {
 
-    /*
-     * Prevent the normal "/" navigation
-     * while checking for triple tap.
-     */
-    e.preventDefault();
+    event.preventDefault();
 
 
     logoClickCount.current += 1;
 
 
-    /*
-     * Clear the previous timer.
-     */
     clearTimeout(
       logoClickTimer.current
     );
 
 
-    /*
-     * Reset the counter if the
-     * user stops tapping.
-     */
-    logoClickTimer.current =
-      setTimeout(() => {
-
-        logoClickCount.current = 0;
-
-      }, 1000);
-
-
     // ========================================================
-    // THREE TAPS
+    // THIRD CLICK
     // ========================================================
 
     if (
-      logoClickCount.current === 3
+      logoClickCount.current >= 3
     ) {
+
+      logoClickCount.current = 0;
+
 
       clearTimeout(
         logoClickTimer.current
       );
 
 
-      logoClickCount.current = 0;
-
-
       setMenuOpen(false);
 
 
-      /*
-       * IMPORTANT:
-       *
-       * We use the SAME LOGIN PAGE.
-       *
-       * We do NOT navigate to:
-       *
-       * /admin-login
-       *
-       * because there is no separate
-       * admin-login route.
-       *
-       * Instead we tell Login.jsx that
-       * the login attempt came through
-       * administrator access.
-       */
+      navigate(
+        '/login',
+        {
+          state: {
+            adminAccess: true,
+          },
+        }
+      );
 
-      navigate('/login', {
-        state: {
-          adminAccess: true,
-        },
-      });
+
+      return;
 
     }
 
+
+    // ========================================================
+    // NORMAL LOGO CLICK
+    // ========================================================
+
+    logoClickTimer.current =
+      setTimeout(
+        () => {
+
+          logoClickCount.current = 0;
+
+
+          navigate('/');
+
+        },
+        450
+      );
+
   }
+
+
+  // ==========================================================
+  // CLEAN UP LOGO TIMER
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      return () => {
+
+        clearTimeout(
+          logoClickTimer.current
+        );
+
+      };
+
+    },
+    []
+  );
 
 
   // ==========================================================
   // SEARCH
   // ==========================================================
 
-  function handleSearch(e) {
+  function handleSearch(
+    event
+  ) {
 
-    e.preventDefault();
+    event.preventDefault();
 
 
     const value =
       query.trim();
 
 
-    if (!value) {
+    if (
+      !value
+    ) {
       return;
     }
 
 
     navigate(
-      `/search?q=${encodeURIComponent(value)}`
+      `/search?q=${encodeURIComponent(
+        value
+      )}`
     );
 
 
@@ -194,19 +335,15 @@ export default function Navbar() {
 
   function getAccountPath() {
 
-    /*
-     * No authenticated user
-     */
-    if (!user) {
+    if (
+      !user
+    ) {
 
       return '/login';
 
     }
 
 
-    /*
-     * Administrator
-     */
     if (
       user.role === 'admin' ||
       user.role === 'administrator'
@@ -217,10 +354,30 @@ export default function Navbar() {
     }
 
 
-    /*
-     * Normal customer
-     */
     return '/dashboard';
+
+  }
+
+
+  // ==========================================================
+  // MENU TOGGLE
+  // ==========================================================
+
+  function toggleMenu() {
+
+    setMenuOpen(
+      (
+        current
+      ) =>
+        !current
+    );
+
+  }
+
+
+  function closeMenu() {
+
+    setMenuOpen(false);
 
   }
 
@@ -233,20 +390,25 @@ export default function Navbar() {
 
     <header className="navbar">
 
+
+      {/* ======================================================
+          MAIN NAVBAR
+      ====================================================== */}
+
       <div className="container navbar-inner">
 
 
-        {/* ==================================================
+        {/* ====================================================
             LOGO
-        ================================================== */}
+        ==================================================== */}
 
         <Link
           to="/"
           className="navbar-brand"
           onClick={
-            handleLogoTripleClick
+            handleLogoClick
           }
-          aria-label="Apex Machinery"
+          aria-label="Apex Machinery home"
         >
 
           <img
@@ -271,38 +433,73 @@ export default function Navbar() {
         </Link>
 
 
-        {/* ==================================================
-            NAVIGATION
-        ================================================== */}
+        {/* ====================================================
+            DESKTOP / MOBILE NAVIGATION
+        ==================================================== */}
 
         <nav
-          className={`navbar-links ${
-            menuOpen
-              ? 'open'
-              : ''
-          }`}
+          id="main-navigation"
+          className={
+            `navbar-links ${
+              menuOpen
+                ? 'open'
+                : ''
+            }`
+          }
+          aria-label="Main navigation"
         >
 
-          {links.map((link) => (
 
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() =>
-                setMenuOpen(false)
-              }
-            >
+          {/* ==================================================
+              NAVIGATION LINKS
+          ================================================== */}
 
-              {link.label}
+          <div className="navbar-nav-links">
 
-            </Link>
+            {
+              links.map(
+                (
+                  link
+                ) => (
 
-          ))}
+                  <NavLink
+                    key={
+                      link.to
+                    }
+                    to={
+                      link.to
+                    }
+                    onClick={
+                      closeMenu
+                    }
+                    className={
+                      (
+                        {
+                          isActive,
+                        }
+                      ) =>
+                        isActive
+                          ? 'navbar-link active'
+                          : 'navbar-link'
+                    }
+                  >
+
+                    {
+                      link.label
+                    }
+
+                  </NavLink>
+
+                )
+              )
+            }
+
+          </div>
 
 
-          {/* =================================================
+          {/* ==================================================
               SEARCH
-          ================================================= */}
+          ================================================== */}
 
           <form
             className="navbar-search"
@@ -311,44 +508,172 @@ export default function Navbar() {
             }
           >
 
-            <Icon
-              name="search"
-              size={18}
-            />
+            <span className="navbar-search-icon">
+
+              <Icon
+                name="search"
+                size={18}
+              />
+
+            </span>
 
 
             <input
               type="search"
-              placeholder="Search industrial machinery..."
-              value={query}
-              onChange={(e) =>
-                setQuery(
-                  e.target.value
-                )
+              placeholder="Search machinery..."
+              value={
+                query
+              }
+              onChange={
+                (
+                  event
+                ) =>
+                  setQuery(
+                    event.target.value
+                  )
               }
               aria-label="Search products"
             />
 
+
+            <button
+              type="submit"
+              className="navbar-search-submit"
+              aria-label="Search"
+            >
+
+              <Icon
+                name="search"
+                size={18}
+              />
+
+            </button>
+
           </form>
+
+
+          {/* ==================================================
+              MOBILE ACCOUNT LINKS
+          ================================================== */}
+
+          <div className="navbar-mobile-actions">
+
+            <Link
+              to="/wishlist"
+              onClick={
+                closeMenu
+              }
+            >
+
+              <Icon
+                name="heart"
+                size={19}
+              />
+
+              <span>
+                Wishlist
+              </span>
+
+              {
+                wishlistItems.length >
+                0 && (
+
+                  <span className="navbar-mobile-count">
+
+                    {
+                      wishlistItems.length
+                    }
+
+                  </span>
+
+                )
+              }
+
+            </Link>
+
+
+            <Link
+              to="/cart"
+              onClick={
+                closeMenu
+              }
+            >
+
+              <Icon
+                name="cart"
+                size={19}
+              />
+
+              <span>
+                Cart
+              </span>
+
+              {
+                itemCount >
+                0 && (
+
+                  <span className="navbar-mobile-count">
+
+                    {
+                      itemCount
+                    }
+
+                  </span>
+
+                )
+              }
+
+            </Link>
+
+
+            <Link
+              to={
+                getAccountPath()
+              }
+              onClick={
+                closeMenu
+              }
+            >
+
+              <Icon
+                name="user"
+                size={19}
+              />
+
+              <span>
+                {
+                  user
+                    ? 'My Account'
+                    : 'Login'
+                }
+              </span>
+
+            </Link>
+
+          </div>
 
         </nav>
 
 
-        {/* ==================================================
-            NAVBAR ACTIONS
-        ================================================== */}
+        {/* ====================================================
+            DESKTOP ACTIONS
+        ==================================================== */}
 
         <div className="navbar-actions">
 
 
-          {/* =================================================
+          {/* ==================================================
               WISHLIST
-          ================================================= */}
+          ================================================== */}
 
           <Link
             to="/wishlist"
-            className="navbar-icon-btn"
-            aria-label="Wishlist"
+            className="navbar-icon-btn navbar-desktop-action"
+            aria-label={
+              `Wishlist ${
+                wishlistItems.length
+              } items`
+            }
           >
 
             <Icon
@@ -356,27 +681,39 @@ export default function Navbar() {
             />
 
 
-            {wishlistItems.length > 0 && (
+            {
+              wishlistItems.length >
+              0 && (
 
-              <span className="navbar-badge">
+                <span className="navbar-badge">
 
-                {wishlistItems.length}
+                  {
+                    wishlistItems.length >
+                    99
+                      ? '99+'
+                      : wishlistItems.length
+                  }
 
-              </span>
+                </span>
 
-            )}
+              )
+            }
 
           </Link>
 
 
-          {/* =================================================
+          {/* ==================================================
               CART
-          ================================================= */}
+          ================================================== */}
 
           <Link
             to="/cart"
-            className="navbar-icon-btn"
-            aria-label="Cart"
+            className="navbar-icon-btn navbar-desktop-action"
+            aria-label={
+              `Cart ${
+                itemCount
+              } items`
+            }
           >
 
             <Icon
@@ -384,27 +721,41 @@ export default function Navbar() {
             />
 
 
-            {itemCount > 0 && (
+            {
+              itemCount >
+              0 && (
 
-              <span className="navbar-badge">
+                <span className="navbar-badge">
 
-                {itemCount}
+                  {
+                    itemCount >
+                    99
+                      ? '99+'
+                      : itemCount
+                  }
 
-              </span>
+                </span>
 
-            )}
+              )
+            }
 
           </Link>
 
 
-          {/* =================================================
+          {/* ==================================================
               ACCOUNT
-          ================================================= */}
+          ================================================== */}
 
           <Link
-            to={getAccountPath()}
-            className="navbar-icon-btn"
-            aria-label="Account"
+            to={
+              getAccountPath()
+            }
+            className="navbar-icon-btn navbar-desktop-action"
+            aria-label={
+              user
+                ? 'My account'
+                : 'Login'
+            }
           >
 
             <Icon
@@ -414,19 +765,25 @@ export default function Navbar() {
           </Link>
 
 
-          {/* =================================================
-              MOBILE MENU
-          ================================================= */}
+          {/* ==================================================
+              MOBILE MENU BUTTON
+          ================================================== */}
 
           <button
             type="button"
             className="navbar-menu-toggle"
-            onClick={() =>
-              setMenuOpen(
-                (open) => !open
-              )
+            onClick={
+              toggleMenu
             }
-            aria-label="Toggle menu"
+            aria-label={
+              menuOpen
+                ? 'Close navigation menu'
+                : 'Open navigation menu'
+            }
+            aria-expanded={
+              menuOpen
+            }
+            aria-controls="main-navigation"
           >
 
             <Icon
@@ -442,6 +799,26 @@ export default function Navbar() {
         </div>
 
       </div>
+
+
+      {/* ======================================================
+          MOBILE BACKDROP
+      ====================================================== */}
+
+      {
+        menuOpen && (
+
+          <button
+            type="button"
+            className="navbar-backdrop"
+            onClick={
+              closeMenu
+            }
+            aria-label="Close navigation menu"
+          />
+
+        )
+      }
 
     </header>
 
