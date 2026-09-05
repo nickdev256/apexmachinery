@@ -5,6 +5,7 @@ import 'dotenv/config';
 import authRoutes from './routes/authRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import adminInventoryRoutes from './routes/adminInventoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
@@ -21,6 +22,7 @@ import {
 const app =
   express();
 
+
 const PORT =
   process.env.PORT ||
   5000;
@@ -34,13 +36,12 @@ function cleanEnvUrl(
   value
 ) {
 
-  if (
-    !value
-  ) {
+  if (!value) {
 
     return null;
 
   }
+
 
   return String(
     value
@@ -61,13 +62,39 @@ function cleanEnvUrl(
 const allowedOrigins =
   new Set(
     [
+
+      // ------------------------------------------------------
+      // LOCAL DEVELOPMENT
+      // ------------------------------------------------------
+
       'http://localhost:5173',
+
       'http://127.0.0.1:5173',
 
+      'http://localhost:5174',
+
+      'http://127.0.0.1:5174',
+
+
+      // ------------------------------------------------------
+      // PRODUCTION DOMAIN
+      // ------------------------------------------------------
+
       'https://www.apexmachinery256.com',
+
       'https://apexmachinery256.com',
 
+
+      // ------------------------------------------------------
+      // VERCEL
+      // ------------------------------------------------------
+
       'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
+
+
+      // ------------------------------------------------------
+      // ENVIRONMENT-BASED FRONTENDS
+      // ------------------------------------------------------
 
       cleanEnvUrl(
         process.env.FRONTEND_URL
@@ -84,7 +111,7 @@ const allowedOrigins =
 
 
 // ============================================================
-// CORS
+// CORS OPTIONS
 // ============================================================
 
 const corsOptions = {
@@ -96,12 +123,15 @@ const corsOptions = {
 
     // --------------------------------------------------------
     // Allow requests without Origin
-    // curl, Postman, server-to-server, direct browser URL
+    //
+    // Examples:
+    // - curl
+    // - Postman
+    // - server-to-server
+    // - direct browser navigation
     // --------------------------------------------------------
 
-    if (
-      !origin
-    ) {
+    if (!origin) {
 
       return callback(
         null,
@@ -118,7 +148,7 @@ const corsOptions = {
 
 
     // --------------------------------------------------------
-    // Allow trusted origins
+    // ALLOW TRUSTED ORIGIN
     // --------------------------------------------------------
 
     if (
@@ -131,6 +161,7 @@ const corsOptions = {
         `[CORS ALLOWED] ${normalizedOrigin}`
       );
 
+
       return callback(
         null,
         true
@@ -140,7 +171,7 @@ const corsOptions = {
 
 
     // --------------------------------------------------------
-    // Block unknown origins
+    // BLOCK UNKNOWN ORIGIN
     // --------------------------------------------------------
 
     console.warn(
@@ -191,6 +222,10 @@ const corsOptions = {
 };
 
 
+// ============================================================
+// CORS
+// ============================================================
+
 app.use(
   cors(
     corsOptions
@@ -212,11 +247,13 @@ app.use(
 
 app.use(
   express.urlencoded({
+
     extended:
       true,
 
     limit:
       '10mb',
+
   })
 );
 
@@ -375,6 +412,9 @@ app.get(
           admin:
             '/api/admin',
 
+          adminInventory:
+            '/api/admin/inventory',
+
           products:
             '/api/products',
 
@@ -427,6 +467,19 @@ app.use(
 
 
 // ------------------------------------------------------------
+// ADMIN INVENTORY
+//
+// IMPORTANT:
+// Mount this BEFORE the general /api/admin router.
+// ------------------------------------------------------------
+
+app.use(
+  '/api/admin/inventory',
+  adminInventoryRoutes
+);
+
+
+// ------------------------------------------------------------
 // ADMIN
 // ------------------------------------------------------------
 
@@ -474,21 +527,31 @@ console.log(
   '✅ Auth routes mounted at /api/auth'
 );
 
+
 console.log(
   '✅ Customer routes mounted at /api/customer'
 );
+
+
+console.log(
+  '✅ Admin inventory routes mounted at /api/admin/inventory'
+);
+
 
 console.log(
   '✅ Admin routes mounted at /api/admin'
 );
 
+
 console.log(
   '✅ Product routes mounted at /api/products'
 );
 
+
 console.log(
   '✅ Home routes mounted at /api/home'
 );
+
 
 console.log(
   '✅ Contact routes mounted at /api/contact'
@@ -538,6 +601,7 @@ app.use(
     console.error(
       '[SERVER ERROR]',
       {
+
         message:
           error?.message,
 
@@ -550,6 +614,7 @@ app.use(
           'development'
             ? error?.stack
             : undefined,
+
       }
     );
 
@@ -604,9 +669,11 @@ app.listen(
       '========================================'
     );
 
+
     console.log(
       '       APEX MACHINERY API'
     );
+
 
     console.log(
       '========================================'
@@ -653,37 +720,54 @@ app.listen(
     );
 
 
+    // ========================================================
+    // ROUTES
+    // ========================================================
+
     console.log(
       'Mounted API routes:'
     );
+
 
     console.log(
       ' - /api/health'
     );
 
+
     console.log(
       ' - /api/auth'
     );
+
 
     console.log(
       ' - /api/customer'
     );
 
+
     console.log(
       ' - /api/admin'
     );
+
+
+    console.log(
+      ' - /api/admin/inventory'
+    );
+
 
     console.log(
       ' - /api/products'
     );
 
+
     console.log(
       ' - /api/products/categories'
     );
 
+
     console.log(
       ' - /api/home'
     );
+
 
     console.log(
       ' - /api/contact'
@@ -696,7 +780,7 @@ app.listen(
 
 
     // ========================================================
-    // DATABASE CONFIGURATION STATUS
+    // DATABASE CONFIGURATION
     // ========================================================
 
     console.log(
@@ -728,15 +812,17 @@ app.listen(
 
 
     // ========================================================
-    // EMAIL CONFIGURATION STATUS
-    // NEVER PRINT THE REAL APP PASSWORD
+    // EMAIL CONFIGURATION
+    //
+    // NEVER PRINT THE ACTUAL GMAIL APP PASSWORD.
     // ========================================================
 
     const gmailUser =
       String(
         process.env.GMAIL_USER ||
         ''
-      ).trim();
+      )
+        .trim();
 
 
     const gmailPassword =
@@ -755,7 +841,8 @@ app.listen(
       String(
         process.env.APEX_CONTACT_EMAIL ||
         ''
-      ).trim();
+      )
+        .trim();
 
 
     console.log(
