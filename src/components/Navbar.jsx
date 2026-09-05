@@ -28,6 +28,11 @@ import './Navbar.css';
 
 const links = [
   {
+    to: '/',
+    label: 'Home',
+  },
+
+  {
     to: '/shop',
     label: 'Shop',
   },
@@ -46,6 +51,11 @@ const links = [
     to: '/brands',
     label: 'Brands',
   },
+
+  {
+    to: '/contact',
+    label: 'Contact',
+  },
 ];
 
 
@@ -60,6 +70,7 @@ export default function Navbar() {
     setMenuOpen,
   ] = useState(false);
 
+
   const [
     query,
     setQuery,
@@ -72,6 +83,7 @@ export default function Navbar() {
 
   const navigate =
     useNavigate();
+
 
   const location =
     useLocation();
@@ -202,6 +214,7 @@ export default function Navbar() {
   const logoClickCount =
     useRef(0);
 
+
   const logoClickTimer =
     useRef(null);
 
@@ -313,7 +326,9 @@ export default function Navbar() {
     if (
       !value
     ) {
+
       return;
+
     }
 
 
@@ -468,6 +483,9 @@ export default function Navbar() {
                     }
                     to={
                       link.to
+                    }
+                    end={
+                      link.to === '/'
                     }
                     onClick={
                       closeMenu
