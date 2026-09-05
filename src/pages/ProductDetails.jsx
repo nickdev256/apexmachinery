@@ -35,37 +35,12 @@ import { formatCurrency } from '../utils/format';
 import './ProductDetails.css';
 
 
-
 // ============================================================
-// CUSTOMER REVIEWS
+// SITE CONFIG
 // ============================================================
 
-const reviews = [
-  {
-    name: 'Jonathan Reyes',
-    rating: 5,
-    date: 'Mar 12, 2026',
-    text:
-      'Exceeded expectations for the price point. Runs smooth under continuous industrial load.',
-  },
-
-  {
-    name: 'Amara Osei',
-    rating: 4,
-    date: 'Feb 28, 2026',
-    text:
-      'Solid build quality. Shipping took a little longer than quoted but support kept us updated.',
-  },
-
-  {
-    name: 'Liu Wei',
-    rating: 5,
-    date: 'Feb 09, 2026',
-    text:
-      'Specifications matched exactly what was listed. Our maintenance team is impressed.',
-  },
-];
-
+const SITE_URL =
+  'https://www.apexmachinery256.com';
 
 
 // ============================================================
@@ -74,79 +49,146 @@ const reviews = [
 
 function getProductsArray(data) {
 
-  if (Array.isArray(data)) {
+  if (
+    Array.isArray(data)
+  ) {
+
     return data;
+
   }
 
-  if (Array.isArray(data?.products)) {
+
+  if (
+    Array.isArray(
+      data?.products
+    )
+  ) {
+
     return data.products;
+
   }
 
-  if (Array.isArray(data?.data?.products)) {
+
+  if (
+    Array.isArray(
+      data?.data?.products
+    )
+  ) {
+
     return data.data.products;
+
   }
+
 
   return [];
 
 }
 
 
+// ============================================================
+// GET SINGLE PRODUCT OBJECT
+// ============================================================
 
 function getProductObject(data) {
 
-  if (!data) {
+  if (
+    !data
+  ) {
+
     return null;
+
   }
+
+
+  // productApi unwraps:
+  //
+  // {
+  //   product: {...}
+  // }
 
   if (
     data?.product &&
-    typeof data.product === 'object'
+    typeof data.product ===
+      'object'
   ) {
+
     return data.product;
+
   }
+
+
+  // Fallback if raw API response is passed
 
   if (
     data?.data?.product &&
-    typeof data.data.product === 'object'
+    typeof data.data.product ===
+      'object'
   ) {
+
     return data.data.product;
+
   }
 
+
+  // Backward compatibility
+
   if (
-    typeof data === 'object' &&
-    !Array.isArray(data)
+    typeof data ===
+      'object' &&
+    !Array.isArray(data) &&
+    data?.id
   ) {
+
     return data;
+
   }
+
 
   return null;
 
 }
 
 
+// ============================================================
+// ABSOLUTE IMAGE URL
+// ============================================================
 
-function makeAbsoluteImageUrl(image) {
-
-  if (!image) {
-    return 'https://www.apexmachinery256.com/logo.jpg';
-  }
+function makeAbsoluteImageUrl(
+  image
+) {
 
   if (
-    image.startsWith('http://') ||
-    image.startsWith('https://')
+    !image
   ) {
-    return image;
+
+    return `${SITE_URL}/logo.jpg`;
+
   }
+
+
+  if (
+    image.startsWith(
+      'http://'
+    ) ||
+    image.startsWith(
+      'https://'
+    )
+  ) {
+
+    return image;
+
+  }
+
 
   const normalized =
     image.startsWith('/')
       ? image
       : `/${image}`;
 
-  return `https://www.apexmachinery256.com${normalized}`;
+
+  return `${SITE_URL}${normalized}`;
 
 }
-
 
 
 // ============================================================
@@ -155,8 +197,10 @@ function makeAbsoluteImageUrl(image) {
 
 export default function ProductDetails() {
 
-  const { id } = useParams();
-
+  const {
+    id,
+  } =
+    useParams();
 
 
   // ==========================================================
@@ -166,50 +210,57 @@ export default function ProductDetails() {
   const [
     product,
     setProduct,
-  ] = useState(null);
+  ] =
+    useState(null);
 
 
   const [
     allProducts,
     setAllProducts,
-  ] = useState([]);
+  ] =
+    useState([]);
 
 
   const [
     loading,
     setLoading,
-  ] = useState(true);
+  ] =
+    useState(true);
 
 
   const [
     error,
     setError,
-  ] = useState('');
+  ] =
+    useState('');
 
 
   const [
     notFound,
     setNotFound,
-  ] = useState(false);
+  ] =
+    useState(false);
 
 
   const [
     activeImg,
     setActiveImg,
-  ] = useState(0);
+  ] =
+    useState(0);
 
 
   const [
     qty,
     setQty,
-  ] = useState(1);
+  ] =
+    useState(1);
 
 
   const [
     quoteOpen,
     setQuoteOpen,
-  ] = useState(false);
-
+  ] =
+    useState(false);
 
 
   // ==========================================================
@@ -218,51 +269,69 @@ export default function ProductDetails() {
 
   const {
     addToCart,
-  } = useCart();
+  } =
+    useCart();
 
 
   const {
     toggleWishlist,
     isWishlisted,
-  } = useWishlist();
-
+  } =
+    useWishlist();
 
 
   // ==========================================================
-  // LOAD PRODUCT FROM BACKEND
+  // LOAD PRODUCT
   // ==========================================================
 
   useEffect(
     () => {
 
-      let cancelled = false;
+      let cancelled =
+        false;
 
 
       async function loadProductDetails() {
 
         try {
 
-          setLoading(true);
+          setLoading(
+            true
+          );
 
-          setError('');
+          setError(
+            ''
+          );
 
-          setNotFound(false);
+          setNotFound(
+            false
+          );
 
-          setActiveImg(0);
+          setActiveImg(
+            0
+          );
 
-          setQty(1);
+          setQty(
+            1
+          );
 
 
-          // --------------------------------------------------
-          // Load selected product
-          // --------------------------------------------------
+          // ==================================================
+          // SELECTED PRODUCT
+          // ==================================================
 
           const productResponse =
-            await getProduct(id);
+            await getProduct(
+              id
+            );
 
 
-          if (cancelled) {
+          if (
+            cancelled
+          ) {
+
             return;
+
           }
 
 
@@ -272,11 +341,17 @@ export default function ProductDetails() {
             );
 
 
-          if (!selectedProduct?.id) {
+          if (
+            !selectedProduct?.id
+          ) {
 
-            setNotFound(true);
+            setNotFound(
+              true
+            );
 
-            setProduct(null);
+            setProduct(
+              null
+            );
 
             return;
 
@@ -288,9 +363,9 @@ export default function ProductDetails() {
           );
 
 
-          // --------------------------------------------------
-          // Load catalogue for related products
-          // --------------------------------------------------
+          // ==================================================
+          // RELATED PRODUCTS
+          // ==================================================
 
           try {
 
@@ -298,8 +373,12 @@ export default function ProductDetails() {
               await getProducts();
 
 
-            if (cancelled) {
+            if (
+              cancelled
+            ) {
+
               return;
+
             }
 
 
@@ -314,14 +393,14 @@ export default function ProductDetails() {
           ) {
 
             console.error(
-              'Related products loading error:',
+              '[PRODUCT DETAILS] Related products error:',
               relatedError
             );
 
 
-            // Product page can still work even if
-            // related products fail to load.
-            setAllProducts([]);
+            setAllProducts(
+              []
+            );
 
           }
 
@@ -330,24 +409,45 @@ export default function ProductDetails() {
           loadError
         ) {
 
-          if (cancelled) {
+          if (
+            cancelled
+          ) {
+
             return;
+
           }
 
 
           console.error(
-            'Product details loading error:',
-            loadError
+            '[PRODUCT DETAILS] Loading error:',
+            {
+              message:
+                loadError?.message,
+
+              status:
+                loadError?.response?.status,
+
+              data:
+                loadError?.response?.data,
+
+              productId:
+                id,
+            }
           );
 
 
           if (
-            loadError?.response?.status === 404
+            loadError?.response?.status ===
+            404
           ) {
 
-            setNotFound(true);
+            setNotFound(
+              true
+            );
 
-            setProduct(null);
+            setProduct(
+              null
+            );
 
           } else {
 
@@ -359,12 +459,15 @@ export default function ProductDetails() {
 
           }
 
-
         } finally {
 
-          if (!cancelled) {
+          if (
+            !cancelled
+          ) {
 
-            setLoading(false);
+            setLoading(
+              false
+            );
 
           }
 
@@ -373,29 +476,37 @@ export default function ProductDetails() {
       }
 
 
-      if (id) {
+      if (
+        id
+      ) {
 
         loadProductDetails();
 
       } else {
 
-        setLoading(false);
+        setLoading(
+          false
+        );
 
-        setNotFound(true);
+        setNotFound(
+          true
+        );
 
       }
 
 
       return () => {
 
-        cancelled = true;
+        cancelled =
+          true;
 
       };
 
     },
-    [id]
+    [
+      id,
+    ]
   );
-
 
 
   // ==========================================================
@@ -406,8 +517,12 @@ export default function ProductDetails() {
     useMemo(
       () => {
 
-        if (!product) {
+        if (
+          !product
+        ) {
+
           return [];
+
         }
 
 
@@ -418,10 +533,16 @@ export default function ProductDetails() {
             product.categorySlug,
             product.categoryName,
           ]
-            .filter(Boolean)
+            .filter(
+              Boolean
+            )
             .map(
-              (value) =>
-                String(value)
+              (
+                value
+              ) =>
+                String(
+                  value
+                )
                   .trim()
                   .toLowerCase()
             );
@@ -429,18 +550,30 @@ export default function ProductDetails() {
 
         return allProducts
           .filter(
-            (item) => {
+            (
+              item
+            ) => {
 
-              if (!item) {
+              if (
+                !item
+              ) {
+
                 return false;
+
               }
 
 
               if (
-                String(item.id) ===
-                String(product.id)
+                String(
+                  item.id
+                ) ===
+                String(
+                  product.id
+                )
               ) {
+
                 return false;
+
               }
 
 
@@ -451,17 +584,25 @@ export default function ProductDetails() {
                   item.categorySlug,
                   item.categoryName,
                 ]
-                  .filter(Boolean)
+                  .filter(
+                    Boolean
+                  )
                   .map(
-                    (value) =>
-                      String(value)
+                    (
+                      value
+                    ) =>
+                      String(
+                        value
+                      )
                         .trim()
                         .toLowerCase()
                   );
 
 
               return itemCategoryValues.some(
-                (value) =>
+                (
+                  value
+                ) =>
                   productCategoryValues.includes(
                     value
                   )
@@ -482,12 +623,13 @@ export default function ProductDetails() {
     );
 
 
-
   // ==========================================================
   // LOADING
   // ==========================================================
 
-  if (loading) {
+  if (
+    loading
+  ) {
 
     return (
 
@@ -514,22 +656,24 @@ export default function ProductDetails() {
   }
 
 
-
   // ==========================================================
   // PRODUCT NOT FOUND
   // ==========================================================
 
-  if (notFound) {
+  if (
+    notFound
+  ) {
 
     return (
+
       <Navigate
         to="/shop"
         replace
       />
+
     );
 
   }
-
 
 
   // ==========================================================
@@ -574,7 +718,6 @@ export default function ProductDetails() {
   }
 
 
-
   // ==========================================================
   // PRODUCT DATA
   // ==========================================================
@@ -586,15 +729,22 @@ export default function ProductDetails() {
 
 
   const productImages =
-    product.images?.length
+    Array.isArray(
+      product.images
+    ) &&
+    product.images.length >
+      0
       ? product.images
       : product.image
-        ? [product.image]
+        ? [
+            product.image,
+          ]
         : [];
 
 
   const safeActiveImg =
-    activeImg >= productImages.length
+    activeImg >=
+    productImages.length
       ? 0
       : activeImg;
 
@@ -614,7 +764,9 @@ export default function ProductDetails() {
 
 
   const productUrl =
-    `https://www.apexmachinery256.com/product/${productSlug}`;
+    `${SITE_URL}/product/${encodeURIComponent(
+      productSlug
+    )}`;
 
 
   const productImage =
@@ -636,27 +788,61 @@ export default function ProductDetails() {
     '';
 
 
+  // ==========================================================
+  // STATUS
+  // ==========================================================
+
+  const normalizedStatus =
+    String(
+      product.status ||
+      ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const outOfStock =
+    normalizedStatus ===
+    'out of stock';
+
+
   const statusClass =
-    product.status === 'In Stock'
+    normalizedStatus ===
+    'in stock'
       ? 'badge-instock'
-      : product.status === 'Out of Stock'
+      : normalizedStatus ===
+          'out of stock'
         ? 'badge-outofstock'
         : 'badge-limited';
 
 
-  const outOfStock =
-    product.status ===
-    'Out of Stock';
+  // ==========================================================
+  // PRICE
+  // ==========================================================
+
+  const numericPrice =
+    product.price !== null &&
+    product.price !== undefined
+      ? Number(
+          product.price
+        )
+      : null;
+
+
+  const hasPrice =
+    Number.isFinite(
+      numericPrice
+    ) &&
+    numericPrice >
+      0;
 
 
   const priceDisplay =
     product.priceDisplay ||
     (
-      product.price !== null &&
-      product.price !== undefined &&
-      Number(product.price) > 0
+      hasPrice
         ? formatCurrency(
-            Number(product.price),
+            numericPrice,
             product.currency ||
               'UGX'
           )
@@ -664,13 +850,18 @@ export default function ProductDetails() {
     );
 
 
+  // ==========================================================
+  // SKU
+  // ==========================================================
+
   const sku =
     product.slug
-      ? product.slug.toUpperCase()
+      ? String(
+          product.slug
+        ).toUpperCase()
       : String(
           product.id
         ).toUpperCase();
-
 
 
   // ==========================================================
@@ -692,96 +883,154 @@ export default function ProductDetails() {
       productDescription,
 
     image:
-      [productImage],
+      [
+        productImage,
+      ],
 
     sku,
 
+    url:
+      productUrl,
+
     brand: {
+
       '@type':
         'Brand',
 
       name:
         product.brand ||
         'ApexMach UG',
+
     },
 
     category:
       categoryLabel,
 
 
-    ...(product.rating &&
-    product.reviewCount
-      ? {
+    ...(
+      Number(
+        product.rating
+      ) >
+        0 &&
+      Number(
+        product.reviewCount
+      ) >
+        0
+        ? {
 
-          aggregateRating: {
-
-            '@type':
-              'AggregateRating',
-
-            ratingValue:
-              Number(
-                product.rating
-              ),
-
-            reviewCount:
-              Number(
-                product.reviewCount
-              ),
-
-          },
-
-        }
-      : {}),
-
-
-    ...(product.price !== undefined &&
-    product.price !== null &&
-    Number(product.price) > 0
-      ? {
-
-          offers: {
-
-            '@type':
-              'Offer',
-
-            url:
-              productUrl,
-
-            priceCurrency:
-              product.currency ||
-              'UGX',
-
-            price:
-              Number(
-                product.price
-              ),
-
-            availability:
-              product.status ===
-              'In Stock'
-                ? 'https://schema.org/InStock'
-                : product.status ===
-                    'Out of Stock'
-                  ? 'https://schema.org/OutOfStock'
-                  : 'https://schema.org/LimitedAvailability',
-
-            seller: {
+            aggregateRating: {
 
               '@type':
-                'Organization',
+                'AggregateRating',
 
-              name:
-                'ApexMach UG',
+              ratingValue:
+                Number(
+                  product.rating
+                ),
+
+              reviewCount:
+                Number(
+                  product.reviewCount
+                ),
 
             },
 
-          },
+          }
+        : {}
+    ),
 
-        }
-      : {}),
+
+    ...(
+      hasPrice
+        ? {
+
+            offers: {
+
+              '@type':
+                'Offer',
+
+              url:
+                productUrl,
+
+              priceCurrency:
+                product.currency ||
+                'UGX',
+
+              price:
+                numericPrice,
+
+              availability:
+                normalizedStatus ===
+                'in stock'
+                  ? 'https://schema.org/InStock'
+                  : normalizedStatus ===
+                      'out of stock'
+                    ? 'https://schema.org/OutOfStock'
+                    : 'https://schema.org/LimitedAvailability',
+
+              seller: {
+
+                '@type':
+                  'Organization',
+
+                name:
+                  'ApexMach UG',
+
+              },
+
+            },
+
+          }
+        : {}
+    ),
 
   };
 
+
+  // ==========================================================
+  // ADD TO CART
+  // ==========================================================
+
+  function handleAddToCart() {
+
+    if (
+      outOfStock
+    ) {
+
+      return;
+
+    }
+
+
+    addToCart(
+      product,
+      qty
+    );
+
+  }
+
+
+  // ==========================================================
+  // BUY NOW
+  // ==========================================================
+
+  function handleBuyNow() {
+
+    if (
+      outOfStock
+    ) {
+
+      return;
+
+    }
+
+
+    addToCart(
+      product,
+      qty
+    );
+
+  }
 
 
   // ==========================================================
@@ -930,7 +1179,6 @@ export default function ProductDetails() {
       </Helmet>
 
 
-
       {/* ======================================================
           PAGE
       ====================================================== */}
@@ -945,8 +1193,11 @@ export default function ProductDetails() {
         <Breadcrumb
           items={[
             {
-              to: '/shop',
-              label: 'Shop',
+              to:
+                '/shop',
+
+              label:
+                'Shop',
             },
 
             {
@@ -969,7 +1220,6 @@ export default function ProductDetails() {
         />
 
 
-
         {/* ====================================================
             PRODUCT MAIN AREA
         ==================================================== */}
@@ -982,7 +1232,6 @@ export default function ProductDetails() {
           ================================================== */}
 
           <div className="pd-gallery">
-
 
             <div className="pd-main-image">
 
@@ -1006,14 +1255,15 @@ export default function ProductDetails() {
                   : (
 
                     <div className="pd-no-image">
+
                       No Image Available
+
                     </div>
 
                   )
               }
 
             </div>
-
 
 
             {/* ==================================================
@@ -1074,7 +1324,6 @@ export default function ProductDetails() {
           </div>
 
 
-
           {/* ==================================================
               PRODUCT INFORMATION
           ================================================== */}
@@ -1094,8 +1343,7 @@ export default function ProductDetails() {
             </span>
 
 
-
-            {/* PRODUCT NAME */}
+            {/* NAME */}
 
             <h1>
               {
@@ -1104,57 +1352,84 @@ export default function ProductDetails() {
             </h1>
 
 
-
             {/* META */}
 
             <div className="pd-meta">
 
-              <span className="stars">
-                ★{' '}
-                {
-                  product.rating ??
-                  '—'
-                }
-              </span>
+              {
+                Number(
+                  product.rating
+                ) >
+                  0 && (
+
+                  <span className="stars">
+
+                    ★{' '}
+
+                    {
+                      Number(
+                        product.rating
+                      ).toFixed(
+                        1
+                      )
+                    }
+
+                  </span>
+
+                )
+              }
 
 
-              <span>
-                (
-                {
-                  product.reviewCount ??
-                  0
-                }{' '}
-                reviews)
-              </span>
+              {
+                Number(
+                  product.reviewCount
+                ) >
+                  0 && (
+
+                  <span>
+
+                    (
+                    {
+                      product.reviewCount
+                    }{' '}
+                    reviews)
+
+                  </span>
+
+                )
+              }
 
 
               <span className="pd-sku">
+
                 SKU: {sku}
+
               </span>
 
             </div>
-
 
 
             {/* PRICE */}
 
             <div className="pd-price">
+
               {
                 priceDisplay
               }
-            </div>
 
+            </div>
 
 
             {/* DESCRIPTION */}
 
             <p className="pd-desc">
+
               {
                 product.description ||
                 'Product details are available on request.'
               }
-            </p>
 
+            </p>
 
 
             {/* ==================================================
@@ -1177,7 +1452,7 @@ export default function ProductDetails() {
                           Math.max(
                             1,
                             currentQty -
-                              1
+                            1
                           )
                       )
                   }
@@ -1222,7 +1497,6 @@ export default function ProductDetails() {
               </div>
 
 
-
               {/* ADD TO CART */}
 
               <button
@@ -1232,11 +1506,7 @@ export default function ProductDetails() {
                   outOfStock
                 }
                 onClick={
-                  () =>
-                    addToCart(
-                      product,
-                      qty
-                    )
+                  handleAddToCart
                 }
               >
 
@@ -1254,20 +1524,15 @@ export default function ProductDetails() {
               </button>
 
 
-
               {/* WISHLIST */}
 
               <button
                 type="button"
-                className={`
-                  btn
-                  btn-outline-navy
-                  ${
-                    wishlisted
-                      ? 'active-wish'
-                      : ''
-                  }
-                `}
+                className={`btn btn-outline-navy ${
+                  wishlisted
+                    ? 'active-wish'
+                    : ''
+                }`}
                 onClick={
                   () =>
                     toggleWishlist(
@@ -1300,19 +1565,43 @@ export default function ProductDetails() {
             </div>
 
 
-
             {/* ==================================================
                 BUY / QUOTE
             ================================================== */}
 
             <div className="pd-actions-row">
 
-              <Link
-                to="/checkout"
-                className="btn btn-gold btn-block"
-              >
-                Buy Now
-              </Link>
+              {
+                outOfStock
+                  ? (
+
+                    <button
+                      type="button"
+                      className="btn btn-gold btn-block"
+                      disabled
+                    >
+
+                      Out of Stock
+
+                    </button>
+
+                  )
+                  : (
+
+                    <Link
+                      to="/checkout"
+                      className="btn btn-gold btn-block"
+                      onClick={
+                        handleBuyNow
+                      }
+                    >
+
+                      Buy Now
+
+                    </Link>
+
+                  )
+              }
 
 
               <button
@@ -1325,15 +1614,16 @@ export default function ProductDetails() {
                     )
                 }
               >
+
                 Request Quote
+
               </button>
 
             </div>
 
 
-
             {/* ==================================================
-                TRUST INFORMATION
+                TRUST
             ================================================== */}
 
             <div className="pd-trust">
@@ -1357,7 +1647,7 @@ export default function ProductDetails() {
                   size={18}
                 />
 
-                Global Logistics
+                Delivery Support
 
               </div>
 
@@ -1369,7 +1659,7 @@ export default function ProductDetails() {
                   size={18}
                 />
 
-                Verified Supplier
+                Verified Equipment
 
               </div>
 
@@ -1380,25 +1670,21 @@ export default function ProductDetails() {
         </div>
 
 
-
         {/* ======================================================
-            SPECIFICATIONS + REVIEWS
+            SPECIFICATIONS
         ====================================================== */}
 
         <div className="pd-tabs">
 
-
-          {/* ====================================================
-              SPECIFICATIONS
-          ==================================================== */}
-
           <section className="pd-specs">
 
             <h2>
+
               {
                 product.name
               }{' '}
               Specifications
+
             </h2>
 
 
@@ -1459,7 +1745,9 @@ export default function ProductDetails() {
                 : (
 
                   <p className="pd-desc">
+
                     Specifications are available on request.
+
                   </p>
 
                 )
@@ -1467,84 +1755,7 @@ export default function ProductDetails() {
 
           </section>
 
-
-
-          {/* ====================================================
-              REVIEWS
-          ==================================================== */}
-
-          <section className="pd-reviews">
-
-            <h2>
-              Customer Reviews
-            </h2>
-
-
-            {
-              reviews.map(
-                (
-                  review
-                ) => (
-
-                  <div
-                    key={
-                      review.name
-                    }
-                    className="pd-review"
-                  >
-
-                    <div className="pd-review-top">
-
-                      <strong>
-                        {
-                          review.name
-                        }
-                      </strong>
-
-
-                      <span className="stars">
-
-                        {
-                          '★'.repeat(
-                            review.rating
-                          )
-                        }
-
-                        {
-                          '☆'.repeat(
-                            5 -
-                            review.rating
-                          )
-                        }
-
-                      </span>
-
-
-                      <span className="pd-review-date">
-                        {
-                          review.date
-                        }
-                      </span>
-
-                    </div>
-
-
-                    <p>
-                      {
-                        review.text
-                      }
-                    </p>
-
-                  </div>
-
-                )
-              )
-            }
-
-          </section>
-
         </div>
-
 
 
         {/* ======================================================
@@ -1557,35 +1768,42 @@ export default function ProductDetails() {
 
             <section className="pd-related">
 
-
               <div className="pd-related-header">
 
                 <div>
 
                   <span className="section-eyebrow">
+
                     {
                       categoryLabel
                     }
+
                   </span>
 
 
                   <h2 className="section-heading">
+
                     More{' '}
+
                     {
                       categoryLabel
                     }
+
                   </h2>
 
 
                   <p>
-                    Explore other products available
-                    in the{' '}
+
+                    Explore other products available in the{' '}
+
                     {
                       String(
                         categoryLabel
                       ).toLowerCase()
                     }{' '}
+
                     category.
+
                   </p>
 
                 </div>
@@ -1612,7 +1830,6 @@ export default function ProductDetails() {
                 </Link>
 
               </div>
-
 
 
               <div className="grid-4">
@@ -1642,7 +1859,6 @@ export default function ProductDetails() {
 
           )
         }
-
 
 
         {/* ======================================================
@@ -1678,13 +1894,14 @@ export default function ProductDetails() {
             }
           >
 
-
             <div className="field">
 
               <label
                 htmlFor="quote-company"
               >
+
                 Company Name
+
               </label>
 
               <input
@@ -1701,7 +1918,9 @@ export default function ProductDetails() {
               <label
                 htmlFor="quote-email"
               >
+
                 Work Email
+
               </label>
 
               <input
@@ -1719,7 +1938,9 @@ export default function ProductDetails() {
               <label
                 htmlFor="quote-quantity"
               >
+
                 Quantity Needed
+
               </label>
 
               <input
@@ -1739,7 +1960,9 @@ export default function ProductDetails() {
               <label
                 htmlFor="quote-notes"
               >
+
                 Notes
+
               </label>
 
               <textarea
@@ -1755,7 +1978,9 @@ export default function ProductDetails() {
               type="submit"
               className="btn btn-primary btn-block"
             >
+
               Submit Quote Request
+
             </button>
 
           </form>
