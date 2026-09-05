@@ -12,92 +12,104 @@ function normalizeProduct(
 ) {
 
   const category =
-    product.category ||
+    product?.category ||
     null;
+
+
+  const stock =
+    Number(
+      product?.stock ||
+      0
+    );
+
+
+  const price =
+    product?.price === null ||
+    product?.price === undefined
+      ? null
+      : Number(
+          product.price
+        );
 
 
   return {
 
     id:
-      product.id,
+      product?.id,
 
     name:
-      product.name,
+      product?.name ||
+      '',
 
     slug:
-      product.slug,
+      product?.slug ||
+      '',
 
     brand:
-      product.brand ||
+      product?.brand ||
       'Apex Machinery',
 
     description:
-      product.description ||
+      product?.description ||
       '',
 
     price:
-      product.price === null
-        ? null
-        : Number(
-            product.price
-          ),
+
+      Number.isFinite(
+        price
+      )
+        ? price
+        : null,
 
     currency:
-      product.currency ||
+      product?.currency ||
       'UGX',
 
     priceDisplay:
-      product.price_display ||
+      product?.price_display ||
       (
-        product.price !== null
-          ? `UGX ${Number(
-              product.price
-            ).toLocaleString()}`
+        Number.isFinite(
+          price
+        )
+          ? `UGX ${price.toLocaleString()}`
           : 'Request Quote'
       ),
 
-    stock:
-      Number(
-        product.stock ||
-        0
-      ),
+    stock,
 
     status:
-      product.status ||
+      product?.status ||
       (
-        Number(
-          product.stock ||
-          0
-        ) > 0
+        stock > 0
           ? 'In Stock'
           : 'Out of Stock'
       ),
 
     rating:
       Number(
-        product.rating ||
+        product?.rating ||
         0
       ),
 
     reviewCount:
       Number(
-        product.review_count ||
+        product?.review_count ||
         0
       ),
 
     image:
-      product.image_url ||
+      product?.image_url ||
       '',
 
     images:
       Array.isArray(
-        product.images
+        product?.images
       )
         ? product.images
         : [],
 
     specifications:
-      product.specifications &&
+      product?.specifications &&
       typeof product.specifications ===
         'object'
         ? product.specifications
@@ -105,18 +117,18 @@ function normalizeProduct(
 
     badges:
       Array.isArray(
-        product.badges
+        product?.badges
       )
         ? product.badges
         : [],
 
     isFeatured:
       Boolean(
-        product.is_featured
+        product?.is_featured
       ),
 
     categoryId:
-      product.category_id ||
+      product?.category_id ||
       category?.id ||
       '',
 
@@ -149,7 +161,7 @@ function isValidUuid(
     String(
       value ||
       ''
-    )
+    ).trim()
   );
 
 }
@@ -212,16 +224,20 @@ export async function getProducts(
       );
 
 
-    return res.json({
+    return res
+      .status(
+        200
+      )
+      .json({
 
-      success:
-        true,
+        success:
+          true,
 
-      data: {
-        products,
-      },
+        data: {
+          products,
+        },
 
-    });
+      });
 
 
   } catch (
@@ -229,8 +245,17 @@ export async function getProducts(
   ) {
 
     console.error(
-      'Public products error:',
-      error
+      '[PUBLIC PRODUCTS] Error:',
+      {
+        message:
+          error?.message,
+
+        code:
+          error?.code,
+
+        details:
+          error?.details,
+      }
     );
 
 
@@ -244,7 +269,6 @@ export async function getProducts(
           false,
 
         message:
-          error.message ||
           'Unable to load products.',
 
       });
@@ -274,15 +298,16 @@ export async function getProduct(
       String(
         req.params.id ||
         ''
-      )
-        .trim();
+      ).trim();
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // VALIDATE IDENTIFIER
-    // --------------------------------------------------------
+    // ========================================================
 
-    if (!identifier) {
+    if (
+      !identifier
+    ) {
 
       return res
         .status(
@@ -301,9 +326,9 @@ export async function getProduct(
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // BASE QUERY
-    // --------------------------------------------------------
+    // ========================================================
 
     let query =
       supabaseAdmin
@@ -325,9 +350,9 @@ export async function getProduct(
         );
 
 
-    // --------------------------------------------------------
-    // UUID OR SLUG
-    // --------------------------------------------------------
+    // ========================================================
+    // LOOK UP BY UUID OR SLUG
+    // ========================================================
 
     if (
       isValidUuid(
@@ -352,9 +377,9 @@ export async function getProduct(
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // EXECUTE QUERY
-    // --------------------------------------------------------
+    // ========================================================
 
     const {
       data,
@@ -371,11 +396,13 @@ export async function getProduct(
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
     // PRODUCT NOT FOUND
-    // --------------------------------------------------------
+    // ========================================================
 
-    if (!data) {
+    if (
+      !data
+    ) {
 
       return res
         .status(
@@ -394,21 +421,34 @@ export async function getProduct(
     }
 
 
-    // --------------------------------------------------------
+    // ========================================================
+    // NORMALIZE
+    // ========================================================
+
+    const product =
+      normalizeProduct(
+        data
+      );
+
+
+    // ========================================================
     // SUCCESS
-    // --------------------------------------------------------
+    // ========================================================
 
-    return res.json({
+    return res
+      .status(
+        200
+      )
+      .json({
 
-      success:
-        true,
+        success:
+          true,
 
-      data:
-        normalizeProduct(
-          data
-        ),
+        data: {
+          product,
+        },
 
-    });
+      });
 
 
   } catch (
@@ -416,8 +456,20 @@ export async function getProduct(
   ) {
 
     console.error(
-      'Public product error:',
-      error
+      '[PUBLIC PRODUCT] Error:',
+      {
+        identifier:
+          req?.params?.id,
+
+        message:
+          error?.message,
+
+        code:
+          error?.code,
+
+        details:
+          error?.details,
+      }
     );
 
 
@@ -431,7 +483,6 @@ export async function getProduct(
           false,
 
         message:
-          error.message ||
           'Unable to load product.',
 
       });
@@ -522,16 +573,20 @@ export async function getCategories(
       );
 
 
-    return res.json({
+    return res
+      .status(
+        200
+      )
+      .json({
 
-      success:
-        true,
+        success:
+          true,
 
-      data: {
-        categories,
-      },
+        data: {
+          categories,
+        },
 
-    });
+      });
 
 
   } catch (
@@ -539,8 +594,17 @@ export async function getCategories(
   ) {
 
     console.error(
-      'Public categories error:',
-      error
+      '[PUBLIC CATEGORIES] Error:',
+      {
+        message:
+          error?.message,
+
+        code:
+          error?.code,
+
+        details:
+          error?.details,
+      }
     );
 
 
@@ -554,7 +618,6 @@ export async function getCategories(
           false,
 
         message:
-          error.message ||
           'Unable to load categories.',
 
       });
