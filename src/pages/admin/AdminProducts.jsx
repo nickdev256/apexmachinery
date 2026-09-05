@@ -1,8 +1,41 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+import {
+  useNavigate,
+} from 'react-router-dom';
+
 import Icon from '../../components/Icon';
-import { products as initialProducts } from '../../data/products';
+
+import {
+  createAdminProduct,
+  deleteAdminProduct,
+  getAdminCategories,
+  getAdminProducts,
+  updateAdminProduct,
+} from '../../services/adminApi';
+
 import './AdminProducts.css';
+
+
+// ============================================================
+// EMPTY FORM
+// ============================================================
+
+const EMPTY_FORM = {
+  name: '',
+  categoryId: '',
+  brand: '',
+  price: '',
+  stock: 0,
+  status: 'Out of Stock',
+  description: '',
+  image: '',
+};
 
 
 // ============================================================
@@ -10,150 +43,252 @@ import './AdminProducts.css';
 // ============================================================
 
 export default function AdminProducts() {
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
+
 
   // ==========================================================
-  // PRODUCTS
+  // DATA
   // ==========================================================
 
-  const [productList, setProductList] =
-    useState(
-      initialProducts.map((product) => ({
-        ...product,
-        stock: Number(product.stock || 0),
-        status:
-          Number(product.stock || 0) > 0
-            ? 'In Stock'
-            : 'Out of Stock',
-      }))
-    );
+  const [
+    productList,
+    setProductList,
+  ] =
+    useState([]);
+
+  const [
+    categoryList,
+    setCategoryList,
+  ] =
+    useState([]);
+
 
   // ==========================================================
-  // FILTERS
+  // UI STATE
   // ==========================================================
 
-  const [search, setSearch] =
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+  const [
+    saving,
+    setSaving,
+  ] =
+    useState(false);
+
+  const [
+    error,
+    setError,
+  ] =
     useState('');
 
-  const [category, setCategory] =
+  const [
+    search,
+    setSearch,
+  ] =
+    useState('');
+
+  const [
+    category,
+    setCategory,
+  ] =
     useState('all');
 
-  const [statusFilter, setStatusFilter] =
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] =
     useState('all');
+
 
   // ==========================================================
   // MODALS
   // ==========================================================
 
-  const [selectedProduct, setSelectedProduct] =
+  const [
+    selectedProduct,
+    setSelectedProduct,
+  ] =
     useState(null);
 
-  const [editingProduct, setEditingProduct] =
+  const [
+    editingProduct,
+    setEditingProduct,
+  ] =
     useState(null);
 
-  const [showProductModal, setShowProductModal] =
+  const [
+    showProductModal,
+    setShowProductModal,
+  ] =
     useState(false);
 
-  const [showAddModal, setShowAddModal] =
+  const [
+    showAddModal,
+    setShowAddModal,
+  ] =
     useState(false);
+
 
   // ==========================================================
   // FORM
   // ==========================================================
 
-  const [form, setForm] = useState({
-    name: '',
-    category: '',
-    categoryName: '',
-    brand: '',
-    price: '',
-    stock: 0,
-    status: 'In Stock',
-    description: '',
-  });
-
-  // ==========================================================
-  // CATEGORIES
-  // ==========================================================
-
-  const categories = useMemo(() => {
-    const map = new Map();
-
-    productList.forEach((product) => {
-      if (!product.category) {
-        return;
-      }
-
-      map.set(
-        product.category,
-        product.categoryName ||
-          product.category
-      );
-    });
-
-    return Array.from(
-      map.entries()
+  const [
+    form,
+    setForm,
+  ] =
+    useState(
+      EMPTY_FORM
     );
-  }, [productList]);
+
+
+  // ==========================================================
+  // LOAD DATA
+  // ==========================================================
+
+  const loadData =
+    useCallback(
+      async (
+        showLoader = true
+      ) => {
+        try {
+          if (
+            showLoader
+          ) {
+            setLoading(
+              true
+            );
+          }
+
+          setError('');
+
+          const [
+            productResult,
+            categoryResult,
+          ] =
+            await Promise.all([
+              getAdminProducts(),
+              getAdminCategories(),
+            ]);
+
+          setProductList(
+            productResult
+              ?.products ||
+            productResult ||
+            []
+          );
+
+          setCategoryList(
+            categoryResult
+              ?.categories ||
+            categoryResult ||
+            []
+          );
+        } catch (
+          requestError
+        ) {
+          console.error(
+            'Unable to load products:',
+            requestError
+          );
+
+          setError(
+            requestError
+              ?.response
+              ?.data
+              ?.message ||
+            'Unable to load products.'
+          );
+        } finally {
+          if (
+            showLoader
+          ) {
+            setLoading(
+              false
+            );
+          }
+        }
+      },
+      []
+    );
+
+
+  useEffect(
+    () => {
+      loadData();
+    },
+    [
+      loadData,
+    ]
+  );
+
 
   // ==========================================================
   // FILTER PRODUCTS
   // ==========================================================
 
-  const filteredProducts = useMemo(() => {
-    const query =
-      search.trim().toLowerCase();
+  const filteredProducts =
+    useMemo(
+      () => {
+        const query =
+          search
+            .trim()
+            .toLowerCase();
 
-    return productList.filter(
-      (product) => {
-        const name =
-          String(
-            product.name || ''
-          ).toLowerCase();
+        return productList.filter(
+          (
+            product
+          ) => {
+            const searchable =
+              [
+                product.name,
+                product.brand,
+                product.categoryName,
+                product.id,
+                product.slug,
+              ]
+                .join(' ')
+                .toLowerCase();
 
-        const categoryName =
-          String(
-            product.categoryName || ''
-          ).toLowerCase();
+            const matchesSearch =
+              !query ||
+              searchable.includes(
+                query
+              );
 
-        const brand =
-          String(
-            product.brand || ''
-          ).toLowerCase();
+            const matchesCategory =
+              category ===
+                'all' ||
+              product.categoryId ===
+                category;
 
-        const id =
-          String(
-            product.id || ''
-          ).toLowerCase();
+            const matchesStatus =
+              statusFilter ===
+                'all' ||
+              product.status ===
+                statusFilter;
 
-        const matchesSearch =
-          !query ||
-          name.includes(query) ||
-          categoryName.includes(query) ||
-          brand.includes(query) ||
-          id.includes(query);
-
-        const matchesCategory =
-          category === 'all' ||
-          product.category === category;
-
-        const matchesStatus =
-          statusFilter === 'all' ||
-          product.status === statusFilter;
-
-        return (
-          matchesSearch &&
-          matchesCategory &&
-          matchesStatus
+            return (
+              matchesSearch &&
+              matchesCategory &&
+              matchesStatus
+            );
+          }
         );
-      }
+      },
+      [
+        productList,
+        search,
+        category,
+        statusFilter,
+      ]
     );
-  }, [
-    productList,
-    search,
-    category,
-    statusFilter,
-  ]);
+
 
   // ==========================================================
   // STATISTICS
@@ -164,386 +299,606 @@ export default function AdminProducts() {
 
   const inStock =
     productList.filter(
-      (product) =>
-        product.status === 'In Stock'
+      (
+        product
+      ) =>
+        product.status ===
+          'In Stock' &&
+        Number(
+          product.stock ||
+          0
+        ) > 0
     ).length;
 
   const outOfStock =
     productList.filter(
-      (product) =>
-        product.status === 'Out of Stock'
+      (
+        product
+      ) =>
+        product.status ===
+          'Out of Stock' ||
+        Number(
+          product.stock ||
+          0
+        ) <= 0
     ).length;
 
   const totalUnits =
     productList.reduce(
-      (total, product) =>
+      (
+        total,
+        product
+      ) =>
         total +
-        Number(product.stock || 0),
+        Number(
+          product.stock ||
+          0
+        ),
       0
     );
 
-  // ==========================================================
-  // FORMAT CURRENCY
-  // ==========================================================
-
-  const formatCurrency = (value) => {
-    return `UGX ${Number(
-      value || 0
-    ).toLocaleString()}`;
-  };
 
   // ==========================================================
-  // OPEN ADD PRODUCT
+  // CURRENCY
   // ==========================================================
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
+  const formatCurrency =
+    (
+      value
+    ) => {
+      if (
+        value === null ||
+        value === undefined ||
+        value === ''
+      ) {
+        return 'Request Quote';
+      }
 
-    setForm({
-      name: '',
-      category:
-        categories[0]?.[0] || '',
-      categoryName:
-        categories[0]?.[1] || '',
-      brand: '',
-      price: '',
-      stock: 0,
-      status: 'Out of Stock',
-      description: '',
-    });
-
-    setShowAddModal(true);
-  };
-
-  // ==========================================================
-  // OPEN EDIT PRODUCT
-  // ==========================================================
-
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-
-    setForm({
-      name: product.name || '',
-      category:
-        product.category || '',
-      categoryName:
-        product.categoryName || '',
-      brand:
-        product.brand || '',
-      price:
-        product.price || '',
-      stock:
-        Number(product.stock || 0),
-      status:
-        Number(product.stock || 0) > 0
-          ? 'In Stock'
-          : 'Out of Stock',
-      description:
-        product.description || '',
-    });
-
-    setShowProductModal(true);
-  };
-
-  // ==========================================================
-  // FORM CHANGE
-  // ==========================================================
-
-  const handleChange = (event) => {
-    const {
-      name,
-      value,
-    } = event.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-  };
-
-  // ==========================================================
-  // STOCK CHANGE
-  // ==========================================================
-
-  const handleStockChange = (event) => {
-    const value =
-      Number(event.target.value);
-
-    setForm((previous) => ({
-      ...previous,
-      stock:
-        value < 0 ? 0 : value,
-      status:
-        value > 0
-          ? 'In Stock'
-          : 'Out of Stock',
-    }));
-  };
-
-  // ==========================================================
-  // STATUS CHANGE
-  // ==========================================================
-
-  const handleStatusChange = (event) => {
-    const value =
-      event.target.value;
-
-    setForm((previous) => ({
-      ...previous,
-      status: value,
-      stock:
-        value === 'Out of Stock'
-          ? 0
-          : Math.max(
-              Number(previous.stock || 0),
-              1
-            ),
-    }));
-  };
-
-  // ==========================================================
-  // SAVE PRODUCT
-  // ==========================================================
-
-  const handleSaveProduct = (event) => {
-    event.preventDefault();
-
-    if (!form.name.trim()) {
-      window.alert(
-        'Product name is required.'
-      );
-
-      return;
-    }
-
-    const stock =
-      form.status === 'Out of Stock'
-        ? 0
-        : Number(form.stock || 0);
-
-    // --------------------------------------------------------
-    // EDIT
-    // --------------------------------------------------------
-
-    if (editingProduct) {
-      setProductList((previous) =>
-        previous.map((product) =>
-          product.id ===
-          editingProduct.id
-            ? {
-                ...product,
-
-                name:
-                  form.name.trim(),
-
-                category:
-                  form.category,
-
-                categoryName:
-                  form.categoryName,
-
-                brand:
-                  form.brand.trim(),
-
-                price:
-                  Number(form.price || 0),
-
-                priceDisplay:
-                  formatCurrency(
-                    form.price
-                  ),
-
-                stock,
-
-                status:
-                  stock > 0
-                    ? 'In Stock'
-                    : 'Out of Stock',
-
-                description:
-                  form.description.trim(),
-              }
-            : product
-        )
-      );
-
-      setSelectedProduct(null);
-      setShowProductModal(false);
-      setEditingProduct(null);
-
-      return;
-    }
-
-    // --------------------------------------------------------
-    // CREATE
-    // --------------------------------------------------------
-
-    const newId =
-      `APX-${Date.now()}`;
-
-    const newProduct = {
-      id: newId,
-
-      name:
-        form.name.trim(),
-
-      category:
-        form.category,
-
-      categoryName:
-        form.categoryName,
-
-      brand:
-        form.brand.trim(),
-
-      price:
-        Number(form.price || 0),
-
-      priceDisplay:
-        formatCurrency(
-          form.price
-        ),
-
-      stock,
-
-      status:
-        stock > 0
-          ? 'In Stock'
-          : 'Out of Stock',
-
-      description:
-        form.description.trim(),
-
-      image: '',
+      return `UGX ${Number(
+        value
+      ).toLocaleString()}`;
     };
 
-    setProductList((previous) => [
-      newProduct,
-      ...previous,
-    ]);
-
-    setShowAddModal(false);
-
-    resetForm();
-  };
 
   // ==========================================================
   // RESET FORM
   // ==========================================================
 
-  const resetForm = () => {
-    setForm({
-      name: '',
-      category: '',
-      categoryName: '',
-      brand: '',
-      price: '',
-      stock: 0,
-      status: 'Out of Stock',
-      description: '',
-    });
+  const resetForm =
+    () => {
+      setForm({
+        ...EMPTY_FORM,
+      });
 
-    setEditingProduct(null);
-  };
+      setEditingProduct(
+        null
+      );
+    };
+
+
+  // ==========================================================
+  // ADD PRODUCT
+  // ==========================================================
+
+  const handleAddProduct =
+    () => {
+      setEditingProduct(
+        null
+      );
+
+      setForm({
+        ...EMPTY_FORM,
+
+        categoryId:
+          categoryList[0]
+            ?.id ||
+          '',
+      });
+
+      setShowAddModal(
+        true
+      );
+    };
+
+
+  // ==========================================================
+  // EDIT PRODUCT
+  // ==========================================================
+
+  const handleEdit =
+    (
+      product
+    ) => {
+      setEditingProduct(
+        product
+      );
+
+      setForm({
+        name:
+          product.name ||
+          '',
+
+        categoryId:
+          product.categoryId ||
+          '',
+
+        brand:
+          product.brand ||
+          '',
+
+        price:
+          product.price ??
+          '',
+
+        stock:
+          Number(
+            product.stock ||
+            0
+          ),
+
+        status:
+          Number(
+            product.stock ||
+            0
+          ) > 0
+            ? 'In Stock'
+            : 'Out of Stock',
+
+        description:
+          product.description ||
+          '',
+
+        image:
+          product.image ||
+          '',
+      });
+
+      setSelectedProduct(
+        null
+      );
+
+      setShowProductModal(
+        true
+      );
+    };
+
+
+  // ==========================================================
+  // FORM CHANGE
+  // ==========================================================
+
+  const handleChange =
+    (
+      event
+    ) => {
+      const {
+        name,
+        value,
+      } =
+        event.target;
+
+      setForm(
+        (
+          previous
+        ) => ({
+          ...previous,
+          [name]:
+            value,
+        })
+      );
+    };
+
+
+  // ==========================================================
+  // STOCK CHANGE
+  // ==========================================================
+
+  const handleStockChange =
+    (
+      event
+    ) => {
+      const value =
+        Math.max(
+          0,
+          Number(
+            event.target
+              .value ||
+            0
+          )
+        );
+
+      setForm(
+        (
+          previous
+        ) => ({
+          ...previous,
+
+          stock:
+            value,
+
+          status:
+            value > 0
+              ? 'In Stock'
+              : 'Out of Stock',
+        })
+      );
+    };
+
+
+  // ==========================================================
+  // STATUS CHANGE
+  // ==========================================================
+
+  const handleStatusChange =
+    (
+      event
+    ) => {
+      const value =
+        event.target
+          .value;
+
+      setForm(
+        (
+          previous
+        ) => ({
+          ...previous,
+
+          status:
+            value,
+
+          stock:
+            value ===
+              'Out of Stock'
+              ? 0
+              : Math.max(
+                  Number(
+                    previous
+                      .stock ||
+                    0
+                  ),
+                  1
+                ),
+        })
+      );
+    };
+
+
+  // ==========================================================
+  // SAVE PRODUCT
+  // ==========================================================
+
+  const handleSaveProduct =
+    async (
+      event
+    ) => {
+      event.preventDefault();
+
+      if (
+        !form.name.trim()
+      ) {
+        window.alert(
+          'Product name is required.'
+        );
+
+        return;
+      }
+
+      if (
+        !form.categoryId
+      ) {
+        window.alert(
+          'Please select a category.'
+        );
+
+        return;
+      }
+
+      const stock =
+        form.status ===
+          'Out of Stock'
+          ? 0
+          : Math.max(
+              1,
+              Number(
+                form.stock ||
+                0
+              )
+            );
+
+      const payload = {
+        name:
+          form.name.trim(),
+
+        categoryId:
+          form.categoryId,
+
+        brand:
+          form.brand.trim(),
+
+        price:
+          form.price,
+
+        stock,
+
+        status:
+          stock > 0
+            ? 'In Stock'
+            : 'Out of Stock',
+
+        description:
+          form.description
+            .trim(),
+
+        image:
+          form.image
+            .trim(),
+      };
+
+      try {
+        setSaving(
+          true
+        );
+
+        setError('');
+
+        if (
+          editingProduct
+        ) {
+          const updated =
+            await updateAdminProduct(
+              editingProduct.id,
+              payload
+            );
+
+          setProductList(
+            (
+              previous
+            ) =>
+              previous.map(
+                (
+                  product
+                ) =>
+                  product.id ===
+                    editingProduct.id
+                    ? updated
+                    : product
+              )
+          );
+
+          setShowProductModal(
+            false
+          );
+        } else {
+          const created =
+            await createAdminProduct(
+              payload
+            );
+
+          setProductList(
+            (
+              previous
+            ) => [
+              created,
+              ...previous,
+            ]
+          );
+
+          setShowAddModal(
+            false
+          );
+        }
+
+        resetForm();
+      } catch (
+        requestError
+      ) {
+        console.error(
+          'Save product error:',
+          requestError
+        );
+
+        const message =
+          requestError
+            ?.response
+            ?.data
+            ?.message ||
+          'Unable to save product.';
+
+        setError(
+          message
+        );
+
+        window.alert(
+          message
+        );
+      } finally {
+        setSaving(
+          false
+        );
+      }
+    };
+
 
   // ==========================================================
   // DELETE PRODUCT
   // ==========================================================
 
-  const handleDelete = (product) => {
-    const confirmed =
-      window.confirm(
-        `Are you sure you want to delete "${product.name}"?`
-      );
+  const handleDelete =
+    async (
+      product
+    ) => {
+      const confirmed =
+        window.confirm(
+          `Are you sure you want to delete "${product.name}"?`
+        );
 
-    if (!confirmed) {
-      return;
-    }
+      if (
+        !confirmed
+      ) {
+        return;
+      }
 
-    setProductList((previous) =>
-      previous.filter(
-        (item) =>
-          item.id !== product.id
-      )
-    );
+      try {
+        setError('');
 
-    setSelectedProduct(null);
-  };
+        await deleteAdminProduct(
+          product.id
+        );
+
+        setProductList(
+          (
+            previous
+          ) =>
+            previous.filter(
+              (
+                item
+              ) =>
+                item.id !==
+                product.id
+            )
+        );
+
+        setSelectedProduct(
+          null
+        );
+      } catch (
+        requestError
+      ) {
+        console.error(
+          'Delete product error:',
+          requestError
+        );
+
+        window.alert(
+          requestError
+            ?.response
+            ?.data
+            ?.message ||
+          'Unable to delete product.'
+        );
+      }
+    };
+
 
   // ==========================================================
   // TOGGLE STOCK
   // ==========================================================
 
-  const toggleStock = (product) => {
-    const newStatus =
-      product.status === 'In Stock'
-        ? 'Out of Stock'
-        : 'In Stock';
+  const toggleStock =
+    async (
+      product
+    ) => {
+      const nextStock =
+        product.status ===
+          'In Stock'
+          ? 0
+          : Math.max(
+              1,
+              Number(
+                product.stock ||
+                0
+              )
+            );
 
-    setProductList((previous) =>
-      previous.map((item) =>
-        item.id === product.id
-          ? {
-              ...item,
-
-              status:
-                newStatus,
-
+      try {
+        const updated =
+          await updateAdminProduct(
+            product.id,
+            {
               stock:
-                newStatus ===
-                'Out of Stock'
-                  ? 0
-                  : Math.max(
-                      Number(
-                        item.stock || 0
-                      ),
-                      1
-                    ),
+                nextStock,
             }
-          : item
-      )
-    );
+          );
 
-    setSelectedProduct(
-      (previous) =>
-        previous &&
-        previous.id === product.id
-          ? {
-              ...previous,
+        setProductList(
+          (
+            previous
+          ) =>
+            previous.map(
+              (
+                item
+              ) =>
+                item.id ===
+                  product.id
+                  ? updated
+                  : item
+            )
+        );
 
-              status:
-                newStatus,
+        setSelectedProduct(
+          (
+            previous
+          ) =>
+            previous?.id ===
+              product.id
+              ? updated
+              : previous
+        );
+      } catch (
+        requestError
+      ) {
+        console.error(
+          'Stock update error:',
+          requestError
+        );
 
-              stock:
-                newStatus ===
-                'Out of Stock'
-                  ? 0
-                  : Math.max(
-                      Number(
-                        previous.stock ||
-                          0
-                      ),
-                      1
-                    ),
-            }
-          : previous
-    );
-  };
+        window.alert(
+          requestError
+            ?.response
+            ?.data
+            ?.message ||
+          'Unable to update stock.'
+        );
+      }
+    };
+
 
   // ==========================================================
   // CLOSE MODALS
   // ==========================================================
 
-  const closeEditModal = () => {
-    setShowProductModal(false);
-    setEditingProduct(null);
-    resetForm();
-  };
+  const closeEditModal =
+    () => {
+      setShowProductModal(
+        false
+      );
 
-  const closeAddModal = () => {
-    setShowAddModal(false);
-    resetForm();
-  };
+      resetForm();
+    };
+
+
+  const closeAddModal =
+    () => {
+      setShowAddModal(
+        false
+      );
+
+      resetForm();
+    };
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
+  if (
+    loading
+  ) {
+    return (
+      <div className="admin-products-page">
+        <div className="card admin-empty">
+          <strong>
+            Loading products...
+          </strong>
+
+          <span>
+            Fetching your Apex Machinery catalogue.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
 
   // ==========================================================
   // RENDER
@@ -552,21 +907,15 @@ export default function AdminProducts() {
   return (
     <div className="admin-products-page">
 
-      {/* ====================================================
-          HEADER
-      ==================================================== */}
-
       <div className="admin-page-header">
-
         <div>
-
-          {/* BACK BUTTON */}
-
           <button
             type="button"
             className="admin-back-button"
             onClick={() =>
-              navigate('/admin')
+              navigate(
+                '/admin'
+              )
             }
           >
             <Icon
@@ -586,11 +935,10 @@ export default function AdminProducts() {
           </h1>
 
           <p>
-            Manage your machinery,
-            equipment and product
-            catalogue.
+            Manage machinery,
+            equipment, stock and
+            catalogue pricing.
           </p>
-
         </div>
 
         <button
@@ -600,26 +948,35 @@ export default function AdminProducts() {
             handleAddProduct
           }
         >
-
           <Icon
             name="plus"
             size={16}
           />
 
           Add Product
-
         </button>
-
       </div>
 
-      {/* ====================================================
-          STATISTICS
-      ==================================================== */}
+
+      {error && (
+        <div className="card admin-products-error">
+          {error}
+
+          <button
+            type="button"
+            onClick={() =>
+              loadData()
+            }
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
 
       <div className="admin-products-stats">
 
         <div className="card admin-product-stat">
-
           <div className="admin-product-stat-icon">
             <Icon
               name="tool"
@@ -636,11 +993,10 @@ export default function AdminProducts() {
               Total Products
             </span>
           </div>
-
         </div>
 
-        <div className="card admin-product-stat">
 
+        <div className="card admin-product-stat">
           <div className="admin-product-stat-icon">
             <Icon
               name="check"
@@ -657,11 +1013,10 @@ export default function AdminProducts() {
               In Stock
             </span>
           </div>
-
         </div>
 
-        <div className="card admin-product-stat">
 
+        <div className="card admin-product-stat">
           <div className="admin-product-stat-icon">
             <Icon
               name="clock"
@@ -678,11 +1033,10 @@ export default function AdminProducts() {
               Out of Stock
             </span>
           </div>
-
         </div>
 
-        <div className="card admin-product-stat">
 
+        <div className="card admin-product-stat">
           <div className="admin-product-stat-icon">
             <Icon
               name="package"
@@ -692,26 +1046,22 @@ export default function AdminProducts() {
 
           <div>
             <strong>
-              {totalUnits.toLocaleString()}
+              {totalUnits
+                .toLocaleString()}
             </strong>
 
             <span>
               Units Available
             </span>
           </div>
-
         </div>
 
       </div>
 
-      {/* ====================================================
-          FILTERS
-      ==================================================== */}
 
       <div className="card admin-products-toolbar">
 
         <div className="admin-products-search">
-
           <Icon
             name="search"
             size={18}
@@ -721,9 +1071,12 @@ export default function AdminProducts() {
             type="search"
             placeholder="Search products, brands or IDs..."
             value={search}
-            onChange={(event) =>
+            onChange={(
+              event
+            ) =>
               setSearch(
-                event.target.value
+                event.target
+                  .value
               )
             }
           />
@@ -739,46 +1092,52 @@ export default function AdminProducts() {
               ×
             </button>
           )}
-
         </div>
+
 
         <select
           value={category}
-          onChange={(event) =>
+          onChange={(
+            event
+          ) =>
             setCategory(
-              event.target.value
+              event.target
+                .value
             )
           }
         >
-
           <option value="all">
             All Categories
           </option>
 
-          {categories.map(
-            ([id, name]) => (
-
+          {categoryList.map(
+            (
+              item
+            ) => (
               <option
-                key={id}
-                value={id}
+                key={item.id}
+                value={item.id}
               >
-                {name}
+                {item.name}
               </option>
-
             )
           )}
-
         </select>
 
+
         <select
-          value={statusFilter}
-          onChange={(event) =>
+          value={
+            statusFilter
+          }
+          onChange={(
+            event
+          ) =>
             setStatusFilter(
-              event.target.value
+              event.target
+                .value
             )
           }
         >
-
           <option value="all">
             All Stock Status
           </option>
@@ -790,19 +1149,18 @@ export default function AdminProducts() {
           <option value="Out of Stock">
             Out of Stock
           </option>
-
         </select>
 
+
         <span className="admin-products-count">
-          {filteredProducts.length}{' '}
+          {
+            filteredProducts.length
+          }{' '}
           Products
         </span>
 
       </div>
 
-      {/* ====================================================
-          PRODUCT TABLE
-      ==================================================== */}
 
       <div className="card admin-products-table-card">
 
@@ -811,9 +1169,7 @@ export default function AdminProducts() {
           <table className="dashboard-table">
 
             <thead>
-
               <tr>
-
                 <th>
                   Product
                 </th>
@@ -837,23 +1193,19 @@ export default function AdminProducts() {
                 <th>
                   Actions
                 </th>
-
               </tr>
-
             </thead>
+
 
             <tbody>
 
               {filteredProducts.length ===
               0 ? (
-
                 <tr>
-
                   <td
                     colSpan="6"
                     className="admin-empty"
                   >
-
                     <Icon
                       name="search"
                       size={30}
@@ -867,30 +1219,24 @@ export default function AdminProducts() {
                       Try changing your
                       search or filters.
                     </span>
-
                   </td>
-
                 </tr>
-
               ) : (
-
                 filteredProducts.map(
-                  (product) => (
-
+                  (
+                    product
+                  ) => (
                     <tr
-                      key={product.id}
+                      key={
+                        product.id
+                      }
                     >
 
-                      {/* PRODUCT */}
-
                       <td>
-
                         <div className="admin-product-cell">
 
                           <div className="admin-product-image">
-
                             {product.image ? (
-
                               <img
                                 src={
                                   product.image
@@ -899,48 +1245,46 @@ export default function AdminProducts() {
                                   product.name
                                 }
                               />
-
                             ) : (
-
                               <Icon
                                 name="tool"
                                 size={23}
                               />
-
                             )}
-
                           </div>
 
                           <div>
-
                             <strong>
-                              {product.name}
+                              {
+                                product.name
+                              }
                             </strong>
 
                             <small>
-                              ID: {product.id}
+                              ID:{' '}
+                              {
+                                product.id
+                              }
                             </small>
 
                             {product.brand && (
                               <small>
-                                {product.brand}
+                                {
+                                  product.brand
+                                }
                               </small>
                             )}
-
                           </div>
 
                         </div>
-
                       </td>
 
-                      {/* CATEGORY */}
 
                       <td>
                         {product.categoryName ||
                           'Uncategorized'}
                       </td>
 
-                      {/* PRICE */}
 
                       <td>
                         <strong>
@@ -951,27 +1295,22 @@ export default function AdminProducts() {
                         </strong>
                       </td>
 
-                      {/* STOCK */}
 
                       <td>
-
                         <strong>
                           {Number(
                             product.stock ||
-                              0
+                            0
                           )}
                         </strong>
 
                         <small>
                           {' '}units
                         </small>
-
                       </td>
 
-                      {/* STATUS */}
 
                       <td>
-
                         <button
                           type="button"
                           className={`product-stock-status ${
@@ -987,19 +1326,16 @@ export default function AdminProducts() {
                           }
                           title="Click to change stock status"
                         >
-
                           <span />
 
-                          {product.status}
-
+                          {
+                            product.status
+                          }
                         </button>
-
                       </td>
 
-                      {/* ACTIONS */}
 
                       <td>
-
                         <div className="admin-product-actions">
 
                           <button
@@ -1011,13 +1347,12 @@ export default function AdminProducts() {
                               )
                             }
                           >
-
                             <Icon
                               name="eye"
                               size={16}
                             />
-
                           </button>
+
 
                           <button
                             type="button"
@@ -1028,13 +1363,12 @@ export default function AdminProducts() {
                               )
                             }
                           >
-
                             <Icon
                               name="edit"
                               size={16}
                             />
-
                           </button>
+
 
                           <button
                             type="button"
@@ -1046,23 +1380,18 @@ export default function AdminProducts() {
                               )
                             }
                           >
-
                             <Icon
                               name="trash"
                               size={16}
                             />
-
                           </button>
 
                         </div>
-
                       </td>
 
                     </tr>
-
                   )
                 )
-
               )}
 
             </tbody>
@@ -1070,26 +1399,25 @@ export default function AdminProducts() {
           </table>
 
         </div>
-
       </div>
 
-      {/* ====================================================
-          VIEW PRODUCT MODAL
-      ==================================================== */}
 
       {selectedProduct && (
-
         <div
           className="admin-modal-backdrop"
           onClick={() =>
-            setSelectedProduct(null)
+            setSelectedProduct(
+              null
+            )
           }
         >
-
           <div
             className="admin-modal product-view-modal"
-            onClick={(event) =>
-              event.stopPropagation()
+            onClick={(
+              event
+            ) =>
+              event
+                .stopPropagation()
             }
           >
 
@@ -1097,16 +1425,17 @@ export default function AdminProducts() {
               className="admin-modal-close"
               type="button"
               onClick={() =>
-                setSelectedProduct(null)
+                setSelectedProduct(
+                  null
+                )
               }
             >
               ×
             </button>
 
+
             <div className="product-modal-image">
-
               {selectedProduct.image ? (
-
                 <img
                   src={
                     selectedProduct.image
@@ -1115,30 +1444,30 @@ export default function AdminProducts() {
                     selectedProduct.name
                   }
                 />
-
               ) : (
-
                 <Icon
                   name="tool"
                   size={45}
                 />
-
               )}
-
             </div>
+
 
             <span className="eyebrow">
               Product Details
             </span>
 
             <h2>
-              {selectedProduct.name}
+              {
+                selectedProduct.name
+              }
             </h2>
 
             <p>
               {selectedProduct.description ||
                 'No product description available.'}
             </p>
+
 
             <div className="admin-product-details">
 
@@ -1148,9 +1477,12 @@ export default function AdminProducts() {
                 </span>
 
                 <strong>
-                  {selectedProduct.id}
+                  {
+                    selectedProduct.id
+                  }
                 </strong>
               </div>
+
 
               <div>
                 <span>
@@ -1163,6 +1495,7 @@ export default function AdminProducts() {
                 </strong>
               </div>
 
+
               <div>
                 <span>
                   Brand
@@ -1173,6 +1506,7 @@ export default function AdminProducts() {
                     'Apex Machinery'}
                 </strong>
               </div>
+
 
               <div>
                 <span>
@@ -1187,16 +1521,20 @@ export default function AdminProducts() {
                 </strong>
               </div>
 
+
               <div>
                 <span>
                   Stock
                 </span>
 
                 <strong>
-                  {selectedProduct.stock}
-                  {' '}units
+                  {
+                    selectedProduct.stock
+                  }{' '}
+                  units
                 </strong>
               </div>
+
 
               <div>
                 <span>
@@ -1204,11 +1542,14 @@ export default function AdminProducts() {
                 </span>
 
                 <strong>
-                  {selectedProduct.status}
+                  {
+                    selectedProduct.status
+                  }
                 </strong>
               </div>
 
             </div>
+
 
             <div className="admin-modal-actions">
 
@@ -1216,11 +1557,14 @@ export default function AdminProducts() {
                 type="button"
                 className="btn btn-outline-navy"
                 onClick={() =>
-                  setSelectedProduct(null)
+                  setSelectedProduct(
+                    null
+                  )
                 }
               >
                 Close
               </button>
+
 
               <button
                 type="button"
@@ -1231,65 +1575,73 @@ export default function AdminProducts() {
                   )
                 }
               >
-
                 <Icon
                   name="edit"
                   size={16}
                 />
 
                 Edit Product
-
               </button>
 
             </div>
 
           </div>
-
         </div>
-
       )}
 
-      {/* ====================================================
-          EDIT PRODUCT MODAL
-      ==================================================== */}
 
-      {showProductModal && (
-
+      {(
+        showProductModal ||
+        showAddModal
+      ) && (
         <div
           className="admin-modal-backdrop"
-          onClick={closeEditModal}
+          onClick={
+            showProductModal
+              ? closeEditModal
+              : closeAddModal
+          }
         >
 
           <div
             className="admin-modal"
-            onClick={(event) =>
-              event.stopPropagation()
+            onClick={(
+              event
+            ) =>
+              event
+                .stopPropagation()
             }
           >
 
             <div className="admin-modal-header">
 
               <div>
-
                 <span className="eyebrow">
                   Product Management
                 </span>
 
                 <h2>
-                  Edit Product
+                  {editingProduct
+                    ? 'Edit Product'
+                    : 'Add Product'}
                 </h2>
-
               </div>
+
 
               <button
                 className="admin-modal-close"
                 type="button"
-                onClick={closeEditModal}
+                onClick={
+                  editingProduct
+                    ? closeEditModal
+                    : closeAddModal
+                }
               >
                 ×
               </button>
 
             </div>
+
 
             <form
               className="admin-product-form"
@@ -1299,38 +1651,45 @@ export default function AdminProducts() {
             >
 
               <div className="field">
-
                 <label>
                   Product Name
                 </label>
 
                 <input
                   name="name"
-                  value={form.name}
-                  onChange={handleChange}
+                  value={
+                    form.name
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Industrial Diesel Generator 500 kVA"
                   required
                 />
-
               </div>
+
 
               <div className="admin-form-grid">
 
                 <div className="field">
-
                   <label>
                     Brand
                   </label>
 
                   <input
                     name="brand"
-                    value={form.brand}
-                    onChange={handleChange}
+                    value={
+                      form.brand
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="Apex Machinery"
                   />
-
                 </div>
 
-                <div className="field">
 
+                <div className="field">
                   <label>
                     Price
                   </label>
@@ -1339,66 +1698,63 @@ export default function AdminProducts() {
                     type="number"
                     name="price"
                     min="0"
-                    value={form.price}
-                    onChange={handleChange}
+                    value={
+                      form.price
+                    }
+                    onChange={
+                      handleChange
+                    }
+                    placeholder="UGX"
                   />
-
                 </div>
 
               </div>
 
-              <div className="field">
 
+              <div className="field">
                 <label>
                   Category
                 </label>
 
                 <select
-                  name="category"
-                  value={form.category}
-                  onChange={(event) => {
-                    const selected =
-                      categories.find(
-                        ([id]) =>
-                          id ===
-                          event.target.value
-                      );
-
-                    setForm(
-                      (previous) => ({
-                        ...previous,
-                        category:
-                          event.target
-                            .value,
-                        categoryName:
-                          selected?.[1] ||
-                          previous.categoryName,
-                      })
-                    );
-                  }}
+                  name="categoryId"
+                  value={
+                    form.categoryId
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  required
                 >
+                  <option value="">
+                    Select Category
+                  </option>
 
-                  {categories.map(
-                    ([id, name]) => (
-
+                  {categoryList.map(
+                    (
+                      item
+                    ) => (
                       <option
-                        key={id}
-                        value={id}
+                        key={
+                          item.id
+                        }
+                        value={
+                          item.id
+                        }
                       >
-                        {name}
+                        {
+                          item.name
+                        }
                       </option>
-
                     )
                   )}
-
                 </select>
-
               </div>
+
 
               <div className="admin-form-grid">
 
                 <div className="field">
-
                   <label>
                     Stock Quantity
                   </label>
@@ -1406,27 +1762,29 @@ export default function AdminProducts() {
                   <input
                     type="number"
                     min="0"
-                    value={form.stock}
+                    value={
+                      form.stock
+                    }
                     onChange={
                       handleStockChange
                     }
                   />
-
                 </div>
 
-                <div className="field">
 
+                <div className="field">
                   <label>
                     Stock Status
                   </label>
 
                   <select
-                    value={form.status}
+                    value={
+                      form.status
+                    }
                     onChange={
                       handleStatusChange
                     }
                   >
-
                     <option value="In Stock">
                       In Stock
                     </option>
@@ -1434,270 +1792,31 @@ export default function AdminProducts() {
                     <option value="Out of Stock">
                       Out of Stock
                     </option>
-
                   </select>
-
                 </div>
 
               </div>
 
-              <div className="field">
 
+              <div className="field">
                 <label>
-                  Description
+                  Product Image Path
                 </label>
 
-                <textarea
-                  name="description"
-                  rows="5"
+                <input
+                  name="image"
                   value={
-                    form.description
+                    form.image
                   }
                   onChange={
                     handleChange
                   }
+                  placeholder="/images/machines/example-machine.jpg"
                 />
-
               </div>
 
-              <div className="admin-modal-actions">
-
-                <button
-                  type="button"
-                  className="btn btn-outline-navy"
-                  onClick={
-                    closeEditModal
-                  }
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                >
-
-                  <Icon
-                    name="check"
-                    size={16}
-                  />
-
-                  Save Product
-
-                </button>
-
-              </div>
-
-            </form>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* ====================================================
-          ADD PRODUCT MODAL
-      ==================================================== */}
-
-      {showAddModal && (
-
-        <div
-          className="admin-modal-backdrop"
-          onClick={closeAddModal}
-        >
-
-          <div
-            className="admin-modal"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-
-            <div className="admin-modal-header">
-
-              <div>
-
-                <span className="eyebrow">
-                  Product Management
-                </span>
-
-                <h2>
-                  Add Product
-                </h2>
-
-              </div>
-
-              <button
-                className="admin-modal-close"
-                type="button"
-                onClick={closeAddModal}
-              >
-                ×
-              </button>
-
-            </div>
-
-            <form
-              className="admin-product-form"
-              onSubmit={
-                handleSaveProduct
-              }
-            >
 
               <div className="field">
-
-                <label>
-                  Product Name
-                </label>
-
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Industrial Diesel Generator 500 kVA"
-                  required
-                />
-
-              </div>
-
-              <div className="admin-form-grid">
-
-                <div className="field">
-
-                  <label>
-                    Brand
-                  </label>
-
-                  <input
-                    name="brand"
-                    value={form.brand}
-                    onChange={handleChange}
-                    placeholder="Brand name"
-                  />
-
-                </div>
-
-                <div className="field">
-
-                  <label>
-                    Price
-                  </label>
-
-                  <input
-                    type="number"
-                    name="price"
-                    min="0"
-                    value={form.price}
-                    onChange={handleChange}
-                    placeholder="UGX"
-                  />
-
-                </div>
-
-              </div>
-
-              <div className="field">
-
-                <label>
-                  Category
-                </label>
-
-                <select
-                  name="category"
-                  value={form.category}
-                  onChange={(event) => {
-                    const selected =
-                      categories.find(
-                        ([id]) =>
-                          id ===
-                          event.target.value
-                      );
-
-                    setForm(
-                      (previous) => ({
-                        ...previous,
-                        category:
-                          event.target
-                            .value,
-                        categoryName:
-                          selected?.[1] ||
-                          '',
-                      })
-                    );
-                  }}
-                  required
-                >
-
-                  <option value="">
-                    Select Category
-                  </option>
-
-                  {categories.map(
-                    ([id, name]) => (
-
-                      <option
-                        key={id}
-                        value={id}
-                      >
-                        {name}
-                      </option>
-
-                    )
-                  )}
-
-                </select>
-
-              </div>
-
-              <div className="admin-form-grid">
-
-                <div className="field">
-
-                  <label>
-                    Initial Stock
-                  </label>
-
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.stock}
-                    onChange={
-                      handleStockChange
-                    }
-                  />
-
-                </div>
-
-                <div className="field">
-
-                  <label>
-                    Stock Status
-                  </label>
-
-                  <select
-                    value={form.status}
-                    onChange={
-                      handleStatusChange
-                    }
-                  >
-
-                    <option value="In Stock">
-                      In Stock
-                    </option>
-
-                    <option value="Out of Stock">
-                      Out of Stock
-                    </option>
-
-                  </select>
-
-                </div>
-
-              </div>
-
-              <div className="field">
-
                 <label>
                   Description
                 </label>
@@ -1713,8 +1832,8 @@ export default function AdminProducts() {
                   }
                   placeholder="Describe the product..."
                 />
-
               </div>
+
 
               <div className="admin-modal-actions">
 
@@ -1722,24 +1841,39 @@ export default function AdminProducts() {
                   type="button"
                   className="btn btn-outline-navy"
                   onClick={
-                    closeAddModal
+                    editingProduct
+                      ? closeEditModal
+                      : closeAddModal
+                  }
+                  disabled={
+                    saving
                   }
                 >
                   Cancel
                 </button>
 
+
                 <button
                   type="submit"
                   className="btn btn-primary"
+                  disabled={
+                    saving
+                  }
                 >
-
                   <Icon
-                    name="plus"
+                    name={
+                      editingProduct
+                        ? 'check'
+                        : 'plus'
+                    }
                     size={16}
                   />
 
-                  Create Product
-
+                  {saving
+                    ? 'Saving...'
+                    : editingProduct
+                      ? 'Save Product'
+                      : 'Create Product'}
                 </button>
 
               </div>
@@ -1747,9 +1881,7 @@ export default function AdminProducts() {
             </form>
 
           </div>
-
         </div>
-
       )}
 
     </div>

@@ -1,103 +1,22 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+import {
+  useNavigate,
+} from 'react-router-dom';
+
 import Icon from '../../components/Icon';
+
+import {
+  getAdminOrders,
+  updateAdminOrderStatus,
+} from '../../services/adminApi';
+
 import './AdminOrders.css';
-
-
-// ============================================================
-// INITIAL ORDERS
-// ============================================================
-
-const initialOrders = [
-  {
-    id: '#APX-9921',
-    customer: 'Webb Steelworks',
-    email: 'procurement@webbsteelworks.com',
-    date: '2026-07-24',
-    amount: 45200000,
-    status: 'Delivered',
-    priority: 'High',
-    payment: 'Paid',
-    items: 4,
-  },
-  {
-    id: '#APX-9920',
-    customer: 'Nair Manufacturing',
-    email: 'orders@nairmanufacturing.com',
-    date: '2026-07-23',
-    amount: 15800000,
-    status: 'Processing',
-    priority: 'Medium',
-    payment: 'Paid',
-    items: 2,
-  },
-  {
-    id: '#APX-9919',
-    customer: 'Alvarez Fabrication',
-    email: 'purchasing@alvarezfab.com',
-    date: '2026-07-23',
-    amount: 98500000,
-    status: 'Pending',
-    priority: 'Urgent',
-    payment: 'Pending',
-    items: 8,
-  },
-  {
-    id: '#APX-9918',
-    customer: 'Global Trade Hub',
-    email: 'admin@globaltradehub.com',
-    date: '2026-07-22',
-    amount: 4600000,
-    status: 'Shipped',
-    priority: 'Low',
-    payment: 'Paid',
-    items: 1,
-  },
-  {
-    id: '#APX-9917',
-    customer: 'Precision Engineering',
-    email: 'procurement@precisioneng.com',
-    date: '2026-07-21',
-    amount: 27400000,
-    status: 'Processing',
-    priority: 'Medium',
-    payment: 'Paid',
-    items: 5,
-  },
-  {
-    id: '#APX-9916',
-    customer: 'Kampala Industrial Works',
-    email: 'orders@kiw.ug',
-    date: '2026-07-20',
-    amount: 73200000,
-    status: 'Delivered',
-    priority: 'High',
-    payment: 'Paid',
-    items: 6,
-  },
-  {
-    id: '#APX-9915',
-    customer: 'East Africa Contractors',
-    email: 'procurement@eacontractors.ug',
-    date: '2026-07-19',
-    amount: 18900000,
-    status: 'Cancelled',
-    priority: 'Low',
-    payment: 'Refunded',
-    items: 3,
-  },
-  {
-    id: '#APX-9914',
-    customer: 'Mukono Engineering Ltd',
-    email: 'sales@mukonoengineering.ug',
-    date: '2026-07-18',
-    amount: 34600000,
-    status: 'Shipped',
-    priority: 'Medium',
-    payment: 'Paid',
-    items: 4,
-  },
-];
 
 
 // ============================================================
@@ -108,9 +27,346 @@ const statusOptions = [
   'Pending',
   'Processing',
   'Shipped',
+  'In Transit',
   'Delivered',
   'Cancelled',
 ];
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function formatCurrency(value) {
+
+  const amount =
+    Number(value || 0);
+
+  return `UGX ${amount.toLocaleString(
+    'en-UG'
+  )}`;
+
+}
+
+
+function formatDate(value) {
+
+  if (!value) {
+    return '—';
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+
+  return date.toLocaleDateString(
+    'en-UG',
+    {
+      year:
+        'numeric',
+
+      month:
+        'short',
+
+      day:
+        'numeric',
+    }
+  );
+
+}
+
+
+function normalizeStatus(value) {
+
+  const status =
+    String(
+      value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    pending:
+      'Pending',
+
+    processing:
+      'Processing',
+
+    shipped:
+      'Shipped',
+
+    in_transit:
+      'In Transit',
+
+    'in transit':
+      'In Transit',
+
+    delivered:
+      'Delivered',
+
+    cancelled:
+      'Cancelled',
+  };
+
+
+  return (
+    map[status] ||
+    value ||
+    'Pending'
+  );
+
+}
+
+
+function normalizePriority(value) {
+
+  const priority =
+    String(
+      value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    low:
+      'Low',
+
+    medium:
+      'Medium',
+
+    high:
+      'High',
+
+    urgent:
+      'Urgent',
+  };
+
+
+  return (
+    map[priority] ||
+    'Medium'
+  );
+
+}
+
+
+function normalizePayment(value) {
+
+  const payment =
+    String(
+      value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    paid:
+      'Paid',
+
+    pending:
+      'Pending',
+
+    unpaid:
+      'Unpaid',
+
+    refunded:
+      'Refunded',
+
+    cancelled:
+      'Cancelled',
+  };
+
+
+  return (
+    map[payment] ||
+    value ||
+    'Pending'
+  );
+
+}
+
+
+function normalizeOrder(order) {
+
+  const orderItems =
+    Array.isArray(
+      order?.orderItems
+    )
+      ? order.orderItems
+      : Array.isArray(
+          order?.order_items
+        )
+        ? order.order_items
+        : [];
+
+
+  const itemCount =
+    Number(
+      order?.itemCount ??
+      order?.items ??
+      orderItems.length ??
+      0
+    );
+
+
+  return {
+
+    databaseId:
+      order?.databaseId ||
+      order?.database_id ||
+      order?.id ||
+      null,
+
+    id:
+      order?.orderNumber ||
+      order?.order_number ||
+      (
+        String(
+          order?.id || ''
+        ).startsWith('#')
+          ? order.id
+          : order?.order_number ||
+            order?.id ||
+            '—'
+      ),
+
+    customer:
+      order?.customer ||
+      order?.company ||
+      order?.customerName ||
+      order?.customer_name ||
+      'Unknown Customer',
+
+    email:
+      order?.email ||
+      order?.customerEmail ||
+      order?.customer_email ||
+      '',
+
+    date:
+      order?.date ||
+      order?.createdAt ||
+      order?.created_at ||
+      null,
+
+    amount:
+      Number(
+        order?.amount ??
+        order?.total ??
+        0
+      ),
+
+    status:
+      normalizeStatus(
+        order?.status
+      ),
+
+    priority:
+      normalizePriority(
+        order?.priority
+      ),
+
+    payment:
+      normalizePayment(
+        order?.payment ||
+        order?.paymentStatus ||
+        order?.payment_status
+      ),
+
+    items:
+      Number.isFinite(
+        itemCount
+      )
+        ? itemCount
+        : orderItems.length,
+
+    orderItems,
+
+    shippingAddress:
+      order?.shippingAddress ||
+      order?.shipping_address ||
+      null,
+
+    estimatedDeliveryDate:
+      order?.estimatedDeliveryDate ||
+      order?.estimated_delivery_date ||
+      null,
+
+    notes:
+      order?.notes ||
+      '',
+
+  };
+
+}
+
+
+// ============================================================
+// STATUS CLASS
+// ============================================================
+
+function getStatusClass(
+  status
+) {
+
+  switch (
+    normalizeStatus(
+      status
+    )
+  ) {
+
+    case 'Delivered':
+      return 'order-status delivered';
+
+    case 'Processing':
+      return 'order-status processing';
+
+    case 'Pending':
+      return 'order-status pending';
+
+    case 'Shipped':
+      return 'order-status shipped';
+
+    case 'In Transit':
+      return 'order-status shipped';
+
+    case 'Cancelled':
+      return 'order-status cancelled';
+
+    default:
+      return 'order-status';
+
+  }
+
+}
+
+
+// ============================================================
+// PRIORITY CLASS
+// ============================================================
+
+function getPriorityClass(
+  priority
+) {
+
+  return `priority-${String(
+    priority || 'medium'
+  ).toLowerCase()}`;
+
+}
 
 
 // ============================================================
@@ -119,379 +375,568 @@ const statusOptions = [
 
 export default function AdminOrders() {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const [orders, setOrders] =
-    useState(initialOrders);
 
-  const [search, setSearch] =
+  // ==========================================================
+  // STATE
+  // ==========================================================
+
+  const [
+    orders,
+    setOrders,
+  ] =
+    useState([]);
+
+
+  const [
+    search,
+    setSearch,
+  ] =
     useState('');
 
-  const [statusFilter, setStatusFilter] =
+
+  const [
+    statusFilter,
+    setStatusFilter,
+  ] =
     useState('All');
 
-  const [selectedOrder, setSelectedOrder] =
+
+  const [
+    selectedOrder,
+    setSelectedOrder,
+  ] =
     useState(null);
 
-  const [showCreateModal, setShowCreateModal] =
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] =
     useState(false);
 
-  const [newOrder, setNewOrder] =
-    useState({
-      customer: '',
-      email: '',
-      amount: '',
-      items: 1,
-      priority: 'Medium',
-    });
+
+  const [
+    error,
+    setError,
+  ] =
+    useState('');
+
+
+  const [
+    updatingOrderId,
+    setUpdatingOrderId,
+  ] =
+    useState(null);
+
+
+  // ==========================================================
+  // LOAD ORDERS
+  // ==========================================================
+
+  const loadOrders =
+    useCallback(
+      async (
+        silent = false
+      ) => {
+
+        try {
+
+          if (silent) {
+
+            setRefreshing(
+              true
+            );
+
+          } else {
+
+            setLoading(
+              true
+            );
+
+          }
+
+
+          setError('');
+
+
+          const response =
+            await getAdminOrders();
+
+
+          const rawOrders =
+            Array.isArray(
+              response
+            )
+              ? response
+              : Array.isArray(
+                  response?.orders
+                )
+                ? response.orders
+                : [];
+
+
+          const normalized =
+            rawOrders.map(
+              normalizeOrder
+            );
+
+
+          setOrders(
+            normalized
+          );
+
+
+          setSelectedOrder(
+            (current) => {
+
+              if (!current) {
+                return null;
+              }
+
+
+              return (
+                normalized.find(
+                  (order) =>
+                    order.databaseId ===
+                      current.databaseId ||
+                    order.id ===
+                      current.id
+                ) ||
+                null
+              );
+
+            }
+          );
+
+        } catch (requestError) {
+
+          console.error(
+            '[ADMIN ORDERS LOAD ERROR]',
+            requestError
+          );
+
+
+          setError(
+            requestError
+              ?.response
+              ?.data
+              ?.message ||
+            requestError
+              ?.message ||
+            'Unable to load orders.'
+          );
+
+        } finally {
+
+          setLoading(
+            false
+          );
+
+          setRefreshing(
+            false
+          );
+
+        }
+
+      },
+      []
+    );
+
+
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      loadOrders();
+
+    },
+    [
+      loadOrders,
+    ]
+  );
+
+
+  // ==========================================================
+  // AUTO REFRESH
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      const interval =
+        window.setInterval(
+          () => {
+
+            loadOrders(
+              true
+            );
+
+          },
+          30000
+        );
+
+
+      return () => {
+
+        window.clearInterval(
+          interval
+        );
+
+      };
+
+    },
+    [
+      loadOrders,
+    ]
+  );
 
 
   // ==========================================================
   // BACK TO DASHBOARD
   // ==========================================================
 
-  const goBackToDashboard = () => {
-    navigate('/admin');
-  };
+  const goBackToDashboard =
+    () => {
 
+      navigate(
+        '/admin'
+      );
 
-  // ==========================================================
-  // CURRENCY
-  // ==========================================================
-
-  const formatCurrency = (value) => {
-    return `UGX ${Number(value || 0).toLocaleString('en-UG')}`;
-  };
+    };
 
 
   // ==========================================================
   // FILTER ORDERS
   // ==========================================================
 
-  const filteredOrders = useMemo(() => {
+  const filteredOrders =
+    useMemo(
+      () => {
 
-    const query =
-      search.trim().toLowerCase();
+        const query =
+          search
+            .trim()
+            .toLowerCase();
 
-    return orders.filter((order) => {
 
-      const matchesSearch =
-        !query ||
-        order.id
-          .toLowerCase()
-          .includes(query) ||
-        order.customer
-          .toLowerCase()
-          .includes(query) ||
-        order.email
-          .toLowerCase()
-          .includes(query);
+        return orders.filter(
+          (order) => {
 
-      const matchesStatus =
-        statusFilter === 'All' ||
-        order.status === statusFilter;
+            const matchesSearch =
+              !query ||
+              String(
+                order.id || ''
+              )
+                .toLowerCase()
+                .includes(
+                  query
+                ) ||
+              String(
+                order.customer || ''
+              )
+                .toLowerCase()
+                .includes(
+                  query
+                ) ||
+              String(
+                order.email || ''
+              )
+                .toLowerCase()
+                .includes(
+                  query
+                );
 
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
 
-    });
+            const matchesStatus =
+              statusFilter ===
+                'All' ||
+              order.status ===
+                statusFilter;
 
-  }, [
-    orders,
-    search,
-    statusFilter,
-  ]);
+
+            return (
+              matchesSearch &&
+              matchesStatus
+            );
+
+          }
+        );
+
+      },
+      [
+        orders,
+        search,
+        statusFilter,
+      ]
+    );
 
 
   // ==========================================================
   // STATISTICS
   // ==========================================================
 
-  const totalOrders =
-    orders.length;
+  const statistics =
+    useMemo(
+      () => {
 
-  const pendingOrders =
-    orders.filter(
-      (order) =>
-        order.status === 'Pending'
-    ).length;
+        const countStatus =
+          (status) =>
+            orders.filter(
+              (order) =>
+                order.status ===
+                status
+            ).length;
 
-  const processingOrders =
-    orders.filter(
-      (order) =>
-        order.status === 'Processing'
-    ).length;
 
-  const deliveredOrders =
-    orders.filter(
-      (order) =>
-        order.status === 'Delivered'
-    ).length;
+        const totalRevenue =
+          orders
+            .filter(
+              (order) =>
+                order.status !==
+                  'Cancelled' &&
+                order.payment ===
+                  'Paid'
+            )
+            .reduce(
+              (
+                total,
+                order
+              ) =>
+                total +
+                Number(
+                  order.amount ||
+                  0
+                ),
+              0
+            );
 
-  const shippedOrders =
-    orders.filter(
-      (order) =>
-        order.status === 'Shipped'
-    ).length;
 
-  const cancelledOrders =
-    orders.filter(
-      (order) =>
-        order.status === 'Cancelled'
-    ).length;
+        const pendingRevenue =
+          orders
+            .filter(
+              (order) =>
+                order.payment ===
+                  'Pending' ||
+                order.payment ===
+                  'Unpaid'
+            )
+            .reduce(
+              (
+                total,
+                order
+              ) =>
+                total +
+                Number(
+                  order.amount ||
+                  0
+                ),
+              0
+            );
 
-  const totalRevenue =
-    orders
-      .filter(
-        (order) =>
-          order.status !== 'Cancelled'
-      )
-      .reduce(
-        (total, order) =>
-          total + Number(order.amount),
-        0
-      );
 
-  const pendingRevenue =
-    orders
-      .filter(
-        (order) =>
-          order.payment === 'Pending'
-      )
-      .reduce(
-        (total, order) =>
-          total + Number(order.amount),
-        0
-      );
+        return {
+
+          total:
+            orders.length,
+
+          pending:
+            countStatus(
+              'Pending'
+            ),
+
+          processing:
+            countStatus(
+              'Processing'
+            ),
+
+          shipped:
+            countStatus(
+              'Shipped'
+            ) +
+            countStatus(
+              'In Transit'
+            ),
+
+          delivered:
+            countStatus(
+              'Delivered'
+            ),
+
+          cancelled:
+            countStatus(
+              'Cancelled'
+            ),
+
+          totalRevenue,
+
+          pendingRevenue,
+
+        };
+
+      },
+      [
+        orders,
+      ]
+    );
 
 
   // ==========================================================
   // UPDATE STATUS
   // ==========================================================
 
-  const updateStatus = (
-    orderId,
-    newStatus
-  ) => {
+  const updateStatus =
+    async (
+      order,
+      newStatus
+    ) => {
 
-    setOrders((previous) =>
-      previous.map((order) =>
-        order.id === orderId
-          ? {
-              ...order,
+      if (
+        !order?.databaseId
+      ) {
 
-              status:
-                newStatus,
+        setError(
+          'This order is missing its database ID.'
+        );
 
-              payment:
-                newStatus === 'Cancelled'
-                  ? 'Refunded'
-                  : order.payment,
-            }
-          : order
-      )
-    );
+        return;
+
+      }
 
 
-    setSelectedOrder((previous) =>
-      previous
-        ? {
-            ...previous,
-
-            status:
-              newStatus,
-
-            payment:
-              newStatus === 'Cancelled'
-                ? 'Refunded'
-                : previous.payment,
-          }
-        : previous
-    );
-
-  };
+      const normalizedStatus =
+        normalizeStatus(
+          newStatus
+        );
 
 
-  // ==========================================================
-  // DELETE ORDER
-  // ==========================================================
+      try {
 
-  const deleteOrder = (
-    orderId
-  ) => {
+        setUpdatingOrderId(
+          order.databaseId
+        );
 
-    const confirmed =
-      window.confirm(
-        `Delete order ${orderId}? This action cannot be undone.`
-      );
-
-    if (!confirmed) {
-      return;
-    }
+        setError('');
 
 
-    setOrders((previous) =>
-      previous.filter(
-        (order) =>
-          order.id !== orderId
-      )
-    );
+        await updateAdminOrderStatus(
+          order.databaseId,
+          normalizedStatus
+        );
 
 
-    setSelectedOrder(null);
+        setOrders(
+          (previous) =>
+            previous.map(
+              (item) =>
+                item.databaseId ===
+                order.databaseId
+                  ? {
+                      ...item,
 
-  };
-
-
-  // ==========================================================
-  // NEW ORDER INPUT
-  // ==========================================================
-
-  const handleNewOrderChange = (
-    event
-  ) => {
-
-    const {
-      name,
-      value,
-    } = event.target;
+                      status:
+                        normalizedStatus,
+                    }
+                  : item
+            )
+        );
 
 
-    setNewOrder((previous) => ({
-      ...previous,
+        setSelectedOrder(
+          (previous) =>
+            previous &&
+            previous.databaseId ===
+              order.databaseId
+              ? {
+                  ...previous,
 
-      [name]:
-        value,
-    }));
-
-  };
-
-
-  // ==========================================================
-  // CREATE ORDER
-  // ==========================================================
-
-  const createOrder = (
-    event
-  ) => {
-
-    event.preventDefault();
+                  status:
+                    normalizedStatus,
+                }
+              : previous
+        );
 
 
-    if (
-      !newOrder.customer.trim() ||
-      !newOrder.email.trim() ||
-      !newOrder.amount
-    ) {
-      return;
-    }
+        await loadOrders(
+          true
+        );
+
+      } catch (requestError) {
+
+        console.error(
+          '[ORDER STATUS UPDATE ERROR]',
+          requestError
+        );
 
 
-    const orderNumber =
-      9922 + orders.length;
+        setError(
+          requestError
+            ?.response
+            ?.data
+            ?.message ||
+          requestError
+            ?.message ||
+          'Unable to update order status.'
+        );
 
+      } finally {
 
-    const order = {
+        setUpdatingOrderId(
+          null
+        );
 
-      id:
-        `#APX-${orderNumber}`,
+      }
 
-      customer:
-        newOrder.customer.trim(),
-
-      email:
-        newOrder.email.trim(),
-
-      date:
-        new Date()
-          .toISOString()
-          .split('T')[0],
-
-      amount:
-        Number(newOrder.amount),
-
-      status:
-        'Pending',
-
-      priority:
-        newOrder.priority,
-
-      payment:
-        'Pending',
-
-      items:
-        Number(
-          newOrder.items || 1
-        ),
     };
 
 
-    setOrders((previous) => [
-      order,
-      ...previous,
-    ]);
-
-
-    setNewOrder({
-      customer: '',
-      email: '',
-      amount: '',
-      items: 1,
-      priority: 'Medium',
-    });
-
-
-    setShowCreateModal(false);
-
-  };
-
-
   // ==========================================================
-  // STATUS CLASS
+  // RENDER LOADING
   // ==========================================================
 
-  const getStatusClass = (
-    status
-  ) => {
+  if (
+    loading
+  ) {
 
-    switch (status) {
+    return (
 
-      case 'Delivered':
-        return 'order-status delivered';
+      <div className="admin-orders-page">
 
-      case 'Processing':
-        return 'order-status processing';
+        <div className="admin-orders-loading">
 
-      case 'Pending':
-        return 'order-status pending';
+          <Icon
+            name="settings"
+            size={30}
+          />
 
-      case 'Shipped':
-        return 'order-status shipped';
+          <h2>
+            Loading orders...
+          </h2>
 
-      case 'Cancelled':
-        return 'order-status cancelled';
+          <p>
+            Fetching order data from
+            Apex Machinery.
+          </p>
 
-      default:
-        return 'order-status';
+        </div>
 
-    }
+      </div>
 
-  };
+    );
 
-
-  // ==========================================================
-  // PRIORITY CLASS
-  // ==========================================================
-
-  const getPriorityClass = (
-    priority
-  ) => {
-
-    return `priority-${priority.toLowerCase()}`;
-
-  };
+  }
 
 
   // ==========================================================
@@ -512,7 +957,9 @@ export default function AdminOrders() {
         <button
           type="button"
           className="admin-back-button"
-          onClick={goBackToDashboard}
+          onClick={
+            goBackToDashboard
+          }
         >
 
           <Icon
@@ -547,7 +994,7 @@ export default function AdminOrders() {
 
 
       {/* ====================================================
-          PAGE HEADER
+          HEADER
       ==================================================== */}
 
       <header className="admin-page-header">
@@ -575,21 +1022,63 @@ export default function AdminOrders() {
         <button
           type="button"
           className="btn btn-primary admin-create-btn"
+          disabled={
+            refreshing
+          }
           onClick={() =>
-            setShowCreateModal(true)
+            loadOrders(
+              true
+            )
           }
         >
 
           <Icon
-            name="plus"
+            name="refresh"
             size={17}
           />
 
-          New Order
+          {refreshing
+            ? 'Refreshing...'
+            : 'Refresh Orders'}
 
         </button>
 
       </header>
+
+
+      {/* ====================================================
+          ERROR
+      ==================================================== */}
+
+      {error && (
+
+        <div className="admin-orders-error">
+
+          <div>
+
+            <strong>
+              Orders unavailable
+            </strong>
+
+            <span>
+              {error}
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            onClick={() =>
+              loadOrders()
+            }
+          >
+            Try Again
+          </button>
+
+        </div>
+
+      )}
 
 
       {/* ====================================================
@@ -616,7 +1105,7 @@ export default function AdminOrders() {
             </span>
 
             <strong>
-              {totalOrders}
+              {statistics.total}
             </strong>
 
           </div>
@@ -642,7 +1131,7 @@ export default function AdminOrders() {
             </span>
 
             <strong>
-              {pendingOrders}
+              {statistics.pending}
             </strong>
 
           </div>
@@ -668,7 +1157,7 @@ export default function AdminOrders() {
             </span>
 
             <strong>
-              {processingOrders}
+              {statistics.processing}
             </strong>
 
           </div>
@@ -694,7 +1183,7 @@ export default function AdminOrders() {
             </span>
 
             <strong>
-              {deliveredOrders}
+              {statistics.delivered}
             </strong>
 
           </div>
@@ -716,12 +1205,12 @@ export default function AdminOrders() {
           <div>
 
             <span>
-              Order Revenue
+              Paid Revenue
             </span>
 
             <strong>
               {formatCurrency(
-                totalRevenue
+                statistics.totalRevenue
               )}
             </strong>
 
@@ -733,47 +1222,54 @@ export default function AdminOrders() {
 
 
       {/* ====================================================
-          SECONDARY METRICS
+          SECONDARY SUMMARY
       ==================================================== */}
 
       <section className="orders-mini-summary">
 
         <div>
+
           <span>
-            Shipped
+            Shipped / Transit
           </span>
 
           <strong>
-            {shippedOrders}
+            {statistics.shipped}
           </strong>
+
         </div>
 
 
         <div>
+
           <span>
             Cancelled
           </span>
 
           <strong>
-            {cancelledOrders}
+            {statistics.cancelled}
           </strong>
+
         </div>
 
 
         <div>
+
           <span>
-            Unpaid Orders
+            Pending Payment
           </span>
 
           <strong>
             {formatCurrency(
-              pendingRevenue
+              statistics.pendingRevenue
             )}
           </strong>
+
         </div>
 
 
         <div>
+
           <span>
             Showing
           </span>
@@ -781,6 +1277,7 @@ export default function AdminOrders() {
           <strong>
             {filteredOrders.length}
           </strong>
+
         </div>
 
       </section>
@@ -791,9 +1288,6 @@ export default function AdminOrders() {
       ==================================================== */}
 
       <section className="card admin-orders-container">
-
-
-        {/* TOOLBAR */}
 
         <div className="admin-orders-toolbar">
 
@@ -808,10 +1302,11 @@ export default function AdminOrders() {
               type="search"
               placeholder="Search order ID, customer or email..."
               value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target.value
-                )
+              onChange={
+                (event) =>
+                  setSearch(
+                    event.target.value
+                  )
               }
             />
 
@@ -836,17 +1331,21 @@ export default function AdminOrders() {
 
           <select
             className="orders-filter"
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(
-                event.target.value
-              )
+            value={
+              statusFilter
+            }
+            onChange={
+              (event) =>
+                setStatusFilter(
+                  event.target.value
+                )
             }
           >
 
             <option value="All">
               All Orders
             </option>
+
 
             {statusOptions.map(
               (status) => (
@@ -869,7 +1368,8 @@ export default function AdminOrders() {
             {filteredOrders.length}{' '}
 
             result
-            {filteredOrders.length !== 1
+            {filteredOrders.length !==
+            1
               ? 's'
               : ''}
 
@@ -877,8 +1377,6 @@ export default function AdminOrders() {
 
         </div>
 
-
-        {/* TABLE */}
 
         <div className="admin-table-wrapper">
 
@@ -909,6 +1407,10 @@ export default function AdminOrders() {
                 </th>
 
                 <th>
+                  Payment
+                </th>
+
+                <th>
                   Status
                 </th>
 
@@ -923,12 +1425,13 @@ export default function AdminOrders() {
 
             <tbody>
 
-              {filteredOrders.length === 0 ? (
+              {filteredOrders.length ===
+              0 ? (
 
                 <tr>
 
                   <td
-                    colSpan="7"
+                    colSpan="8"
                     className="admin-orders-empty"
                   >
 
@@ -944,8 +1447,9 @@ export default function AdminOrders() {
                       </strong>
 
                       <span>
-                        Try another search
-                        or status filter.
+                        There are currently
+                        no orders matching
+                        this filter.
                       </span>
 
                     </div>
@@ -960,7 +1464,10 @@ export default function AdminOrders() {
                   (order) => (
 
                     <tr
-                      key={order.id}
+                      key={
+                        order.databaseId ||
+                        order.id
+                      }
                     >
 
                       <td>
@@ -972,11 +1479,15 @@ export default function AdminOrders() {
                           </strong>
 
                           <small>
+
                             {order.items}{' '}
+
                             item
-                            {order.items !== 1
+                            {order.items !==
+                            1
                               ? 's'
                               : ''}
+
                           </small>
 
                         </div>
@@ -993,7 +1504,8 @@ export default function AdminOrders() {
                           </strong>
 
                           <small>
-                            {order.email}
+                            {order.email ||
+                              'No email'}
                           </small>
 
                         </div>
@@ -1004,7 +1516,11 @@ export default function AdminOrders() {
                       <td>
 
                         <span className="order-date">
-                          {order.date}
+
+                          {formatDate(
+                            order.date
+                          )}
+
                         </span>
 
                       </td>
@@ -1013,9 +1529,11 @@ export default function AdminOrders() {
                       <td>
 
                         <strong className="order-amount">
+
                           {formatCurrency(
                             order.amount
                           )}
+
                         </strong>
 
                       </td>
@@ -1024,9 +1542,11 @@ export default function AdminOrders() {
                       <td>
 
                         <span
-                          className={getPriorityClass(
-                            order.priority
-                          )}
+                          className={
+                            getPriorityClass(
+                              order.priority
+                            )
+                          }
                         >
 
                           <span className="priority-dot" />
@@ -1040,12 +1560,25 @@ export default function AdminOrders() {
 
                       <td>
 
+                        <strong>
+                          {order.payment}
+                        </strong>
+
+                      </td>
+
+
+                      <td>
+
                         <span
-                          className={getStatusClass(
-                            order.status
-                          )}
+                          className={
+                            getStatusClass(
+                              order.status
+                            )
+                          }
                         >
+
                           {order.status}
+
                         </span>
 
                       </td>
@@ -1069,26 +1602,6 @@ export default function AdminOrders() {
 
                             <Icon
                               name="eye"
-                              size={16}
-                            />
-
-                          </button>
-
-
-                          <button
-                            type="button"
-                            className="order-action delete"
-                            title="Delete order"
-                            aria-label={`Delete ${order.id}`}
-                            onClick={() =>
-                              deleteOrder(
-                                order.id
-                              )
-                            }
-                          >
-
-                            <Icon
-                              name="trash"
                               size={16}
                             />
 
@@ -1123,14 +1636,17 @@ export default function AdminOrders() {
         <div
           className="admin-modal-overlay"
           onClick={() =>
-            setSelectedOrder(null)
+            setSelectedOrder(
+              null
+            )
           }
         >
 
           <div
             className="admin-modal order-details-modal"
-            onClick={(event) =>
-              event.stopPropagation()
+            onClick={
+              (event) =>
+                event.stopPropagation()
             }
           >
 
@@ -1153,7 +1669,9 @@ export default function AdminOrders() {
                 type="button"
                 className="admin-modal-close"
                 onClick={() =>
-                  setSelectedOrder(null)
+                  setSelectedOrder(
+                    null
+                  )
                 }
               >
                 ×
@@ -1164,14 +1682,14 @@ export default function AdminOrders() {
 
             <div className="order-modal-body">
 
-
-              {/* CUSTOMER */}
-
               <div className="order-detail-customer">
 
                 <div className="customer-avatar">
 
-                  {selectedOrder.customer
+                  {String(
+                    selectedOrder.customer ||
+                    'C'
+                  )
                     .charAt(0)
                     .toUpperCase()}
 
@@ -1185,15 +1703,14 @@ export default function AdminOrders() {
                   </h3>
 
                   <p>
-                    {selectedOrder.email}
+                    {selectedOrder.email ||
+                      'No customer email'}
                   </p>
 
                 </div>
 
               </div>
 
-
-              {/* ORDER INFORMATION */}
 
               <div className="order-detail-grid">
 
@@ -1204,7 +1721,9 @@ export default function AdminOrders() {
                   </span>
 
                   <strong>
-                    {selectedOrder.date}
+                    {formatDate(
+                      selectedOrder.date
+                    )}
                   </strong>
 
                 </div>
@@ -1250,10 +1769,125 @@ export default function AdminOrders() {
 
                 </div>
 
+
+                <div>
+
+                  <span>
+                    Priority
+                  </span>
+
+                  <strong>
+                    {selectedOrder.priority}
+                  </strong>
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    Estimated Delivery
+                  </span>
+
+                  <strong>
+                    {selectedOrder
+                      .estimatedDeliveryDate
+                      ? formatDate(
+                          selectedOrder
+                            .estimatedDeliveryDate
+                        )
+                      : 'Not set'}
+                  </strong>
+
+                </div>
+
               </div>
 
 
-              {/* STATUS */}
+              {/* ============================================
+                  ORDER ITEMS
+              ============================================ */}
+
+              {selectedOrder
+                .orderItems
+                ?.length >
+                0 && (
+
+                <div className="order-items-detail">
+
+                  <h3>
+                    Order Items
+                  </h3>
+
+
+                  {selectedOrder
+                    .orderItems
+                    .map(
+                      (item) => (
+
+                        <div
+                          className="order-item-row"
+                          key={
+                            item.id ||
+                            item.productId ||
+                            item.sku
+                          }
+                        >
+
+                          <div>
+
+                            <strong>
+                              {item.name ||
+                                item.productName ||
+                                'Product'}
+                            </strong>
+
+                            <small>
+                              {item.sku ||
+                                'No SKU'}
+                            </small>
+
+                          </div>
+
+
+                          <span>
+
+                            {Number(
+                              item.quantity ||
+                              0
+                            )}{' '}
+                            ×{' '}
+
+                            {formatCurrency(
+                              item.unitPrice ||
+                              item.unit_price
+                            )}
+
+                          </span>
+
+
+                          <strong>
+
+                            {formatCurrency(
+                              item.totalPrice ||
+                              item.total_price
+                            )}
+
+                          </strong>
+
+                        </div>
+
+                      )
+                    )}
+
+                </div>
+
+              )}
+
+
+              {/* ============================================
+                  STATUS
+              ============================================ */}
 
               <div className="order-status-section">
 
@@ -1261,15 +1895,21 @@ export default function AdminOrders() {
                   Order Status
                 </label>
 
+
                 <select
                   value={
                     selectedOrder.status
                   }
-                  onChange={(event) =>
-                    updateStatus(
-                      selectedOrder.id,
-                      event.target.value
-                    )
+                  disabled={
+                    updatingOrderId ===
+                    selectedOrder.databaseId
+                  }
+                  onChange={
+                    (event) =>
+                      updateStatus(
+                        selectedOrder,
+                        event.target.value
+                      )
                   }
                 >
 
@@ -1288,10 +1928,22 @@ export default function AdminOrders() {
 
                 </select>
 
+
+                {updatingOrderId ===
+                  selectedOrder.databaseId && (
+
+                  <small>
+                    Updating status...
+                  </small>
+
+                )}
+
               </div>
 
 
-              {/* PROGRESS */}
+              {/* ============================================
+                  PROGRESS
+              ============================================ */}
 
               <div className="order-progress">
 
@@ -1310,6 +1962,7 @@ export default function AdminOrders() {
                         'Pending',
                         'Processing',
                         'Shipped',
+                        'In Transit',
                         'Delivered',
                       ].includes(
                         selectedOrder.status
@@ -1327,6 +1980,7 @@ export default function AdminOrders() {
                       [
                         'Processing',
                         'Shipped',
+                        'In Transit',
                         'Delivered',
                       ].includes(
                         selectedOrder.status
@@ -1343,6 +1997,7 @@ export default function AdminOrders() {
                     className={
                       [
                         'Shipped',
+                        'In Transit',
                         'Delivered',
                       ].includes(
                         selectedOrder.status
@@ -1352,6 +2007,22 @@ export default function AdminOrders() {
                     }
                   >
                     Shipped
+                  </span>
+
+
+                  <span
+                    className={
+                      [
+                        'In Transit',
+                        'Delivered',
+                      ].includes(
+                        selectedOrder.status
+                      )
+                        ? 'active'
+                        : ''
+                    }
+                  >
+                    In Transit
                   </span>
 
 
@@ -1371,272 +2042,133 @@ export default function AdminOrders() {
               </div>
 
 
-              {/* ACTIONS */}
-
               <div className="order-modal-actions">
 
                 <button
                   type="button"
                   className="btn btn-outline-navy"
                   onClick={() =>
-                    setSelectedOrder(null)
+                    setSelectedOrder(
+                      null
+                    )
                   }
                 >
                   Close
                 </button>
 
 
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() =>
-                    updateStatus(
-                      selectedOrder.id,
-                      'Processing'
-                    )
-                  }
-                >
+                {selectedOrder.status ===
+                  'Pending' && (
 
-                  <Icon
-                    name="settings"
-                    size={16}
-                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={
+                      updatingOrderId ===
+                      selectedOrder.databaseId
+                    }
+                    onClick={() =>
+                      updateStatus(
+                        selectedOrder,
+                        'Processing'
+                      )
+                    }
+                  >
 
-                  Mark Processing
-
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-
-      {/* ====================================================
-          CREATE ORDER MODAL
-      ==================================================== */}
-
-      {showCreateModal && (
-
-        <div
-          className="admin-modal-overlay"
-          onClick={() =>
-            setShowCreateModal(false)
-          }
-        >
-
-          <div
-            className="admin-modal create-order-modal"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-
-            <div className="admin-modal-header">
-
-              <div>
-
-                <span className="eyebrow">
-                  Order Management
-                </span>
-
-                <h2>
-                  Create New Order
-                </h2>
-
-              </div>
-
-
-              <button
-                type="button"
-                className="admin-modal-close"
-                onClick={() =>
-                  setShowCreateModal(false)
-                }
-              >
-                ×
-              </button>
-
-            </div>
-
-
-            <form
-              className="admin-order-form"
-              onSubmit={createOrder}
-            >
-
-              <div className="field">
-
-                <label>
-                  Customer / Company Name
-                </label>
-
-                <input
-                  name="customer"
-                  value={
-                    newOrder.customer
-                  }
-                  onChange={
-                    handleNewOrderChange
-                  }
-                  placeholder="e.g. Kampala Industrial Works"
-                  required
-                />
-
-              </div>
-
-
-              <div className="field">
-
-                <label>
-                  Customer Email
-                </label>
-
-                <input
-                  type="email"
-                  name="email"
-                  value={
-                    newOrder.email
-                  }
-                  onChange={
-                    handleNewOrderChange
-                  }
-                  placeholder="procurement@company.ug"
-                  required
-                />
-
-              </div>
-
-
-              <div className="admin-form-grid">
-
-                <div className="field">
-
-                  <label>
-                    Order Amount
-                  </label>
-
-                  <div className="input-prefix">
-
-                    <span>
-                      UGX
-                    </span>
-
-                    <input
-                      type="number"
-                      name="amount"
-                      min="0"
-                      value={
-                        newOrder.amount
-                      }
-                      onChange={
-                        handleNewOrderChange
-                      }
-                      placeholder="0"
-                      required
+                    <Icon
+                      name="settings"
+                      size={16}
                     />
 
-                  </div>
+                    Mark Processing
 
-                </div>
+                  </button>
+
+                )}
 
 
-                <div className="field">
+                {selectedOrder.status ===
+                  'Processing' && (
 
-                  <label>
-                    Number of Items
-                  </label>
-
-                  <input
-                    type="number"
-                    name="items"
-                    min="1"
-                    value={
-                      newOrder.items
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={
+                      updatingOrderId ===
+                      selectedOrder.databaseId
                     }
-                    onChange={
-                      handleNewOrderChange
+                    onClick={() =>
+                      updateStatus(
+                        selectedOrder,
+                        'Shipped'
+                      )
                     }
-                    required
-                  />
+                  >
 
-                </div>
+                    Mark Shipped
 
-              </div>
+                  </button>
 
-
-              <div className="field">
-
-                <label>
-                  Priority
-                </label>
-
-                <select
-                  name="priority"
-                  value={
-                    newOrder.priority
-                  }
-                  onChange={
-                    handleNewOrderChange
-                  }
-                >
-
-                  <option value="Low">
-                    Low
-                  </option>
-
-                  <option value="Medium">
-                    Medium
-                  </option>
-
-                  <option value="High">
-                    High
-                  </option>
-
-                  <option value="Urgent">
-                    Urgent
-                  </option>
-
-                </select>
-
-              </div>
+                )}
 
 
-              <div className="order-modal-actions">
+                {selectedOrder.status ===
+                  'Shipped' && (
 
-                <button
-                  type="button"
-                  className="btn btn-outline-navy"
-                  onClick={() =>
-                    setShowCreateModal(false)
-                  }
-                >
-                  Cancel
-                </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={
+                      updatingOrderId ===
+                      selectedOrder.databaseId
+                    }
+                    onClick={() =>
+                      updateStatus(
+                        selectedOrder,
+                        'In Transit'
+                      )
+                    }
+                  >
+
+                    Mark In Transit
+
+                  </button>
+
+                )}
 
 
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                >
+                {selectedOrder.status ===
+                  'In Transit' && (
 
-                  <Icon
-                    name="plus"
-                    size={16}
-                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    disabled={
+                      updatingOrderId ===
+                      selectedOrder.databaseId
+                    }
+                    onClick={() =>
+                      updateStatus(
+                        selectedOrder,
+                        'Delivered'
+                      )
+                    }
+                  >
 
-                  Create Order
+                    <Icon
+                      name="check"
+                      size={16}
+                    />
 
-                </button>
+                    Mark Delivered
+
+                  </button>
+
+                )}
 
               </div>
 
-            </form>
+            </div>
 
           </div>
 
@@ -1647,4 +2179,5 @@ export default function AdminOrders() {
     </div>
 
   );
+
 }

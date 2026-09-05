@@ -1,4 +1,6 @@
 import {
+  useCallback,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -9,167 +11,11 @@ import {
 
 import Icon from '../../components/Icon';
 
+import {
+  getAdminDashboard,
+} from '../../services/adminApi';
+
 import './AdminDashboard.css';
-
-
-// ============================================================
-// DASHBOARD STATISTICS
-// ============================================================
-
-const stats = [
-  {
-    label: 'Total Revenue',
-    value: 'UGX 1.28B',
-    change: '+12.5%',
-    up: true,
-    icon: 'bolt',
-    route: '/admin/reports',
-  },
-
-  {
-    label: 'Active Orders',
-    value: '482',
-    change: '+5.2%',
-    up: true,
-    icon: 'cart',
-    route: '/admin/orders',
-  },
-
-  {
-    label: 'Inventory Value',
-    value: 'UGX 4.2B',
-    change: '-2.1%',
-    up: false,
-    icon: 'package',
-    route: '/admin/inventory',
-  },
-
-  {
-    label: 'Avg. Lead Time',
-    value: '4.2 Days',
-    change: '+0.8%',
-    up: true,
-    icon: 'truck',
-    route: '/admin/reports',
-  },
-];
-
-
-// ============================================================
-// RECENT ORDERS
-// ============================================================
-
-const recentOrders = [
-  {
-    id: '#APX-9921',
-    customer: 'Webb Steelworks',
-    date: '2026-07-24',
-    amount: 'UGX 45,200,000',
-    status: 'Delivered',
-    priority: 'High',
-  },
-
-  {
-    id: '#APX-9920',
-    customer: 'Nair Manufacturing',
-    date: '2026-07-23',
-    amount: 'UGX 15,800,000',
-    status: 'Processing',
-    priority: 'Medium',
-  },
-
-  {
-    id: '#APX-9919',
-    customer: 'Alvarez Fabrication',
-    date: '2026-07-23',
-    amount: 'UGX 98,500,000',
-    status: 'Pending',
-    priority: 'Urgent',
-  },
-
-  {
-    id: '#APX-9918',
-    customer: 'Global Trade Hub',
-    date: '2026-07-22',
-    amount: 'UGX 4,600,000',
-    status: 'Shipped',
-    priority: 'Low',
-  },
-
-  {
-    id: '#APX-9917',
-    customer: 'Precision Engineering',
-    date: '2026-07-21',
-    amount: 'UGX 27,400,000',
-    status: 'Processing',
-    priority: 'Medium',
-  },
-];
-
-
-// ============================================================
-// CATEGORY DISTRIBUTION
-// ============================================================
-
-const categoryDist = [
-  {
-    name: 'Industrial Machinery',
-    pct: 35,
-  },
-
-  {
-    name: 'Generators',
-    pct: 22,
-  },
-
-  {
-    name: 'Power Tools',
-    pct: 18,
-  },
-
-  {
-    name: 'Construction Equipment',
-    pct: 12,
-  },
-
-  {
-    name: 'Kitchen & Laundry',
-    pct: 8,
-  },
-
-  {
-    name: 'Safety Equipment',
-    pct: 5,
-  },
-];
-
-
-// ============================================================
-// INVENTORY ALERTS
-// ============================================================
-
-const inventoryAlerts = [
-  {
-    name: 'Industrial Diesel Generator 250 kVA',
-    sku: 'GEN-250KVA',
-    left: 2,
-    total: 5,
-  },
-
-  {
-    name: 'Heavy Duty Air Compressor',
-    sku: 'CMP-HDA-001',
-    left: 3,
-    total: 10,
-  },
-
-  {
-    name: 'Rotary Hammer SDS-Plus Pro',
-    sku: 'PWR-RHP-001',
-    left: 5,
-    total: 20,
-  },
-];
 
 
 // ============================================================
@@ -181,6 +27,8 @@ const statusClass = {
   Processing: 'badge-navy',
   Pending: 'badge-limited',
   Shipped: 'badge-gold',
+  'In Transit': 'badge-gold',
+  Cancelled: 'badge-limited',
 };
 
 
@@ -220,103 +68,6 @@ const quickActions = [
 
 
 // ============================================================
-// SALES DATA
-// ============================================================
-
-const salesData = {
-
-  6: {
-    labels: [
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-    ],
-
-    points: [
-      [0, 170],
-      [120, 150],
-      [240, 155],
-      [360, 115],
-      [480, 85],
-      [600, 45],
-    ],
-  },
-
-
-  12: {
-    labels: [
-      'Oct',
-      'Nov',
-      'Dec',
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-    ],
-
-    points: [
-      [0, 180],
-      [55, 170],
-      [110, 160],
-      [165, 168],
-      [220, 145],
-      [275, 150],
-      [330, 130],
-      [385, 120],
-      [440, 100],
-      [495, 90],
-      [550, 65],
-      [600, 45],
-    ],
-  },
-
-};
-
-
-// ============================================================
-// BUSINESS SUMMARY
-// ============================================================
-
-const businessSummary = [
-  {
-    value: '1,280',
-    label: 'Orders this month',
-    icon: 'cart',
-    route: '/admin/orders',
-  },
-
-  {
-    value: '3,240',
-    label: 'Active customers',
-    icon: 'user',
-    route: '/admin/customers',
-  },
-
-  {
-    value: '42,000+',
-    label: 'Products in catalog',
-    icon: 'package',
-    route: '/admin/products',
-  },
-
-  {
-    value: '94.8%',
-    label: 'On-time deliveries',
-    icon: 'truck',
-    route: '/admin/reports',
-  },
-];
-
-
-// ============================================================
 // MANAGEMENT LINKS
 // ============================================================
 
@@ -348,6 +99,133 @@ const managementLinks = [
 
 
 // ============================================================
+// DEFAULT SALES DATA
+// ============================================================
+
+const defaultSalesData = {
+  6: {
+    labels: [],
+    points: [],
+  },
+
+  12: {
+    labels: [],
+    points: [],
+  },
+};
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function formatMoney(value) {
+
+  const number =
+    Number(value || 0);
+
+  return `UGX ${number.toLocaleString()}`;
+
+}
+
+
+function formatNumber(value) {
+
+  return Number(
+    value || 0
+  ).toLocaleString();
+
+}
+
+
+function formatDate(value) {
+
+  if (!value) {
+    return '—';
+  }
+
+
+  const date =
+    new Date(value);
+
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value;
+  }
+
+
+  return date.toLocaleDateString(
+    'en-UG',
+    {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }
+  );
+
+}
+
+
+function normalizeStatus(value) {
+
+  const status =
+    String(
+      value || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    pending: 'Pending',
+    processing: 'Processing',
+    shipped: 'Shipped',
+    in_transit: 'In Transit',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled',
+  };
+
+
+  return (
+    map[status] ||
+    value ||
+    'Pending'
+  );
+
+}
+
+
+function normalizePriority(value) {
+
+  const priority =
+    String(
+      value || 'medium'
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    low: 'Low',
+    medium: 'Medium',
+    high: 'High',
+    urgent: 'Urgent',
+  };
+
+
+  return (
+    map[priority] ||
+    'Medium'
+  );
+
+}
+
+
+// ============================================================
 // ADMIN DASHBOARD
 // ============================================================
 
@@ -357,6 +235,10 @@ export default function AdminDashboard() {
     useNavigate();
 
 
+  // ==========================================================
+  // STATE
+  // ==========================================================
+
   const [
     period,
     setPeriod,
@@ -364,18 +246,553 @@ export default function AdminDashboard() {
     useState('6');
 
 
+  const [
+    dashboard,
+    setDashboard,
+  ] =
+    useState(null);
+
+
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
+
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] =
+    useState(false);
+
+
+  const [
+    error,
+    setError,
+  ] =
+    useState('');
+
+
   // ==========================================================
-  // CURRENT SALES DATA
+  // LOAD DASHBOARD
   // ==========================================================
+
+  const loadDashboard =
+    useCallback(
+      async (
+        silent = false
+      ) => {
+
+        try {
+
+          if (silent) {
+
+            setRefreshing(true);
+
+          } else {
+
+            setLoading(true);
+
+          }
+
+
+          setError('');
+
+
+          const data =
+            await getAdminDashboard();
+
+
+          setDashboard(
+            data || {}
+          );
+
+        } catch (requestError) {
+
+          console.error(
+            'Admin dashboard load error:',
+            requestError
+          );
+
+
+          const message =
+            requestError
+              ?.response
+              ?.data
+              ?.message ||
+            requestError
+              ?.message ||
+            'Unable to load the admin dashboard.';
+
+
+          setError(
+            message
+          );
+
+        } finally {
+
+          setLoading(false);
+
+          setRefreshing(false);
+
+        }
+
+      },
+      []
+    );
+
+
+  // ==========================================================
+  // INITIAL LOAD
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      loadDashboard();
+
+    },
+    [
+      loadDashboard,
+    ]
+  );
+
+
+  // ==========================================================
+  // AUTO REFRESH
+  // ==========================================================
+
+  useEffect(
+    () => {
+
+      const interval =
+        window.setInterval(
+          () => {
+
+            loadDashboard(
+              true
+            );
+
+          },
+          30000
+        );
+
+
+      return () =>
+        window.clearInterval(
+          interval
+        );
+
+    },
+    [
+      loadDashboard,
+    ]
+  );
+
+
+  // ==========================================================
+  // NORMALIZED STATS
+  // ==========================================================
+
+  const stats =
+    useMemo(
+      () => {
+
+        const raw =
+          dashboard?.stats ||
+          {};
+
+
+        return [
+          {
+            label: 'Total Revenue',
+            value:
+              formatMoney(
+                raw.totalRevenue
+              ),
+            change:
+              raw.revenueChange ??
+              null,
+            up:
+              Number(
+                raw.revenueChangeValue ||
+                0
+              ) >= 0,
+            icon: 'bolt',
+            route: '/admin/reports',
+          },
+
+          {
+            label: 'Active Orders',
+            value:
+              formatNumber(
+                raw.activeOrders
+              ),
+            change:
+              raw.activeOrdersChange ??
+              null,
+            up:
+              Number(
+                raw.activeOrdersChangeValue ||
+                0
+              ) >= 0,
+            icon: 'cart',
+            route: '/admin/orders',
+          },
+
+          {
+            label: 'Inventory Value',
+            value:
+              formatMoney(
+                raw.inventoryValue
+              ),
+            change:
+              raw.inventoryValueChange ??
+              null,
+            up:
+              Number(
+                raw.inventoryValueChangeValue ||
+                0
+              ) >= 0,
+            icon: 'package',
+            route: '/admin/inventory',
+          },
+
+          {
+            label: 'Avg. Lead Time',
+            value:
+              `${Number(
+                raw.averageLeadTime ||
+                0
+              ).toFixed(1)} Days`,
+            change:
+              raw.leadTimeChange ??
+              null,
+            up:
+              Number(
+                raw.leadTimeChangeValue ||
+                0
+              ) >= 0,
+            icon: 'truck',
+            route: '/admin/reports',
+          },
+        ];
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
+
+  // ==========================================================
+  // RECENT ORDERS
+  // ==========================================================
+
+  const recentOrders =
+    useMemo(
+      () => {
+
+        const rawOrders =
+          dashboard
+            ?.recentOrders ||
+          [];
+
+
+        return rawOrders.map(
+          (order) => ({
+            databaseId:
+              order.databaseId ||
+              order.id,
+
+            id:
+              order.orderNumber ||
+              order.order_number ||
+              order.displayId ||
+              order.id ||
+              '—',
+
+            customer:
+              order.customer ||
+              order.customerName ||
+              order.customer_name ||
+              order.profile?.name ||
+              order.profiles?.name ||
+              'Unknown customer',
+
+            date:
+              formatDate(
+                order.date ||
+                order.createdAt ||
+                order.created_at
+              ),
+
+            amount:
+              typeof order.amount ===
+              'string'
+                ? order.amount
+                : formatMoney(
+                    order.amount ??
+                    order.total
+                  ),
+
+            status:
+              normalizeStatus(
+                order.status
+              ),
+
+            priority:
+              normalizePriority(
+                order.priority
+              ),
+          })
+        );
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
+
+  // ==========================================================
+  // CATEGORY DISTRIBUTION
+  // ==========================================================
+
+  const categoryDist =
+    useMemo(
+      () => {
+
+        const categories =
+          dashboard
+            ?.categoryDistribution ||
+          dashboard
+            ?.categories ||
+          [];
+
+
+        return categories.map(
+          (category) => ({
+            name:
+              category.name ||
+              category.category ||
+              'Uncategorized',
+
+            pct:
+              Number(
+                category.pct ??
+                category.percentage ??
+                0
+              ),
+          })
+        );
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
+
+  // ==========================================================
+  // INVENTORY ALERTS
+  // ==========================================================
+
+  const inventoryAlerts =
+    useMemo(
+      () => {
+
+        const alerts =
+          dashboard
+            ?.inventoryAlerts ||
+          [];
+
+
+        return alerts.map(
+          (item) => ({
+            id:
+              item.id,
+
+            name:
+              item.name ||
+              item.productName ||
+              item.product_name ||
+              'Unnamed product',
+
+            sku:
+              item.sku ||
+              'N/A',
+
+            left:
+              Number(
+                item.left ??
+                item.stockQuantity ??
+                item.stock_quantity ??
+                0
+              ),
+
+            total:
+              Number(
+                item.total ??
+                item.maxStock ??
+                item.max_stock ??
+                item.lowStockThreshold ??
+                item.low_stock_threshold ??
+                1
+              ),
+          })
+        );
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
+
+  // ==========================================================
+  // SALES DATA
+  // ==========================================================
+
+  const salesData =
+    useMemo(
+      () => {
+
+        return (
+          dashboard?.sales ||
+          defaultSalesData
+        );
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
 
   const currentSales =
     useMemo(
-      () =>
-        salesData[
-          period
-        ] ||
-        salesData['6'],
-      [period]
+      () => {
+
+        const selected =
+          salesData[
+            period
+          ] ||
+          salesData[
+            Number(period)
+          ] ||
+          defaultSalesData[
+            period
+          ];
+
+
+        if (
+          selected?.points?.length
+        ) {
+
+          return selected;
+
+        }
+
+
+        if (
+          selected?.values?.length
+        ) {
+
+          const values =
+            selected.values.map(
+              (value) =>
+                Number(value || 0)
+            );
+
+
+          const maxValue =
+            Math.max(
+              ...values,
+              1
+            );
+
+
+          const width =
+            600;
+
+
+          const topPadding =
+            25;
+
+
+          const bottom =
+            200;
+
+
+          const range =
+            bottom -
+            topPadding;
+
+
+          const step =
+            values.length > 1
+              ? width /
+                (
+                  values.length -
+                  1
+                )
+              : 0;
+
+
+          const points =
+            values.map(
+              (
+                value,
+                index
+              ) => {
+
+                const x =
+                  index *
+                  step;
+
+
+                const ratio =
+                  value /
+                  maxValue;
+
+
+                const y =
+                  bottom -
+                  ratio *
+                  range;
+
+
+                return [
+                  x,
+                  y,
+                ];
+
+              }
+            );
+
+
+          return {
+            labels:
+              selected.labels ||
+              [],
+            points,
+          };
+
+        }
+
+
+        return {
+          labels: [],
+          points: [],
+        };
+
+      },
+      [
+        salesData,
+        period,
+      ]
     );
 
 
@@ -393,11 +810,89 @@ export default function AdminDashboard() {
 
 
   const areaPoints =
-    `${linePoints} 600,220 0,220`;
+    linePoints
+      ? `${linePoints} 600,220 0,220`
+      : '';
 
 
   // ==========================================================
-  // NAVIGATE
+  // BUSINESS SUMMARY
+  // ==========================================================
+
+  const businessSummary =
+    useMemo(
+      () => {
+
+        const summary =
+          dashboard?.summary ||
+          dashboard?.businessSummary ||
+          {};
+
+
+        return [
+          {
+            value:
+              formatNumber(
+                summary.monthlyOrders
+              ),
+            label:
+              'Orders this month',
+            icon:
+              'cart',
+            route:
+              '/admin/orders',
+          },
+
+          {
+            value:
+              formatNumber(
+                summary.activeCustomers
+              ),
+            label:
+              'Active customers',
+            icon:
+              'user',
+            route:
+              '/admin/customers',
+          },
+
+          {
+            value:
+              formatNumber(
+                summary.productCount
+              ),
+            label:
+              'Products in catalog',
+            icon:
+              'package',
+            route:
+              '/admin/products',
+          },
+
+          {
+            value:
+              `${Number(
+                summary.onTimeDelivery ||
+                0
+              ).toFixed(1)}%`,
+            label:
+              'On-time deliveries',
+            icon:
+              'truck',
+            route:
+              '/admin/reports',
+          },
+        ];
+
+      },
+      [
+        dashboard,
+      ]
+    );
+
+
+  // ==========================================================
+  // NAVIGATION
   // ==========================================================
 
   function goTo(route) {
@@ -427,9 +922,41 @@ export default function AdminDashboard() {
       {
         state: {
           orderId:
-            order.id,
+            order.databaseId,
         },
       }
+    );
+
+  }
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
+  if (loading) {
+
+    return (
+
+      <div className="admin-dashboard-page">
+
+        <div className="admin-dashboard-loading">
+
+          <div className="admin-loading-spinner" />
+
+          <h2>
+            Loading dashboard
+          </h2>
+
+          <p>
+            Retrieving the latest Apex
+            Machinery business data.
+          </p>
+
+        </div>
+
+      </div>
+
     );
 
   }
@@ -474,7 +1001,28 @@ export default function AdminDashboard() {
         <div className="admin-header-actions">
 
 
-          {/* NOTIFICATIONS */}
+          <button
+            type="button"
+            className="admin-refresh-button"
+            onClick={() =>
+              loadDashboard(
+                true
+              )
+            }
+            disabled={refreshing}
+          >
+
+            <Icon
+              name="refresh"
+              size={16}
+            />
+
+            {refreshing
+              ? 'Refreshing...'
+              : 'Refresh'}
+
+          </button>
+
 
           <button
             type="button"
@@ -494,15 +1042,21 @@ export default function AdminDashboard() {
             />
 
 
-            <span
-              className="notification-dot"
-              aria-hidden="true"
-            />
+            {Number(
+              dashboard
+                ?.unreadNotifications ||
+              0
+            ) > 0 && (
+
+              <span
+                className="notification-dot"
+                aria-hidden="true"
+              />
+
+            )}
 
           </button>
 
-
-          {/* NEW PROCUREMENT */}
 
           <button
             type="button"
@@ -526,6 +1080,44 @@ export default function AdminDashboard() {
         </div>
 
       </header>
+
+
+      {/* ====================================================
+          ERROR
+      ==================================================== */}
+
+      {error && (
+
+        <div className="admin-dashboard-error">
+
+          <div>
+
+            <strong>
+              Dashboard unavailable
+            </strong>
+
+            <span>
+              {error}
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() =>
+              loadDashboard()
+            }
+          >
+
+            Try Again
+
+          </button>
+
+        </div>
+
+      )}
 
 
       {/* ====================================================
@@ -560,17 +1152,21 @@ export default function AdminDashboard() {
                 </div>
 
 
-                <span
-                  className={
-                    stat.up
-                      ? 'admin-up'
-                      : 'admin-down'
-                  }
-                >
+                {stat.change && (
 
-                  {stat.change}
+                  <span
+                    className={
+                      stat.up
+                        ? 'admin-up'
+                        : 'admin-down'
+                    }
+                  >
 
-                </span>
+                    {stat.change}
+
+                  </span>
+
+                )}
 
               </div>
 
@@ -694,7 +1290,8 @@ export default function AdminDashboard() {
 
 
               <p>
-                Monthly revenue performance
+                Revenue from completed
+                transactions
               </p>
 
             </div>
@@ -724,91 +1321,143 @@ export default function AdminDashboard() {
           </div>
 
 
-          <div className="admin-chart-wrapper">
+          {currentSales.points.length >
+          0 ? (
 
-            <svg
-              viewBox="0 0 600 220"
-              className="admin-chart-svg"
-              preserveAspectRatio="none"
-              role="img"
-              aria-label="Sales performance chart"
-            >
+            <>
 
-              <line
-                x1="0"
-                y1="180"
-                x2="600"
-                y2="180"
-                stroke="rgba(11,31,77,0.08)"
-              />
+              <div className="admin-chart-wrapper">
 
+                <svg
+                  viewBox="0 0 600 220"
+                  className="admin-chart-svg"
+                  preserveAspectRatio="none"
+                  role="img"
+                  aria-label="Sales performance chart"
+                >
 
-              <line
-                x1="0"
-                y1="130"
-                x2="600"
-                y2="130"
-                stroke="rgba(11,31,77,0.08)"
-              />
-
-
-              <line
-                x1="0"
-                y1="80"
-                x2="600"
-                y2="80"
-                stroke="rgba(11,31,77,0.08)"
-              />
-
-
-              <polygon
-                fill="rgba(11,31,77,0.08)"
-                points={areaPoints}
-              />
-
-
-              <polyline
-                fill="none"
-                stroke="#0B1F4D"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                points={linePoints}
-              />
-
-
-              {currentSales.points.map(
-                ([cx, cy]) => (
-
-                  <circle
-                    key={`${cx}-${cy}`}
-                    cx={cx}
-                    cy={cy}
-                    r="5"
-                    fill="#0B1F4D"
+                  <line
+                    x1="0"
+                    y1="180"
+                    x2="600"
+                    y2="180"
+                    stroke="rgba(11,31,77,0.08)"
                   />
 
-                )
-              )}
 
-            </svg>
+                  <line
+                    x1="0"
+                    y1="130"
+                    x2="600"
+                    y2="130"
+                    stroke="rgba(11,31,77,0.08)"
+                  />
 
-          </div>
+
+                  <line
+                    x1="0"
+                    y1="80"
+                    x2="600"
+                    y2="80"
+                    stroke="rgba(11,31,77,0.08)"
+                  />
 
 
-          <div className="admin-chart-labels">
+                  <polygon
+                    fill="rgba(11,31,77,0.08)"
+                    points={
+                      areaPoints
+                    }
+                  />
 
-            {currentSales.labels.map(
-              (label) => (
 
-                <span key={label}>
-                  {label}
-                </span>
+                  <polyline
+                    fill="none"
+                    stroke="#0B1F4D"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    points={
+                      linePoints
+                    }
+                  />
 
-              )
-            )}
 
-          </div>
+                  {currentSales
+                    .points
+                    .map(
+                      (
+                        [
+                          cx,
+                          cy,
+                        ]
+                      ) => (
+
+                        <circle
+                          key={
+                            `${cx}-${cy}`
+                          }
+                          cx={cx}
+                          cy={cy}
+                          r="5"
+                          fill="#0B1F4D"
+                        />
+
+                      )
+                    )}
+
+                </svg>
+
+              </div>
+
+
+              <div className="admin-chart-labels">
+
+                {currentSales
+                  .labels
+                  .map(
+                    (
+                      label,
+                      index
+                    ) => (
+
+                      <span
+                        key={
+                          `${label}-${index}`
+                        }
+                      >
+                        {label}
+                      </span>
+
+                    )
+                  )}
+
+              </div>
+
+            </>
+
+          ) : (
+
+            <div className="admin-dashboard-empty">
+
+              <Icon
+                name="bolt"
+                size={28}
+              />
+
+              <strong>
+                No sales data yet
+              </strong>
+
+              <span>
+                Revenue history will appear
+                when completed orders are
+                recorded.
+              </span>
+
+            </div>
+
+          )}
 
 
           <button
@@ -857,54 +1506,91 @@ export default function AdminDashboard() {
           </div>
 
 
-          <div className="admin-category-list">
+          {categoryDist.length >
+          0 ? (
 
-            {categoryDist.map(
-              (category) => (
+            <div className="admin-category-list">
 
-                <button
-                  key={category.name}
-                  type="button"
-                  className="admin-category-row"
-                  onClick={() =>
-                    goTo(
-                      '/admin/categories'
-                    )
-                  }
-                >
+              {categoryDist.map(
+                (category) => (
 
-                  <div className="admin-category-top">
+                  <button
+                    key={
+                      category.name
+                    }
+                    type="button"
+                    className="admin-category-row"
+                    onClick={() =>
+                      goTo(
+                        '/admin/categories'
+                      )
+                    }
+                  >
 
-                    <span>
-                      {category.name}
-                    </span>
+                    <div className="admin-category-top">
 
-
-                    <strong>
-                      {category.pct}%
-                    </strong>
-
-                  </div>
+                      <span>
+                        {category.name}
+                      </span>
 
 
-                  <div className="admin-bar">
+                      <strong>
+                        {category.pct.toFixed(
+                          1
+                        )}
+                        %
+                      </strong>
 
-                    <div
-                      className="admin-bar-fill"
-                      style={{
-                        width:
-                          `${category.pct}%`,
-                      }}
-                    />
+                    </div>
 
-                  </div>
 
-                </button>
+                    <div className="admin-bar">
 
-              )
-            )}
+                      <div
+                        className="admin-bar-fill"
+                        style={{
+                          width:
+                            `${Math.min(
+                              100,
+                              Math.max(
+                                0,
+                                category.pct
+                              )
+                            )}%`,
+                        }}
+                      />
 
-          </div>
+                    </div>
+
+                  </button>
+
+                )
+              )}
+
+            </div>
+
+          ) : (
+
+            <div className="admin-dashboard-empty">
+
+              <Icon
+                name="grid"
+                size={28}
+              />
+
+              <strong>
+                No category data
+              </strong>
+
+              <span>
+                Category distribution will
+                appear when orders contain
+                categorized products.
+              </span>
+
+            </div>
+
+          )}
 
 
           <button
@@ -954,7 +1640,7 @@ export default function AdminDashboard() {
 
 
               <span>
-                Showing 5 recent orders
+                Latest customer orders
               </span>
 
             </div>
@@ -982,128 +1668,156 @@ export default function AdminDashboard() {
           </div>
 
 
-          <div className="admin-table-wrapper">
+          {recentOrders.length >
+          0 ? (
 
-            <table className="dashboard-table">
+            <div className="admin-table-wrapper">
 
-              <thead>
+              <table className="dashboard-table">
 
-                <tr>
+                <thead>
 
-                  <th>
-                    Order ID
-                  </th>
+                  <tr>
 
-                  <th>
-                    Customer
-                  </th>
+                    <th>
+                      Order ID
+                    </th>
 
-                  <th>
-                    Date
-                  </th>
+                    <th>
+                      Customer
+                    </th>
 
-                  <th>
-                    Amount
-                  </th>
+                    <th>
+                      Date
+                    </th>
 
-                  <th>
-                    Status
-                  </th>
+                    <th>
+                      Amount
+                    </th>
 
-                </tr>
+                    <th>
+                      Status
+                    </th>
 
-              </thead>
+                  </tr>
 
-
-              <tbody>
-
-                {recentOrders.map(
-                  (order) => (
-
-                    <tr
-                      key={order.id}
-                      className="admin-clickable-row"
-                      onClick={() =>
-                        handleOrderClick(
-                          order
-                        )
-                      }
-                    >
-
-                      <td>
-
-                        <strong>
-                          {order.id}
-                        </strong>
-
-                      </td>
+                </thead>
 
 
-                      <td>
+                <tbody>
 
-                        {order.customer}
+                  {recentOrders.map(
+                    (order) => (
 
-                        <br />
+                      <tr
+                        key={
+                          order.databaseId ||
+                          order.id
+                        }
+                        className="admin-clickable-row"
+                        onClick={() =>
+                          handleOrderClick(
+                            order
+                          )
+                        }
+                      >
 
+                        <td>
 
-                        <small
-                          className={
-                            `admin-priority priority-${order.priority.toLowerCase()}`
-                          }
-                        >
+                          <strong>
+                            {order.id}
+                          </strong>
 
-                          {order.priority}
-                          {' '}
-                          priority
-
-                        </small>
-
-                      </td>
-
-
-                      <td>
-                        {order.date}
-                      </td>
-
-
-                      <td>
-
-                        <strong>
-                          {order.amount}
-                        </strong>
-
-                      </td>
+                        </td>
 
 
-                      <td>
+                        <td>
 
-                        <span
-                          className={
-                            `badge ${
-                              statusClass[
-                                order.status
-                              ] ||
-                              'badge-navy'
-                            }`
-                          }
-                        >
+                          {order.customer}
 
-                          {order.status}
+                          <br />
 
-                        </span>
 
-                      </td>
+                          <small
+                            className={
+                              `admin-priority priority-${order.priority.toLowerCase()}`
+                            }
+                          >
 
-                    </tr>
+                            {order.priority}
+                            {' '}
+                            priority
 
-                  )
-                )}
+                          </small>
 
-              </tbody>
+                        </td>
 
-            </table>
 
-          </div>
+                        <td>
+                          {order.date}
+                        </td>
+
+
+                        <td>
+
+                          <strong>
+                            {order.amount}
+                          </strong>
+
+                        </td>
+
+
+                        <td>
+
+                          <span
+                            className={
+                              `badge ${
+                                statusClass[
+                                  order.status
+                                ] ||
+                                'badge-navy'
+                              }`
+                            }
+                          >
+
+                            {order.status}
+
+                          </span>
+
+                        </td>
+
+                      </tr>
+
+                    )
+                  )}
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          ) : (
+
+            <div className="admin-dashboard-empty">
+
+              <Icon
+                name="cart"
+                size={30}
+              />
+
+              <strong>
+                No orders yet
+              </strong>
+
+              <span>
+                Customer orders will appear
+                here after they are placed.
+              </span>
+
+            </div>
+
+          )}
 
         </div>
 
@@ -1139,78 +1853,117 @@ export default function AdminDashboard() {
           </div>
 
 
-          <div className="admin-alert-list">
+          {inventoryAlerts.length >
+          0 ? (
 
-            {inventoryAlerts.map(
-              (item) => {
+            <div className="admin-alert-list">
 
-                const percentage =
-                  Math.min(
-                    100,
+              {inventoryAlerts.map(
+                (item) => {
+
+                  const safeTotal =
                     Math.max(
-                      0,
-                      (
-                        item.left /
-                        item.total
-                      ) * 100
-                    )
+                      Number(
+                        item.total ||
+                        1
+                      ),
+                      1
+                    );
+
+
+                  const percentage =
+                    Math.min(
+                      100,
+                      Math.max(
+                        0,
+                        (
+                          item.left /
+                          safeTotal
+                        ) *
+                        100
+                      )
+                    );
+
+
+                  return (
+
+                    <button
+                      key={
+                        item.id ||
+                        item.sku
+                      }
+                      type="button"
+                      className="admin-alert-item"
+                      onClick={() =>
+                        goTo(
+                          '/admin/inventory'
+                        )
+                      }
+                    >
+
+                      <div className="admin-alert-top">
+
+                        <strong>
+                          {item.name}
+                        </strong>
+
+
+                        <span>
+                          {item.left}
+                          /
+                          {safeTotal}
+                        </span>
+
+                      </div>
+
+
+                      <small>
+                        {item.sku}
+                      </small>
+
+
+                      <div className="admin-bar">
+
+                        <div
+                          className="admin-bar-fill warn"
+                          style={{
+                            width:
+                              `${percentage}%`,
+                          }}
+                        />
+
+                      </div>
+
+                    </button>
+
                   );
 
+                }
+              )}
 
-                return (
+            </div>
 
-                  <button
-                    key={item.sku}
-                    type="button"
-                    className="admin-alert-item"
-                    onClick={() =>
-                      goTo(
-                        '/admin/inventory'
-                      )
-                    }
-                  >
+          ) : (
 
-                    <div className="admin-alert-top">
+            <div className="admin-dashboard-empty">
 
-                      <strong>
-                        {item.name}
-                      </strong>
+              <Icon
+                name="package"
+                size={28}
+              />
 
+              <strong>
+                Inventory healthy
+              </strong>
 
-                      <span>
-                        {item.left}
-                        /
-                        {item.total}
-                      </span>
+              <span>
+                No low-stock products are
+                currently reported.
+              </span>
 
-                    </div>
+            </div>
 
-
-                    <small>
-                      {item.sku}
-                    </small>
-
-
-                    <div className="admin-bar">
-
-                      <div
-                        className="admin-bar-fill warn"
-                        style={{
-                          width:
-                            `${percentage}%`,
-                        }}
-                      />
-
-                    </div>
-
-                  </button>
-
-                );
-
-              }
-            )}
-
-          </div>
+          )}
 
 
           <button

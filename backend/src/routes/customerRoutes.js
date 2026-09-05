@@ -1,4 +1,6 @@
-import { Router } from 'express';
+import {
+  Router,
+} from 'express';
 
 import {
   requireAuth,
@@ -11,19 +13,28 @@ import {
   createAddress,
   deleteAddress,
   setDefaultAddress,
-  removeWishlistItem,
   readNotification,
   readAllNotifications,
   updatePreferences,
   changePassword,
   requestCreditTopup,
+  createOrder,
 } from '../controllers/customerController.js';
 
-const router = Router();
+import {
+  getWishlist,
+  addWishlistItem,
+  removeWishlistItem,
+  clearWishlist,
+} from '../controllers/wishlistController.js';
+
+
+const router =
+  Router();
 
 
 // ============================================================
-// ALL CUSTOMER ROUTES REQUIRE LOGIN + CUSTOMER ROLE
+// ALL CUSTOMER ROUTES REQUIRE AUTHENTICATION
 // ============================================================
 
 router.use(
@@ -34,7 +45,6 @@ router.use(
 
 // ============================================================
 // DASHBOARD
-// GET /api/customer/dashboard
 // ============================================================
 
 router.get(
@@ -44,8 +54,17 @@ router.get(
 
 
 // ============================================================
+// ORDERS
+// ============================================================
+
+router.post(
+  '/orders',
+  createOrder
+);
+
+
+// ============================================================
 // PROFILE
-// PATCH /api/customer/profile
 // ============================================================
 
 router.patch(
@@ -63,10 +82,12 @@ router.post(
   createAddress
 );
 
+
 router.delete(
   '/addresses/:id',
   deleteAddress
 );
+
 
 router.patch(
   '/addresses/:id/default',
@@ -76,7 +97,28 @@ router.patch(
 
 // ============================================================
 // WISHLIST
+//
+// IMPORTANT:
+// /wishlist must be before /wishlist/:id where appropriate.
 // ============================================================
+
+router.get(
+  '/wishlist',
+  getWishlist
+);
+
+
+router.post(
+  '/wishlist',
+  addWishlistItem
+);
+
+
+router.delete(
+  '/wishlist',
+  clearWishlist
+);
+
 
 router.delete(
   '/wishlist/:id',
@@ -86,13 +128,13 @@ router.delete(
 
 // ============================================================
 // NOTIFICATIONS
-// IMPORTANT: read-all must come before :id/read
 // ============================================================
 
 router.patch(
   '/notifications/read-all',
   readAllNotifications
 );
+
 
 router.patch(
   '/notifications/:id/read',
@@ -129,5 +171,9 @@ router.post(
   requestCreditTopup
 );
 
+
+// ============================================================
+// EXPORT
+// ============================================================
 
 export default router;

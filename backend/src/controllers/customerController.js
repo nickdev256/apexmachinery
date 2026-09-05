@@ -13,40 +13,505 @@ import {
 // ============================================================
 
 function clean(value) {
+
   return String(
     value ?? ''
   ).trim();
+
 }
 
 
 function money(value) {
-  return Number(value || 0);
+
+  const number =
+    Number(
+      value || 0
+    );
+
+  return Number.isFinite(
+    number
+  )
+    ? number
+    : 0;
+
 }
 
 
-function formatOrderStatus(status) {
-  const map = {
-    pending: 'Pending',
-    processing: 'Processing',
-    in_transit: 'In Transit',
-    delivered: 'Delivered',
-    cancelled: 'Cancelled',
-  };
+// ============================================================
+// UUID VALIDATION
+//
+// Frontend products currently use IDs such as:
+//
+// 1
+// 2
+// 3
+//
+// But Supabase order_items.product_id expects UUID.
+//
+// Until products are stored in Supabase, only actual UUID
+// values are allowed through. Other IDs become null.
+// ============================================================
 
-  return map[status] || status;
+function isUuid(value) {
+
+  if (!value) {
+    return false;
+  }
+
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(
+      value
+    ).trim()
+  );
+
 }
 
 
-function formatInvoiceStatus(status) {
+function formatOrderStatus(
+  status
+) {
+
+  const value =
+    String(
+      status || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
   const map = {
-    pending: 'Pending',
-    due_soon: 'Due Soon',
-    paid: 'Paid',
-    overdue: 'Overdue',
-    cancelled: 'Cancelled',
+    pending:
+      'Pending',
+
+    processing:
+      'Processing',
+
+    shipped:
+      'Shipped',
+
+    in_transit:
+      'In Transit',
+
+    delivered:
+      'Delivered',
+
+    cancelled:
+      'Cancelled',
   };
 
-  return map[status] || status;
+
+  return (
+    map[value] ||
+    status ||
+    'Pending'
+  );
+
+}
+
+
+function formatInvoiceStatus(
+  status
+) {
+
+  const value =
+    String(
+      status || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const map = {
+    pending:
+      'Pending',
+
+    due_soon:
+      'Due Soon',
+
+    paid:
+      'Paid',
+
+    overdue:
+      'Overdue',
+
+    cancelled:
+      'Cancelled',
+  };
+
+
+  return (
+    map[value] ||
+    status ||
+    'Pending'
+  );
+
+}
+
+
+function normalizeProfile(
+  profile
+) {
+
+  if (!profile) {
+    return null;
+  }
+
+
+  return {
+    id:
+      profile.id,
+
+    name:
+      profile.name || '',
+
+    company:
+      profile.company || '',
+
+    email:
+      profile.email || '',
+
+    phone:
+      profile.phone || '',
+
+    role:
+      profile.role || 'customer',
+
+    memberSince:
+      profile.member_since ||
+      profile.created_at ||
+      null,
+
+    updatedAt:
+      profile.updated_at ||
+      null,
+  };
+
+}
+
+
+function normalizeAddress(
+  address
+) {
+
+  if (!address) {
+    return null;
+  }
+
+
+  return {
+    id:
+      address.id,
+
+    title:
+      address.title || '',
+
+    name:
+      address.contact_name || '',
+
+    company:
+      address.company || '',
+
+    address:
+      address.address || '',
+
+    city:
+      address.city || '',
+
+    phone:
+      address.phone || '',
+
+    default:
+      Boolean(
+        address.is_default
+      ),
+
+    createdAt:
+      address.created_at ||
+      null,
+
+    updatedAt:
+      address.updated_at ||
+      null,
+  };
+
+}
+
+
+function normalizeOrderItem(
+  item
+) {
+
+  return {
+    id:
+      item.id,
+
+    productId:
+      item.product_id ||
+      null,
+
+    name:
+      item.product_name ||
+      '',
+
+    productName:
+      item.product_name ||
+      '',
+
+    sku:
+      item.sku || '',
+
+    quantity:
+      Number(
+        item.quantity ||
+        0
+      ),
+
+    unitPrice:
+      money(
+        item.unit_price
+      ),
+
+    totalPrice:
+      money(
+        item.total_price
+      ),
+  };
+
+}
+
+
+function normalizeOrder(
+  order
+) {
+
+  const items =
+    (
+      order.order_items ||
+      []
+    ).map(
+      normalizeOrderItem
+    );
+
+
+  return {
+    id:
+      order.order_number,
+
+    databaseId:
+      order.id,
+
+    items:
+      `${items.length} ${
+        items.length === 1
+          ? 'Item'
+          : 'Items'
+      }`,
+
+    itemCount:
+      items.length,
+
+    orderItems:
+      items,
+
+    status:
+      formatOrderStatus(
+        order.status
+      ),
+
+    rawStatus:
+      order.status,
+
+    subtotal:
+      money(
+        order.subtotal
+      ),
+
+    deliveryFee:
+      money(
+        order.delivery_fee
+      ),
+
+    total:
+      money(
+        order.total
+      ),
+
+    currency:
+      order.currency ||
+      'UGX',
+
+    date:
+      order.created_at,
+
+    createdAt:
+      order.created_at,
+
+    updatedAt:
+      order.updated_at,
+
+    priority:
+      order.priority ||
+      'medium',
+
+    estimatedDeliveryDate:
+      order.estimated_delivery_date ||
+      null,
+
+    notes:
+      order.notes || '',
+
+    shippingAddress:
+      order.shipping_address ||
+      null,
+  };
+
+}
+
+
+function normalizeInvoice(
+  invoice
+) {
+
+  return {
+    id:
+      invoice.invoice_number,
+
+    databaseId:
+      invoice.id,
+
+    orderId:
+      invoice.order_id,
+
+    amount:
+      money(
+        invoice.amount
+      ),
+
+    currency:
+      invoice.currency ||
+      'UGX',
+
+    date:
+      invoice.issue_date,
+
+    due:
+      invoice.due_date,
+
+    paidAt:
+      invoice.paid_at ||
+      null,
+
+    status:
+      formatInvoiceStatus(
+        invoice.status
+      ),
+
+    rawStatus:
+      invoice.status,
+
+    createdAt:
+      invoice.created_at,
+
+    updatedAt:
+      invoice.updated_at,
+  };
+
+}
+
+
+function normalizeWishlistItem(
+  item
+) {
+
+  return {
+    id:
+      item.id,
+
+    productId:
+      item.product_id,
+
+    name:
+      item.product_name ||
+      '',
+
+    category:
+      item.category || '',
+
+    price:
+      money(
+        item.price
+      ),
+
+    stock:
+      item.stock_status ||
+      'Unknown',
+
+    createdAt:
+      item.created_at,
+  };
+
+}
+
+
+function normalizeNotification(
+  notification
+) {
+
+  return {
+    id:
+      notification.id,
+
+    title:
+      notification.title ||
+      '',
+
+    text:
+      notification.message ||
+      '',
+
+    type:
+      notification.type ||
+      'general',
+
+    read:
+      Boolean(
+        notification.is_read
+      ),
+
+    createdAt:
+      notification.created_at,
+  };
+
+}
+
+
+function normalizePreferences(
+  preferences
+) {
+
+  return {
+    orderUpdates:
+      preferences
+        ?.order_updates ??
+      true,
+
+    inventoryAlerts:
+      preferences
+        ?.inventory_alerts ??
+      true,
+
+    invoiceReminders:
+      preferences
+        ?.invoice_reminders ??
+      true,
+
+    marketing:
+      preferences
+        ?.marketing ??
+      false,
+  };
+
 }
 
 
@@ -58,7 +523,9 @@ export async function dashboard(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
@@ -72,25 +539,44 @@ export async function dashboard(
       notificationsResult,
       preferencesResult,
       creditResult,
+      creditTransactionsResult,
     ] =
       await Promise.all([
 
         supabaseAdmin
           .from('profiles')
           .select('*')
-          .eq('id', customerId)
+          .eq(
+            'id',
+            customerId
+          )
           .single(),
 
+
         supabaseAdmin
-          .from('customer_addresses')
+          .from(
+            'customer_addresses'
+          )
           .select('*')
-          .eq('customer_id', customerId)
+          .eq(
+            'customer_id',
+            customerId
+          )
           .order(
             'is_default',
             {
-              ascending: false,
+              ascending:
+                false,
+            }
+          )
+          .order(
+            'created_at',
+            {
+              ascending:
+                false,
             }
           ),
+
 
         supabaseAdmin
           .from('orders')
@@ -113,9 +599,11 @@ export async function dashboard(
           .order(
             'created_at',
             {
-              ascending: false,
+              ascending:
+                false,
             }
           ),
+
 
         supabaseAdmin
           .from('invoices')
@@ -127,12 +615,16 @@ export async function dashboard(
           .order(
             'created_at',
             {
-              ascending: false,
+              ascending:
+                false,
             }
           ),
 
+
         supabaseAdmin
-          .from('wishlist_items')
+          .from(
+            'wishlist_items'
+          )
           .select('*')
           .eq(
             'customer_id',
@@ -141,12 +633,16 @@ export async function dashboard(
           .order(
             'created_at',
             {
-              ascending: false,
+              ascending:
+                false,
             }
           ),
 
+
         supabaseAdmin
-          .from('notifications')
+          .from(
+            'notifications'
+          )
           .select('*')
           .eq(
             'customer_id',
@@ -155,12 +651,16 @@ export async function dashboard(
           .order(
             'created_at',
             {
-              ascending: false,
+              ascending:
+                false,
             }
           ),
 
+
         supabaseAdmin
-          .from('customer_preferences')
+          .from(
+            'customer_preferences'
+          )
           .select('*')
           .eq(
             'customer_id',
@@ -168,21 +668,58 @@ export async function dashboard(
           )
           .maybeSingle(),
 
+
         supabaseAdmin
-          .from('customer_credit_accounts')
+          .from(
+            'customer_credit_accounts'
+          )
           .select('*')
           .eq(
             'customer_id',
             customerId
           )
           .maybeSingle(),
+
+
+        supabaseAdmin
+          .from(
+            'credit_transactions'
+          )
+          .select(`
+            id,
+            amount,
+            transaction_type,
+            status,
+            reference,
+            description,
+            created_at,
+            updated_at
+          `)
+          .eq(
+            'customer_id',
+            customerId
+          )
+          .order(
+            'created_at',
+            {
+              ascending:
+                false,
+            }
+          )
+          .limit(20),
       ]);
 
+
+    // ========================================================
+    // QUERY ERRORS
+    // ========================================================
 
     if (
       profileResult.error
     ) {
+
       throw profileResult.error;
+
     }
 
 
@@ -194,57 +731,30 @@ export async function dashboard(
       notificationsResult.error,
       preferencesResult.error,
       creditResult.error,
+      creditTransactionsResult.error,
     ].filter(Boolean);
 
 
     if (
-      queryErrors.length > 0
+      queryErrors.length >
+      0
     ) {
+
       throw queryErrors[0];
+
     }
 
+
+    // ========================================================
+    // NORMALIZE DATA
+    // ========================================================
 
     const orders =
       (
         ordersResult.data ||
         []
       ).map(
-        (order) => ({
-          id:
-            order.order_number,
-
-          databaseId:
-            order.id,
-
-          items:
-            `${order.order_items?.length || 0} ${
-              order.order_items?.length === 1
-                ? 'Item'
-                : 'Items'
-            }`,
-
-          orderItems:
-            order.order_items || [],
-
-          status:
-            formatOrderStatus(
-              order.status
-            ),
-
-          total:
-            money(
-              order.total
-            ),
-
-          date:
-            order.created_at,
-
-          priority:
-            order.priority,
-
-          estimatedDeliveryDate:
-            order.estimated_delivery_date,
-        })
+        normalizeOrder
       );
 
 
@@ -253,32 +763,7 @@ export async function dashboard(
         invoicesResult.data ||
         []
       ).map(
-        (invoice) => ({
-          id:
-            invoice.invoice_number,
-
-          databaseId:
-            invoice.id,
-
-          orderId:
-            invoice.order_id,
-
-          amount:
-            money(
-              invoice.amount
-            ),
-
-          date:
-            invoice.issue_date,
-
-          due:
-            invoice.due_date,
-
-          status:
-            formatInvoiceStatus(
-              invoice.status
-            ),
-        })
+        normalizeInvoice
       );
 
 
@@ -286,33 +771,11 @@ export async function dashboard(
       (
         addressesResult.data ||
         []
-      ).map(
-        (address) => ({
-          id:
-            address.id,
-
-          title:
-            address.title,
-
-          name:
-            address.contact_name,
-
-          company:
-            address.company || '',
-
-          address:
-            address.address,
-
-          city:
-            address.city,
-
-          phone:
-            address.phone || '',
-
-          default:
-            address.is_default,
-        })
-      );
+      )
+        .map(
+          normalizeAddress
+        )
+        .filter(Boolean);
 
 
     const wishlist =
@@ -320,28 +783,7 @@ export async function dashboard(
         wishlistResult.data ||
         []
       ).map(
-        (item) => ({
-          id:
-            item.id,
-
-          productId:
-            item.product_id,
-
-          name:
-            item.product_name,
-
-          category:
-            item.category,
-
-          price:
-            money(
-              item.price
-            ),
-
-          stock:
-            item.stock_status ||
-            'Unknown',
-        })
+        normalizeWishlistItem
       );
 
 
@@ -350,34 +792,66 @@ export async function dashboard(
         notificationsResult.data ||
         []
       ).map(
-        (notification) => ({
+        normalizeNotification
+      );
+
+
+    const unreadNotifications =
+      notifications.filter(
+        (item) =>
+          !item.read
+      ).length;
+
+
+    const creditTransactions =
+      (
+        creditTransactionsResult.data ||
+        []
+      ).map(
+        (transaction) => ({
           id:
-            notification.id,
+            transaction.id,
 
-          title:
-            notification.title,
-
-          text:
-            notification.message,
+          amount:
+            money(
+              transaction.amount
+            ),
 
           type:
-            notification.type,
+            transaction.transaction_type,
 
-          read:
-            notification.is_read,
+          status:
+            transaction.status,
+
+          reference:
+            transaction.reference,
+
+          description:
+            transaction.description ||
+            '',
 
           createdAt:
-            notification.created_at,
+            transaction.created_at,
+
+          updatedAt:
+            transaction.updated_at,
         })
       );
 
 
+    // ========================================================
+    // RESPONSE
+    // ========================================================
+
     return res.json({
       success: true,
 
-      dashboard: {
+      data: {
+
         profile:
-          profileResult.data,
+          normalizeProfile(
+            profileResult.data
+          ),
 
         orders,
 
@@ -389,36 +863,46 @@ export async function dashboard(
 
         notifications,
 
+        unreadNotifications,
+
         preferences:
-          preferencesResult.data || {
-            order_updates: true,
-            inventory_alerts: true,
-            invoice_reminders: true,
-            marketing: false,
-          },
+          normalizePreferences(
+            preferencesResult.data
+          ),
 
         credit: {
           balance:
             money(
-              creditResult.data?.balance
+              creditResult
+                .data
+                ?.balance
             ),
+
+          transactions:
+            creditTransactions,
         },
       },
     });
+
   } catch (error) {
+
     console.error(
-      'Customer dashboard error:',
+      '[CUSTOMER DASHBOARD ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
         success: false,
+
         message:
           'Unable to load customer dashboard.',
       });
+
   }
+
 }
 
 
@@ -430,31 +914,45 @@ export async function updateProfile(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
 
     const name =
-      clean(req.body.name);
+      clean(
+        req.body.name
+      );
+
 
     const company =
-      clean(req.body.company);
+      clean(
+        req.body.company
+      );
+
 
     const phone =
-      clean(req.body.phone);
+      clean(
+        req.body.phone
+      );
 
 
     if (
       name.length < 2
     ) {
+
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
             'Valid name is required.',
         });
+
     }
 
 
@@ -466,23 +964,31 @@ export async function updateProfile(
         .from('profiles')
         .update({
           name,
+
           company:
-            company || null,
+            company ||
+            null,
+
           phone:
-            phone || null,
+            phone ||
+            null,
+
           updated_at:
-            new Date().toISOString(),
+            new Date()
+              .toISOString(),
         })
         .eq(
           'id',
           customerId
         )
-        .select()
+        .select('*')
         .single();
 
 
     if (error) {
+
       throw error;
+
     }
 
 
@@ -506,22 +1012,33 @@ export async function updateProfile(
 
     return res.json({
       success: true,
-      profile: data,
+
+      data:
+        normalizeProfile(
+          data
+        ),
     });
+
   } catch (error) {
+
     console.error(
-      'Update profile error:',
+      '[UPDATE PROFILE ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update profile.',
       });
+
   }
+
 }
 
 
@@ -533,28 +1050,49 @@ export async function createAddress(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
 
     const title =
-      clean(req.body.title);
+      clean(
+        req.body.title
+      );
+
 
     const contactName =
-      clean(req.body.name);
+      clean(
+        req.body.name ??
+        req.body.contactName ??
+        req.body.contact_name
+      );
+
 
     const company =
-      clean(req.body.company);
+      clean(
+        req.body.company
+      );
+
 
     const address =
-      clean(req.body.address);
+      clean(
+        req.body.address
+      );
+
 
     const city =
-      clean(req.body.city);
+      clean(
+        req.body.city
+      );
+
 
     const phone =
-      clean(req.body.phone);
+      clean(
+        req.body.phone
+      );
 
 
     if (
@@ -563,13 +1101,17 @@ export async function createAddress(
       !address ||
       !city
     ) {
+
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
-            'Required address fields are missing.',
+            'Title, contact name, address and city are required.',
         });
+
     }
 
 
@@ -579,12 +1121,17 @@ export async function createAddress(
         countError,
     } =
       await supabaseAdmin
-        .from('customer_addresses')
+        .from(
+          'customer_addresses'
+        )
         .select(
           'id',
           {
-            count: 'exact',
-            head: true,
+            count:
+              'exact',
+
+            head:
+              true,
           }
         )
         .eq(
@@ -593,8 +1140,12 @@ export async function createAddress(
         );
 
 
-    if (countError) {
+    if (
+      countError
+    ) {
+
       throw countError;
+
     }
 
 
@@ -603,7 +1154,9 @@ export async function createAddress(
       error,
     } =
       await supabaseAdmin
-        .from('customer_addresses')
+        .from(
+          'customer_addresses'
+        )
         .insert({
           customer_id:
             customerId,
@@ -614,24 +1167,34 @@ export async function createAddress(
             contactName,
 
           company:
-            company || null,
+            company ||
+            null,
 
           address,
 
           city,
 
           phone:
-            phone || null,
+            phone ||
+            null,
 
           is_default:
-            (count || 0) === 0,
+            (
+              count || 0
+            ) === 0,
+
+          updated_at:
+            new Date()
+              .toISOString(),
         })
-        .select()
+        .select('*')
         .single();
 
 
     if (error) {
+
       throw error;
+
     }
 
 
@@ -656,23 +1219,35 @@ export async function createAddress(
     return res
       .status(201)
       .json({
-        success: true,
-        address: data,
+        success:
+          true,
+
+        data:
+          normalizeAddress(
+            data
+          ),
       });
+
   } catch (error) {
+
     console.error(
-      'Create address error:',
+      '[CREATE ADDRESS ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to create address.',
       });
+
   }
+
 }
 
 
@@ -684,9 +1259,12 @@ export async function deleteAddress(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
+
 
     const {
       id,
@@ -697,6 +1275,7 @@ export async function deleteAddress(
     const {
       data:
         existing,
+
       error:
         findError,
     } =
@@ -705,7 +1284,10 @@ export async function deleteAddress(
           'customer_addresses'
         )
         .select('*')
-        .eq('id', id)
+        .eq(
+          'id',
+          id
+        )
         .eq(
           'customer_id',
           customerId
@@ -713,19 +1295,29 @@ export async function deleteAddress(
         .maybeSingle();
 
 
-    if (findError) {
+    if (
+      findError
+    ) {
+
       throw findError;
+
     }
 
 
-    if (!existing) {
+    if (
+      !existing
+    ) {
+
       return res
         .status(404)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
             'Address not found.',
         });
+
     }
 
 
@@ -737,7 +1329,10 @@ export async function deleteAddress(
           'customer_addresses'
         )
         .delete()
-        .eq('id', id)
+        .eq(
+          'id',
+          id
+        )
         .eq(
           'customer_id',
           customerId
@@ -745,16 +1340,26 @@ export async function deleteAddress(
 
 
     if (error) {
+
       throw error;
+
     }
 
+
+    // ========================================================
+    // IF DEFAULT WAS DELETED, PICK ANOTHER DEFAULT
+    // ========================================================
 
     if (
       existing.is_default
     ) {
+
       const {
         data:
           remaining,
+
+        error:
+          remainingError,
       } =
         await supabaseAdmin
           .from(
@@ -768,27 +1373,58 @@ export async function deleteAddress(
           .order(
             'created_at',
             {
-              ascending: true,
+              ascending:
+                true,
             }
           )
           .limit(1);
 
 
       if (
+        remainingError
+      ) {
+
+        throw remainingError;
+
+      }
+
+
+      if (
         remaining?.length
       ) {
-        await supabaseAdmin
-          .from(
-            'customer_addresses'
-          )
-          .update({
-            is_default: true,
-          })
-          .eq(
-            'id',
-            remaining[0].id
-          );
+
+        const {
+          error:
+            defaultError,
+        } =
+          await supabaseAdmin
+            .from(
+              'customer_addresses'
+            )
+            .update({
+              is_default:
+                true,
+
+              updated_at:
+                new Date()
+                  .toISOString(),
+            })
+            .eq(
+              'id',
+              remaining[0].id
+            );
+
+
+        if (
+          defaultError
+        ) {
+
+          throw defaultError;
+
+        }
+
       }
+
     }
 
 
@@ -811,22 +1447,34 @@ export async function deleteAddress(
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data: {
+        id,
+      },
     });
+
   } catch (error) {
+
     console.error(
-      'Delete address error:',
+      '[DELETE ADDRESS ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to delete address.',
       });
+
   }
+
 }
 
 
@@ -838,9 +1486,12 @@ export async function setDefaultAddress(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
+
 
     const {
       id,
@@ -851,6 +1502,7 @@ export async function setDefaultAddress(
     const {
       data:
         address,
+
       error:
         addressError,
     } =
@@ -859,7 +1511,10 @@ export async function setDefaultAddress(
           'customer_addresses'
         )
         .select('id')
-        .eq('id', id)
+        .eq(
+          'id',
+          id
+        )
         .eq(
           'customer_id',
           customerId
@@ -867,19 +1522,29 @@ export async function setDefaultAddress(
         .maybeSingle();
 
 
-    if (addressError) {
+    if (
+      addressError
+    ) {
+
       throw addressError;
+
     }
 
 
-    if (!address) {
+    if (
+      !address
+    ) {
+
       return res
         .status(404)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
             'Address not found.',
         });
+
     }
 
 
@@ -892,7 +1557,12 @@ export async function setDefaultAddress(
           'customer_addresses'
         )
         .update({
-          is_default: false,
+          is_default:
+            false,
+
+          updated_at:
+            new Date()
+              .toISOString(),
         })
         .eq(
           'customer_id',
@@ -900,12 +1570,19 @@ export async function setDefaultAddress(
         );
 
 
-    if (clearError) {
+    if (
+      clearError
+    ) {
+
       throw clearError;
+
     }
 
 
     const {
+      data:
+        updatedAddress,
+
       error:
         updateError,
     } =
@@ -914,15 +1591,31 @@ export async function setDefaultAddress(
           'customer_addresses'
         )
         .update({
-          is_default: true,
+          is_default:
+            true,
+
           updated_at:
-            new Date().toISOString(),
+            new Date()
+              .toISOString(),
         })
-        .eq('id', id);
+        .eq(
+          'id',
+          id
+        )
+        .eq(
+          'customer_id',
+          customerId
+        )
+        .select('*')
+        .single();
 
 
-    if (updateError) {
+    if (
+      updateError
+    ) {
+
       throw updateError;
+
     }
 
 
@@ -945,22 +1638,35 @@ export async function setDefaultAddress(
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data:
+        normalizeAddress(
+          updatedAddress
+        ),
     });
+
   } catch (error) {
+
     console.error(
-      'Default address error:',
+      '[DEFAULT ADDRESS ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update default address.',
       });
+
   }
+
 }
 
 
@@ -972,14 +1678,66 @@ export async function removeWishlistItem(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
+
 
     const {
       id,
     } =
       req.params;
+
+
+    const {
+      data:
+        existing,
+
+      error:
+        findError,
+    } =
+      await supabaseAdmin
+        .from(
+          'wishlist_items'
+        )
+        .select('id')
+        .eq(
+          'id',
+          id
+        )
+        .eq(
+          'customer_id',
+          customerId
+        )
+        .maybeSingle();
+
+
+    if (
+      findError
+    ) {
+
+      throw findError;
+
+    }
+
+
+    if (
+      !existing
+    ) {
+
+      return res
+        .status(404)
+        .json({
+          success:
+            false,
+
+          message:
+            'Wishlist item not found.',
+        });
+
+    }
 
 
     const {
@@ -990,7 +1748,10 @@ export async function removeWishlistItem(
           'wishlist_items'
         )
         .delete()
-        .eq('id', id)
+        .eq(
+          'id',
+          id
+        )
         .eq(
           'customer_id',
           customerId
@@ -998,7 +1759,9 @@ export async function removeWishlistItem(
 
 
     if (error) {
+
       throw error;
+
     }
 
 
@@ -1021,22 +1784,34 @@ export async function removeWishlistItem(
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data: {
+        id,
+      },
     });
+
   } catch (error) {
+
     console.error(
-      'Remove wishlist error:',
+      '[REMOVE WISHLIST ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to remove wishlist item.',
       });
+
   }
+
 }
 
 
@@ -1048,9 +1823,12 @@ export async function readNotification(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
+
 
     const {
       id,
@@ -1059,54 +1837,97 @@ export async function readNotification(
 
 
     const {
+      data,
       error,
     } =
       await supabaseAdmin
-        .from('notifications')
+        .from(
+          'notifications'
+        )
         .update({
-          is_read: true,
+          is_read:
+            true,
         })
-        .eq('id', id)
+        .eq(
+          'id',
+          id
+        )
         .eq(
           'customer_id',
           customerId
-        );
+        )
+        .select('*')
+        .maybeSingle();
 
 
     if (error) {
+
       throw error;
+
+    }
+
+
+    if (
+      !data
+    ) {
+
+      return res
+        .status(404)
+        .json({
+          success:
+            false,
+
+          message:
+            'Notification not found.',
+        });
+
     }
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data:
+        normalizeNotification(
+          data
+        ),
     });
+
   } catch (error) {
+
     console.error(
-      'Notification read error:',
+      '[NOTIFICATION READ ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update notification.',
       });
+
   }
+
 }
 
 
 // ============================================================
-// READ ALL
+// READ ALL NOTIFICATIONS
 // ============================================================
 
 export async function readAllNotifications(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
@@ -1115,9 +1936,12 @@ export async function readAllNotifications(
       error,
     } =
       await supabaseAdmin
-        .from('notifications')
+        .from(
+          'notifications'
+        )
         .update({
-          is_read: true,
+          is_read:
+            true,
         })
         .eq(
           'customer_id',
@@ -1130,27 +1954,42 @@ export async function readAllNotifications(
 
 
     if (error) {
+
       throw error;
+
     }
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data: {
+        readAll:
+          true,
+      },
     });
+
   } catch (error) {
+
     console.error(
-      'Read all notification error:',
+      '[READ ALL NOTIFICATIONS ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update notifications.',
       });
+
   }
+
 }
 
 
@@ -1162,9 +2001,30 @@ export async function updatePreferences(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
+
+
+    const orderUpdates =
+      req.body.orderUpdates ??
+      req.body.order_updates;
+
+
+    const inventoryAlerts =
+      req.body.inventoryAlerts ??
+      req.body.inventory_alerts;
+
+
+    const invoiceReminders =
+      req.body.invoiceReminders ??
+      req.body.invoice_reminders;
+
+
+    const marketing =
+      req.body.marketing;
 
 
     const payload = {
@@ -1172,27 +2032,36 @@ export async function updatePreferences(
         customerId,
 
       order_updates:
-        Boolean(
-          req.body.orderUpdates
-        ),
+        orderUpdates === undefined
+          ? true
+          : Boolean(
+              orderUpdates
+            ),
 
       inventory_alerts:
-        Boolean(
-          req.body.inventoryAlerts
-        ),
+        inventoryAlerts === undefined
+          ? true
+          : Boolean(
+              inventoryAlerts
+            ),
 
       invoice_reminders:
-        Boolean(
-          req.body.invoiceReminders
-        ),
+        invoiceReminders === undefined
+          ? true
+          : Boolean(
+              invoiceReminders
+            ),
 
       marketing:
-        Boolean(
-          req.body.marketing
-        ),
+        marketing === undefined
+          ? false
+          : Boolean(
+              marketing
+            ),
 
       updated_at:
-        new Date().toISOString(),
+        new Date()
+          .toISOString(),
     };
 
 
@@ -1211,12 +2080,14 @@ export async function updatePreferences(
               'customer_id',
           }
         )
-        .select()
+        .select('*')
         .single();
 
 
     if (error) {
+
       throw error;
+
     }
 
 
@@ -1239,23 +2110,35 @@ export async function updatePreferences(
 
 
     return res.json({
-      success: true,
-      preferences: data,
+      success:
+        true,
+
+      data:
+        normalizePreferences(
+          data
+        ),
     });
+
   } catch (error) {
+
     console.error(
-      'Preferences error:',
+      '[PREFERENCES ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update preferences.',
       });
+
   }
+
 }
 
 
@@ -1267,7 +2150,9 @@ export async function changePassword(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
@@ -1287,21 +2172,62 @@ export async function changePassword(
 
 
     if (
-      newPassword.length < 6
+      !currentPassword
     ) {
+
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
+
+          message:
+            'Current password is required.',
+        });
+
+    }
+
+
+    if (
+      newPassword.length <
+      6
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
           message:
             'New password must be at least 6 characters.',
         });
+
+    }
+
+
+    if (
+      currentPassword ===
+      newPassword
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            'New password must be different from the current password.',
+        });
+
     }
 
 
     const {
       data:
         profile,
+
       error:
         profileError,
     } =
@@ -1315,8 +2241,12 @@ export async function changePassword(
         .single();
 
 
-    if (profileError) {
+    if (
+      profileError
+    ) {
+
       throw profileError;
+
     }
 
 
@@ -1335,14 +2265,20 @@ export async function changePassword(
         });
 
 
-    if (verifyError) {
+    if (
+      verifyError
+    ) {
+
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
             'Current password is incorrect.',
         });
+
     }
 
 
@@ -1362,8 +2298,12 @@ export async function changePassword(
         );
 
 
-    if (updateError) {
+    if (
+      updateError
+    ) {
+
       throw updateError;
+
     }
 
 
@@ -1386,24 +2326,38 @@ export async function changePassword(
 
 
     return res.json({
-      success: true,
+      success:
+        true,
+
+      data: {
+        passwordUpdated:
+          true,
+      },
+
       message:
         'Password updated successfully.',
     });
+
   } catch (error) {
+
     console.error(
-      'Change password error:',
+      '[CHANGE PASSWORD ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to update password.',
       });
+
   }
+
 }
 
 
@@ -1415,7 +2369,9 @@ export async function requestCreditTopup(
   req,
   res
 ) {
+
   try {
+
     const customerId =
       req.user.id;
 
@@ -1427,21 +2383,30 @@ export async function requestCreditTopup(
 
 
     if (
-      !Number.isFinite(amount) ||
+      !Number.isFinite(
+        amount
+      ) ||
       amount <= 0
     ) {
+
       return res
         .status(400)
         .json({
-          success: false,
+          success:
+            false,
+
           message:
-            'A valid amount is required.',
+            'A valid amount greater than zero is required.',
         });
+
     }
 
 
     const reference =
-      `CR-${Date.now()}`;
+      `CR-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)
+        .toUpperCase()}`;
 
 
     const {
@@ -1468,13 +2433,19 @@ export async function requestCreditTopup(
 
           description:
             'Customer credit top-up request',
+
+          updated_at:
+            new Date()
+              .toISOString(),
         })
-        .select()
+        .select('*')
         .single();
 
 
     if (error) {
+
       throw error;
+
     }
 
 
@@ -1504,21 +2475,908 @@ export async function requestCreditTopup(
     return res
       .status(201)
       .json({
-        success: true,
-        transaction: data,
+        success:
+          true,
+
+        data: {
+          id:
+            data.id,
+
+          amount:
+            money(
+              data.amount
+            ),
+
+          type:
+            data.transaction_type,
+
+          status:
+            data.status,
+
+          reference:
+            data.reference,
+
+          description:
+            data.description ||
+            '',
+
+          createdAt:
+            data.created_at,
+        },
       });
+
   } catch (error) {
+
     console.error(
-      'Credit request error:',
+      '[CREDIT REQUEST ERROR]',
       error
     );
+
 
     return res
       .status(500)
       .json({
-        success: false,
+        success:
+          false,
+
         message:
           'Unable to submit credit request.',
       });
+
   }
+
+}
+
+
+// ============================================================
+// CREATE CUSTOMER ORDER
+// ============================================================
+
+export async function createOrder(
+  req,
+  res
+) {
+
+  try {
+
+    const customerId =
+      req.user.id;
+
+
+    const {
+      shipping,
+      deliveryMethod,
+      paymentMethod,
+      purchaseOrderNumber,
+      items,
+    } =
+      req.body;
+
+
+    // ========================================================
+    // SHIPPING VALIDATION
+    // ========================================================
+
+    if (
+      !shipping ||
+      !clean(
+        shipping.firstName
+      ) ||
+      !clean(
+        shipping.lastName
+      ) ||
+      !clean(
+        shipping.email
+      ) ||
+      !clean(
+        shipping.phone
+      ) ||
+      !clean(
+        shipping.address
+      ) ||
+      !clean(
+        shipping.city
+      ) ||
+      !clean(
+        shipping.country
+      )
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            'Complete shipping information is required.',
+        });
+
+    }
+
+
+    // ========================================================
+    // CART VALIDATION
+    // ========================================================
+
+    if (
+      !Array.isArray(
+        items
+      ) ||
+      items.length ===
+        0
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            'Your cart is empty.',
+        });
+
+    }
+
+
+    // ========================================================
+    // NORMALIZE ITEMS
+    // ========================================================
+
+    const normalizedItems =
+      items.map(
+        (item) => ({
+
+          // ==================================================
+          // IMPORTANT
+          //
+          // Current frontend catalog IDs may be:
+          //
+          // 1
+          // 2
+          // 3
+          //
+          // Those are NOT valid PostgreSQL UUID values.
+          //
+          // Therefore:
+          //
+          // Valid UUID    -> keep product ID
+          // Numeric/local -> save product_id as null
+          //
+          // Product name, SKU, quantity and price are still
+          // preserved in order_items.
+          // ==================================================
+
+          productId:
+            isUuid(
+              item.productId
+            )
+              ? String(
+                  item.productId
+                ).trim()
+              : null,
+
+          productName:
+            clean(
+              item.productName ||
+              item.name
+            ),
+
+          sku:
+            clean(
+              item.sku
+            ),
+
+          quantity:
+            Number(
+              item.quantity ||
+              item.qty ||
+              0
+            ),
+
+          unitPrice:
+            money(
+              item.unitPrice ??
+              item.price
+            ),
+
+        })
+      );
+
+
+    // ========================================================
+    // VALIDATE ITEMS
+    // ========================================================
+
+    const invalidItem =
+      normalizedItems.find(
+        (item) =>
+
+          !item.productName ||
+
+          !Number.isFinite(
+            item.quantity
+          ) ||
+
+          item.quantity <=
+            0 ||
+
+          !Number.isFinite(
+            item.unitPrice
+          ) ||
+
+          item.unitPrice <
+            0
+      );
+
+
+    if (
+      invalidItem
+    ) {
+
+      return res
+        .status(400)
+        .json({
+          success:
+            false,
+
+          message:
+            'One or more order items are invalid.',
+        });
+
+    }
+
+
+    // ========================================================
+    // CALCULATE SUBTOTAL
+    // ========================================================
+
+    const subtotal =
+      normalizedItems.reduce(
+        (
+          currentTotal,
+          item
+        ) =>
+          currentTotal +
+          (
+            item.unitPrice *
+            item.quantity
+          ),
+        0
+      );
+
+
+    // ========================================================
+    // DELIVERY METHOD
+    // ========================================================
+
+    const normalizedDeliveryMethod =
+      deliveryMethod ===
+      'express'
+        ? 'express'
+        : 'standard';
+
+
+    // ========================================================
+    // DELIVERY FEE
+    // ========================================================
+
+    const deliveryFee =
+      normalizedDeliveryMethod ===
+      'express'
+        ? 250000
+        : 0;
+
+
+    // ========================================================
+    // TAX
+    // ========================================================
+
+    const tax =
+      Math.round(
+        subtotal *
+        0.05
+      );
+
+
+    // ========================================================
+    // TOTAL
+    // ========================================================
+
+    const total =
+      subtotal +
+      deliveryFee +
+      tax;
+
+
+    // ========================================================
+    // PAYMENT METHOD
+    //
+    // Card here means the customer selected card checkout.
+    // Actual card settlement should later be performed through
+    // a payment provider.
+    // ========================================================
+
+    const normalizedPaymentMethod =
+      paymentMethod ===
+      'card'
+        ? 'card'
+        : 'invoice';
+
+
+    // ========================================================
+    // ORDER NUMBER
+    // ========================================================
+
+    const orderNumber =
+      `#APX-${Date.now()
+        .toString()
+        .slice(-8)}-${Math.random()
+        .toString(36)
+        .slice(2, 5)
+        .toUpperCase()}`;
+
+
+    // ========================================================
+    // SHIPPING ADDRESS SNAPSHOT
+    //
+    // We save the checkout address inside the order so future
+    // customer profile/address changes do not change an old
+    // order's delivery information.
+    // ========================================================
+
+    const shippingAddress = {
+
+      firstName:
+        clean(
+          shipping.firstName
+        ),
+
+      lastName:
+        clean(
+          shipping.lastName
+        ),
+
+      email:
+        clean(
+          shipping.email
+        ),
+
+      phone:
+        clean(
+          shipping.phone
+        ),
+
+      address:
+        clean(
+          shipping.address
+        ),
+
+      city:
+        clean(
+          shipping.city
+        ),
+
+      country:
+        clean(
+          shipping.country
+        ),
+
+      deliveryMethod:
+        normalizedDeliveryMethod,
+
+      paymentMethod:
+        normalizedPaymentMethod,
+
+      purchaseOrderNumber:
+        clean(
+          purchaseOrderNumber
+        ) ||
+        null,
+
+      tax,
+
+    };
+
+
+    // ========================================================
+    // CREATE ORDER
+    // ========================================================
+
+    const {
+      data:
+        createdOrder,
+
+      error:
+        orderError,
+    } =
+      await supabaseAdmin
+        .from('orders')
+        .insert({
+
+          order_number:
+            orderNumber,
+
+          customer_id:
+            customerId,
+
+          status:
+            'pending',
+
+          priority:
+            normalizedDeliveryMethod ===
+            'express'
+              ? 'high'
+              : 'medium',
+
+          subtotal,
+
+          delivery_fee:
+            deliveryFee,
+
+          total,
+
+          currency:
+            'UGX',
+
+          shipping_address:
+            shippingAddress,
+
+          notes:
+            clean(
+              purchaseOrderNumber
+            )
+              ? `Customer PO: ${clean(
+                  purchaseOrderNumber
+                )}`
+              : null,
+
+          updated_at:
+            new Date()
+              .toISOString(),
+
+        })
+        .select(`
+          id,
+          order_number,
+          customer_id,
+          status,
+          priority,
+          subtotal,
+          delivery_fee,
+          total,
+          currency,
+          notes,
+          estimated_delivery_date,
+          shipping_address,
+          created_at,
+          updated_at
+        `)
+        .single();
+
+
+    if (
+      orderError
+    ) {
+
+      console.error(
+        '[CREATE ORDER DATABASE ERROR]',
+        orderError
+      );
+
+
+      throw orderError;
+
+    }
+
+
+    // ========================================================
+    // CREATE ORDER ITEMS
+    // ========================================================
+
+    const orderItems =
+      normalizedItems.map(
+        (item) => ({
+
+          order_id:
+            createdOrder.id,
+
+          // Valid UUID -> UUID
+          // Frontend numeric ID -> null
+          product_id:
+            item.productId,
+
+          product_name:
+            item.productName,
+
+          sku:
+            item.sku ||
+            null,
+
+          quantity:
+            item.quantity,
+
+          unit_price:
+            item.unitPrice,
+
+          total_price:
+            item.quantity *
+            item.unitPrice,
+
+        })
+      );
+
+
+    const {
+      data:
+        createdItems,
+
+      error:
+        orderItemsError,
+    } =
+      await supabaseAdmin
+        .from(
+          'order_items'
+        )
+        .insert(
+          orderItems
+        )
+        .select();
+
+
+    // ========================================================
+    // ROLLBACK ORDER IF ORDER ITEMS FAIL
+    // ========================================================
+
+    if (
+      orderItemsError
+    ) {
+
+      console.error(
+        '[ORDER ITEMS ERROR]',
+        orderItemsError
+      );
+
+
+      const {
+        error:
+          rollbackError,
+      } =
+        await supabaseAdmin
+          .from('orders')
+          .delete()
+          .eq(
+            'id',
+            createdOrder.id
+          );
+
+
+      if (
+        rollbackError
+      ) {
+
+        console.error(
+          '[ORDER ROLLBACK ERROR]',
+          rollbackError
+        );
+
+      }
+
+
+      throw orderItemsError;
+
+    }
+
+
+    // ========================================================
+    // CREATE INVOICE
+    // ========================================================
+
+    const invoiceNumber =
+      `INV-${Date.now()
+        .toString()
+        .slice(-8)}-${Math.random()
+        .toString(36)
+        .slice(2, 5)
+        .toUpperCase()}`;
+
+
+    const issueDate =
+      new Date();
+
+
+    const dueDate =
+      new Date();
+
+
+    dueDate.setDate(
+      dueDate.getDate() +
+      14
+    );
+
+
+    const {
+      data:
+        createdInvoice,
+
+      error:
+        invoiceError,
+    } =
+      await supabaseAdmin
+        .from(
+          'invoices'
+        )
+        .insert({
+
+          invoice_number:
+            invoiceNumber,
+
+          order_id:
+            createdOrder.id,
+
+          customer_id:
+            customerId,
+
+          amount:
+            total,
+
+          currency:
+            'UGX',
+
+          status:
+            'pending',
+
+          issue_date:
+            issueDate
+              .toISOString()
+              .split('T')[0],
+
+          due_date:
+            dueDate
+              .toISOString()
+              .split('T')[0],
+
+          updated_at:
+            new Date()
+              .toISOString(),
+
+        })
+        .select('*')
+        .single();
+
+
+    if (
+      invoiceError
+    ) {
+
+      console.error(
+        '[ORDER INVOICE ERROR]',
+        invoiceError
+      );
+
+    }
+
+
+    // ========================================================
+    // CREATE CUSTOMER NOTIFICATION
+    // ========================================================
+
+    const {
+      error:
+        notificationError,
+    } =
+      await supabaseAdmin
+        .from(
+          'notifications'
+        )
+        .insert({
+
+          customer_id:
+            customerId,
+
+          title:
+            'Order received',
+
+          message:
+            `Your order ${orderNumber} has been received and is awaiting processing.`,
+
+          type:
+            'order',
+
+          is_read:
+            false,
+
+        });
+
+
+    if (
+      notificationError
+    ) {
+
+      console.error(
+        '[ORDER NOTIFICATION ERROR]',
+        notificationError
+      );
+
+    }
+
+
+    // ========================================================
+    // ACTIVITY LOG
+    // ========================================================
+
+    await logActivity({
+
+      userId:
+        customerId,
+
+      action:
+        'order_created',
+
+      entityType:
+        'order',
+
+      entityId:
+        createdOrder.id,
+
+      description:
+        `Customer created procurement order ${orderNumber}.`,
+
+      metadata: {
+
+        orderNumber,
+
+        subtotal,
+
+        deliveryFee,
+
+        tax,
+
+        total,
+
+        currency:
+          'UGX',
+
+        itemCount:
+          normalizedItems.length,
+
+        deliveryMethod:
+          normalizedDeliveryMethod,
+
+        paymentMethod:
+          normalizedPaymentMethod,
+
+      },
+
+    });
+
+
+    // ========================================================
+    // SUCCESS RESPONSE
+    // ========================================================
+
+    return res
+      .status(201)
+      .json({
+
+        success:
+          true,
+
+        data: {
+
+          databaseId:
+            createdOrder.id,
+
+          id:
+            createdOrder.order_number,
+
+          orderNumber:
+            createdOrder.order_number,
+
+          status:
+            formatOrderStatus(
+              createdOrder.status
+            ),
+
+          rawStatus:
+            createdOrder.status,
+
+          priority:
+            createdOrder.priority,
+
+          subtotal:
+            money(
+              createdOrder.subtotal
+            ),
+
+          deliveryFee:
+            money(
+              createdOrder.delivery_fee
+            ),
+
+          tax,
+
+          total:
+            money(
+              createdOrder.total
+            ),
+
+          currency:
+            createdOrder.currency ||
+            'UGX',
+
+          shippingAddress:
+            createdOrder.shipping_address,
+
+          invoice:
+            createdInvoice
+              ? {
+
+                  id:
+                    createdInvoice.id,
+
+                  invoiceNumber:
+                    createdInvoice.invoice_number,
+
+                  amount:
+                    money(
+                      createdInvoice.amount
+                    ),
+
+                  status:
+                    formatInvoiceStatus(
+                      createdInvoice.status
+                    ),
+
+                  issueDate:
+                    createdInvoice.issue_date,
+
+                  dueDate:
+                    createdInvoice.due_date,
+
+                }
+              : null,
+
+          items:
+            (
+              createdItems ||
+              []
+            ).map(
+              normalizeOrderItem
+            ),
+
+          createdAt:
+            createdOrder.created_at,
+
+        },
+
+        message:
+          `Order ${orderNumber} placed successfully.`,
+
+      });
+
+  } catch (error) {
+
+    console.error(
+      '[CREATE CUSTOMER ORDER ERROR]',
+      error
+    );
+
+
+    return res
+      .status(500)
+      .json({
+
+        success:
+          false,
+
+        message:
+          error.message ||
+          'Unable to place order.',
+
+      });
+
+  }
+
 }

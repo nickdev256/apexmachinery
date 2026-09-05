@@ -1,49 +1,26 @@
-import { Link } from 'react-router-dom';
+import {
+  useEffect,
+  useState,
+} from 'react';
+
+import {
+  Link,
+} from 'react-router-dom';
+
 import Icon from '../components/Icon';
+
 import ProductCard from '../components/ProductCard';
+
 import {
   StatCard,
   FeatureCard,
-  CategoryCard,
 } from '../components/InfoCards';
 
-import { getFeaturedProducts } from '../data/products';
 import {
-  categories,
-  categoryImages,
-} from '../data/categories';
-
-import { brands } from '../data/brands';
+  getHomePage,
+} from '../services/homeApi';
 
 import './Home.css';
-
-
-// ============================================================
-// TESTIMONIALS
-// ============================================================
-
-const testimonials = [
-  {
-    name: 'Marcus Webb',
-    role: 'Plant Operations Director, Webb Steelworks',
-    quote:
-      'Apex Machinery cut our procurement cycle in half. The certified inventory and quoting process removed all the guesswork from buying heavy equipment.',
-  },
-
-  {
-    name: 'Priya Nair',
-    role: 'Head of Facilities, Nair Manufacturing Group',
-    quote:
-      'We outfitted an entire production line through Apex. The bulk quote desk and logistics coordination were the best we have worked with.',
-  },
-
-  {
-    name: 'Diego Alvarez',
-    role: 'Maintenance Lead, Alvarez Fabrication',
-    quote:
-      'Reliable stock, honest specs, and a support team that actually understands industrial equipment. Exactly what our shop floor needed.',
-  },
-];
 
 
 // ============================================================
@@ -52,558 +29,1130 @@ const testimonials = [
 
 export default function Home() {
 
-  const featured = getFeaturedProducts(8);
+  const [
+    home,
+    setHome,
+  ] =
+    useState(null);
 
-  const homeCategories = categories;
 
-  return (
-    <div className="home-page">
+  const [
+    loading,
+    setLoading,
+  ] =
+    useState(true);
 
-      {/* ======================================================
-          HERO
-      ====================================================== */}
 
-      <section className="hero">
+  const [
+    error,
+    setError,
+  ] =
+    useState('');
 
-        <div className="container hero-inner">
 
-          <div className="hero-content">
+  // ==========================================================
+  // LOAD HOME FROM BACKEND
+  // ==========================================================
 
-            <span className="eyebrow">
-              Established 2026
-            </span>
+  async function loadHome() {
 
-            <h1>
-              Powering Industry.
-              <br />
-              Building Futures.
-            </h1>
+    try {
 
-            <p className="hero-sub">
-              Apex Machinery is your certified partner
-              for industrial equipment, power tools,
-              generators, kitchen equipment, bathroom
-              equipment, laundry systems, and enterprise
-              procurement — engineered for reliability,
-              sourced for scale.
-            </p>
+      setLoading(
+        true
+      );
 
-            <div className="hero-actions">
+      setError(
+        ''
+      );
 
-              <Link
-                to="/shop"
-                className="btn btn-primary"
-              >
-                Explore the Catalog
-              </Link>
 
-              <Link
-                to="/contact"
-                className="btn btn-outline"
-              >
-                Request a Quote
-              </Link>
+      const data =
+        await getHomePage();
+
+
+      setHome(
+        data
+      );
+
+    } catch (
+      requestError
+    ) {
+
+      console.error(
+        'Home page loading error:',
+        requestError
+      );
+
+
+      setError(
+        requestError
+          ?.response
+          ?.data
+          ?.message ||
+          'Unable to load homepage.'
+      );
+
+    } finally {
+
+      setLoading(
+        false
+      );
+
+    }
+
+  }
+
+
+  useEffect(
+    () => {
+
+      loadHome();
+
+    },
+    []
+  );
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
+  if (
+    loading
+  ) {
+
+    return (
+
+      <div className="home-page">
+
+        <section className="section">
+
+          <div className="container">
+
+            <div className="home-products-message">
+
+              <Icon
+                name="clock"
+                size={28}
+              />
+
+              <p>
+                Loading Apex Machinery...
+              </p>
 
             </div>
 
           </div>
 
-        </div>
+        </section>
 
-      </section>
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // ERROR
+  // ==========================================================
+
+  if (
+    error ||
+    !home
+  ) {
+
+    return (
+
+      <div className="home-page">
+
+        <section className="section">
+
+          <div className="container">
+
+            <div className="home-products-message">
+
+              <Icon
+                name="alert-circle"
+                size={32}
+              />
+
+
+              <h2>
+                Unable to load homepage
+              </h2>
+
+
+              <p>
+                {error}
+              </p>
+
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={
+                  loadHome
+                }
+              >
+                Try Again
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // DATA
+  // ==========================================================
+
+  const {
+    hero,
+    stats = [],
+    about,
+    featuredSection,
+    categorySection,
+    brandSection,
+    featureSection,
+    testimonialSection,
+    cta,
+  } =
+    home;
+
+
+  // ==========================================================
+  // HERO STYLE
+  // ==========================================================
+
+  const heroStyle =
+    hero?.image
+      ? {
+
+          backgroundImage: `
+            linear-gradient(
+              rgba(11, 31, 77, 0.78),
+              rgba(11, 31, 77, 0.78)
+            ),
+            url("${hero.image}")
+          `,
+
+        }
+      : undefined;
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
+
+  return (
+
+    <div className="home-page">
+
+
+      {/* ======================================================
+          HERO
+      ====================================================== */}
+
+      {hero && (
+
+        <section
+          className="hero"
+          style={
+            heroStyle
+          }
+        >
+
+          <div className="container hero-inner">
+
+            <div className="hero-content">
+
+
+              {hero.eyebrow && (
+
+                <span className="eyebrow">
+                  {hero.eyebrow}
+                </span>
+
+              )}
+
+
+              {hero.title && (
+
+                <h1>
+                  {hero.title}
+                </h1>
+
+              )}
+
+
+              {hero.subtitle && (
+
+                <p className="hero-sub">
+                  {hero.subtitle}
+                </p>
+
+              )}
+
+
+              <div className="hero-actions">
+
+
+                {hero
+                  .primaryAction
+                  ?.label &&
+                  hero
+                    .primaryAction
+                    ?.link && (
+
+                  <Link
+                    to={
+                      hero
+                        .primaryAction
+                        .link
+                    }
+                    className="btn btn-primary"
+                  >
+
+                    {
+                      hero
+                        .primaryAction
+                        .label
+                    }
+
+                  </Link>
+
+                )}
+
+
+                {hero
+                  .secondaryAction
+                  ?.label &&
+                  hero
+                    .secondaryAction
+                    ?.link && (
+
+                  <Link
+                    to={
+                      hero
+                        .secondaryAction
+                        .link
+                    }
+                    className="btn btn-outline"
+                  >
+
+                    {
+                      hero
+                        .secondaryAction
+                        .label
+                    }
+
+                  </Link>
+
+                )}
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      )}
 
 
       {/* ======================================================
           STATS
       ====================================================== */}
 
-      <section className="section stats-section">
+      {stats.length >
+        0 && (
 
-        <div className="container grid-4">
+        <section className="section stats-section">
 
-          <StatCard
-            value="3,200+"
-            label="Enterprise Clients"
-          />
+          <div className="container grid-4">
 
-          <StatCard
-            value="42,000+"
-            label="Industrial Products"
-          />
+            {stats.map(
+              (
+                stat
+              ) => (
 
-          <StatCard
-            value="18+"
-            label="Active Countries"
-          />
+                <StatCard
+                  key={
+                    stat.id
+                  }
+                  value={
+                    `${stat.value}${stat.suffix || ''}`
+                  }
+                  label={
+                    stat.label
+                  }
+                />
 
-          <StatCard
-            value="15+"
-            label="Years of Excellence"
-          />
+              )
+            )}
 
-        </div>
+          </div>
 
-      </section>
+        </section>
+
+      )}
 
 
       {/* ======================================================
-    ABOUT APEX
-====================================================== */}
+          ABOUT
+      ====================================================== */}
 
-<section className="section">
-  <div className="container about-grid">
+      {about && (
 
-    <div>
-      <span className="eyebrow">
-        About Apex Machinery
-      </span>
+        <section className="section">
 
-      <h2 className="section-heading">
-        Engineering the Future of
-        Industrial Procurement
-      </h2>
+          <div className="container about-grid">
 
-      <p className="section-sub">
-        We connect manufacturers, contractors,
-        hotels, hospitals, commercial facilities,
-        and enterprises with certified machinery,
-        power tools, generators, kitchen systems,
-        bathroom equipment, laundry equipment,
-        and industrial solutions — backed by
-        transparent pricing and a logistics network
-        built for demanding applications.
-      </p>
 
-      <div className="about-points">
+            <div>
 
-        <div>
-          <h4>
-            <Icon name="shield" size={18} />
-            Our Mission
-          </h4>
 
-          <p>
-            Delivering dependable access to
-            certified industrial and commercial
-            equipment with transparency at
-            every step.
-          </p>
-        </div>
+              {about.eyebrow && (
 
-        <div>
-          <h4>
-            <Icon name="bolt" size={18} />
-            Our Vision
-          </h4>
+                <span className="eyebrow">
+                  {about.eyebrow}
+                </span>
 
-          <p>
-            To be the trusted digital backbone
-            of industrial supply chains worldwide.
-          </p>
-        </div>
+              )}
 
-      </div>
-    </div>
 
-    {/* LOCAL IMAGE */}
-   <div className="about-media">
-  <img
-    src="/images/machines/apex-machinery-team.jpg"
-    alt="Apex Machinery engineering team"
-  />
-</div>
+              {about.title && (
 
-  </div>
-</section>
+                <h2 className="section-heading">
+                  {about.title}
+                </h2>
+
+              )}
+
+
+              {about.description && (
+
+                <p className="section-sub">
+                  {about.description}
+                </p>
+
+              )}
+
+
+              <div className="about-points">
+
+
+                {about.mission && (
+
+                  <div>
+
+                    <h4>
+
+                      <Icon
+                        name={
+                          about
+                            .mission
+                            .icon ||
+                          'shield'
+                        }
+                        size={18}
+                      />
+
+                      {
+                        about
+                          .mission
+                          .title
+                      }
+
+                    </h4>
+
+
+                    <p>
+                      {
+                        about
+                          .mission
+                          .text
+                      }
+                    </p>
+
+                  </div>
+
+                )}
+
+
+                {about.vision && (
+
+                  <div>
+
+                    <h4>
+
+                      <Icon
+                        name={
+                          about
+                            .vision
+                            .icon ||
+                          'bolt'
+                        }
+                        size={18}
+                      />
+
+                      {
+                        about
+                          .vision
+                          .title
+                      }
+
+                    </h4>
+
+
+                    <p>
+                      {
+                        about
+                          .vision
+                          .text
+                      }
+                    </p>
+
+                  </div>
+
+                )}
+
+
+              </div>
+
+            </div>
+
+
+            {about.image && (
+
+              <div className="about-media">
+
+                <img
+                  src={
+                    about.image
+                  }
+                  alt={
+                    about.title ||
+                    'Apex Machinery'
+                  }
+                />
+
+              </div>
+
+            )}
+
+
+          </div>
+
+        </section>
+
+      )}
 
 
       {/* ======================================================
           FEATURED PRODUCTS
       ====================================================== */}
 
-      <section className="section section-light">
+      {featuredSection && (
 
-        <div className="container">
+        <section className="section section-light">
 
-          <div className="section-header-row">
+          <div className="container">
 
-            <div>
 
-              <span className="eyebrow">
-                Featured Inventory
-              </span>
+            <div className="section-header-row">
 
-              <h2 className="section-heading">
-                Top-Rated Equipment
-              </h2>
+              <div>
+
+
+                {featuredSection
+                  .eyebrow && (
+
+                  <span className="eyebrow">
+
+                    {
+                      featuredSection
+                        .eyebrow
+                    }
+
+                  </span>
+
+                )}
+
+
+                {featuredSection
+                  .title && (
+
+                  <h2 className="section-heading">
+
+                    {
+                      featuredSection
+                        .title
+                    }
+
+                  </h2>
+
+                )}
+
+
+              </div>
+
+
+              <Link
+                to="/shop"
+                className="btn btn-outline-navy"
+              >
+                View All Products
+              </Link>
 
             </div>
 
-            <Link
-              to="/shop"
-              className="btn btn-outline-navy"
-            >
-              View All Products
-            </Link>
+
+            {featuredSection
+              .products
+              ?.length >
+            0 ? (
+
+              <div className="grid-4">
+
+                {featuredSection
+                  .products
+                  .map(
+                    (
+                      product
+                    ) => (
+
+                      <ProductCard
+                        key={
+                          product.id
+                        }
+                        product={
+                          product
+                        }
+                      />
+
+                    )
+                  )}
+
+              </div>
+
+            ) : (
+
+              <div className="home-products-message">
+
+                <Icon
+                  name="package"
+                  size={28}
+                />
+
+                <p>
+                  No featured products available.
+                </p>
+
+              </div>
+
+            )}
+
 
           </div>
 
+        </section>
 
-          <div className="grid-4">
-
-            {featured.map((product) => (
-
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-
-            ))}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
+      )}
 
 
       {/* ======================================================
-          SPECIALIZED EQUIPMENT
+          SPECIALIZED CATEGORIES
       ====================================================== */}
 
-      <section className="section section-light">
+      {categorySection && (
 
-        <div className="container">
+        <section className="section section-light">
 
-          <div className="section-header-row">
+          <div className="container">
 
-            <div>
 
-              <span className="eyebrow">
-                Specialized Equipment
-              </span>
+            <div className="section-header-row">
 
-              <h2 className="section-heading">
-                Equipment for Every Operation
-              </h2>
+              <div>
+
+
+                {categorySection
+                  .eyebrow && (
+
+                  <span className="eyebrow">
+
+                    {
+                      categorySection
+                        .eyebrow
+                    }
+
+                  </span>
+
+                )}
+
+
+                {categorySection
+                  .title && (
+
+                  <h2 className="section-heading">
+
+                    {
+                      categorySection
+                        .title
+                    }
+
+                  </h2>
+
+                )}
+
+              </div>
+
+            </div>
+
+
+            <div className="grid-4">
+
+              {categorySection
+                .categories
+                ?.map(
+                  (
+                    category
+                  ) => (
+
+                    <Link
+                      key={
+                        category.id
+                      }
+                      to={
+                        category.link
+                      }
+                      className="home-category-link"
+                    >
+
+                      <Icon
+                        name={
+                          category.icon ||
+                          'settings'
+                        }
+                        size={28}
+                      />
+
+
+                      <div>
+
+                        <h3>
+                          {
+                            category.title
+                          }
+                        </h3>
+
+
+                        <p>
+                          {
+                            category.description
+                          }
+                        </p>
+
+                      </div>
+
+
+                    </Link>
+
+                  )
+                )}
 
             </div>
 
           </div>
 
+        </section>
 
-          <div className="grid-4">
-
-
-            {/* GENERATORS */}
-
-            <Link
-              to="/shop?category=generators"
-              className="home-category-link"
-            >
-
-              <Icon
-                name="zap"
-                size={28}
-              />
-
-              <div>
-
-                <h3>
-                  Generators
-                </h3>
-
-                <p>
-                  Diesel and standard generators
-                  for homes, businesses,
-                  construction and industrial use.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            {/* KITCHEN */}
-
-            <Link
-              to="/shop?category=kitchen-equipment"
-              className="home-category-link"
-            >
-
-              <Icon
-                name="utensils"
-                size={28}
-              />
-
-              <div>
-
-                <h3>
-                  Kitchen Equipment
-                </h3>
-
-                <p>
-                  Commercial cooking,
-                  preparation and food
-                  processing equipment.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            {/* BATHROOM */}
-
-            <Link
-              to="/shop?category=bathroom-equipment"
-              className="home-category-link"
-            >
-
-              <Icon
-                name="bath"
-                size={28}
-              />
-
-              <div>
-
-                <h3>
-                  Bathroom Equipment
-                </h3>
-
-                <p>
-                  Professional water,
-                  hygiene and commercial
-                  bathroom systems.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            {/* LAUNDRY */}
-
-            <Link
-              to="/shop?category=laundry-equipment"
-              className="home-category-link"
-            >
-
-              <Icon
-                name="shirt"
-                size={28}
-              />
-
-              <div>
-
-                <h3>
-                  Laundry Equipment
-                </h3>
-
-                <p>
-                  Industrial washing,
-                  drying, ironing and
-                  folding systems.
-                </p>
-
-              </div>
-
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
+      )}
 
 
       {/* ======================================================
           MANUFACTURERS
       ====================================================== */}
 
-      <section className="section section-light">
+      {brandSection && (
 
-        <div className="container text-center">
+        <section className="section section-light">
 
-          <span className="eyebrow">
-            Global Trusted Partners
-          </span>
+          <div className="container text-center">
 
-          <h2 className="section-heading">
-            Manufacturers We Represent
-          </h2>
 
-          <div className="brand-strip">
+            {brandSection
+              .eyebrow && (
 
-            {brands.map((brand) => (
+              <span className="eyebrow">
 
-              <span key={brand.id}>
-                {brand.name}
+                {
+                  brandSection
+                    .eyebrow
+                }
+
               </span>
 
-            ))}
+            )}
+
+
+            {brandSection
+              .title && (
+
+              <h2 className="section-heading">
+
+                {
+                  brandSection
+                    .title
+                }
+
+              </h2>
+
+            )}
+
+
+            <div className="brand-strip">
+
+              {brandSection
+                .brands
+                ?.map(
+                  (
+                    brand
+                  ) => (
+
+                    <span
+                      key={
+                        brand.id
+                      }
+                    >
+
+                      {
+                        brand.name
+                      }
+
+                    </span>
+
+                  )
+                )}
+
+            </div>
+
 
           </div>
 
-        </div>
+        </section>
 
-      </section>
+      )}
 
 
       {/* ======================================================
           WHY CHOOSE US
       ====================================================== */}
 
-      <section className="section">
+      {featureSection && (
 
-        <div className="container">
+        <section className="section">
 
-          <span className="eyebrow">
-            Why Choose Us
-          </span>
+          <div className="container">
 
-          <h2 className="section-heading">
-            The Apex Machinery Standard
-          </h2>
 
-          <div className="grid-4">
+            {featureSection
+              .eyebrow && (
 
-            <FeatureCard
-              icon="shield"
-              title="OEM Certified"
-              text="Authentic equipment sourced from certified manufacturers and trusted suppliers."
-            />
+              <span className="eyebrow">
 
-            <FeatureCard
-              icon="truck"
-              title="Priority Logistics"
-              text="Specialized heavy-lift shipping, delivery coordination and customs clearance support."
-            />
+                {
+                  featureSection
+                    .eyebrow
+                }
 
-            <FeatureCard
-              icon="bolt"
-              title="Fast Procurement"
-              text="Digital quoting and procurement workflows designed for businesses and enterprise purchasing."
-            />
+              </span>
 
-            <FeatureCard
-              icon="clock"
-              title="24/7 Support"
-              text="Dedicated support for equipment selection, technical assistance, spare parts and procurement."
-            />
+            )}
+
+
+            {featureSection
+              .title && (
+
+              <h2 className="section-heading">
+
+                {
+                  featureSection
+                    .title
+                }
+
+              </h2>
+
+            )}
+
+
+            <div className="grid-4">
+
+              {featureSection
+                .features
+                ?.map(
+                  (
+                    feature
+                  ) => (
+
+                    <FeatureCard
+                      key={
+                        feature.id
+                      }
+                      icon={
+                        feature.icon
+                      }
+                      title={
+                        feature.title
+                      }
+                      text={
+                        feature.text
+                      }
+                    />
+
+                  )
+                )}
+
+            </div>
 
           </div>
 
-        </div>
+        </section>
 
-      </section>
+      )}
 
 
       {/* ======================================================
           TESTIMONIALS
       ====================================================== */}
 
-      <section className="section section-light">
+      {testimonialSection && (
 
-        <div className="container">
+        <section className="section section-light">
 
-          <span className="eyebrow">
-            Client Testimonials
-          </span>
+          <div className="container">
 
-          <h2 className="section-heading">
-            Trusted on the Shop Floor
-          </h2>
 
-          <div className="grid-3">
+            {testimonialSection
+              .eyebrow && (
 
-            {testimonials.map((testimonial) => (
+              <span className="eyebrow">
 
-              <div
-                key={testimonial.name}
-                className="testimonial-card card"
-              >
+                {
+                  testimonialSection
+                    .eyebrow
+                }
 
-                <Icon
-                  name="quote"
-                  size={28}
-                />
+              </span>
 
-                <p>
-                  &ldquo;
-                  {testimonial.quote}
-                  &rdquo;
-                </p>
+            )}
 
-                <div className="testimonial-author">
 
-                  <strong>
-                    {testimonial.name}
-                  </strong>
+            {testimonialSection
+              .title && (
 
-                  <span>
-                    {testimonial.role}
-                  </span>
+              <h2 className="section-heading">
 
-                </div>
+                {
+                  testimonialSection
+                    .title
+                }
 
-              </div>
+              </h2>
 
-            ))}
+            )}
+
+
+            <div className="grid-3">
+
+              {testimonialSection
+                .testimonials
+                ?.map(
+                  (
+                    testimonial
+                  ) => (
+
+                    <div
+                      key={
+                        testimonial.id
+                      }
+                      className="testimonial-card card"
+                    >
+
+                      <Icon
+                        name="quote"
+                        size={28}
+                      />
+
+
+                      <p>
+
+                        &ldquo;
+                        {
+                          testimonial.quote
+                        }
+                        &rdquo;
+
+                      </p>
+
+
+                      <div className="testimonial-author">
+
+                        <strong>
+                          {
+                            testimonial.name
+                          }
+                        </strong>
+
+
+                        <span>
+
+                          {
+                            testimonial.role
+                          }
+
+                          {
+                            testimonial.company
+                              ? `, ${testimonial.company}`
+                              : ''
+                          }
+
+                        </span>
+
+                      </div>
+
+
+                    </div>
+
+                  )
+                )}
+
+            </div>
 
           </div>
 
-        </div>
+        </section>
 
-      </section>
+      )}
 
 
       {/* ======================================================
           CTA
       ====================================================== */}
 
-      <section className="cta-band">
+      {cta && (
 
-        <div className="container cta-inner">
+        <section className="cta-band">
 
-          <div>
+          <div className="container cta-inner">
 
-            <h2>
-              Ready to Elevate Your Procurement?
-            </h2>
 
-            <p>
-              Join enterprises that trust Apex
-              Machinery for their industrial,
-              commercial and facility equipment needs.
-            </p>
+            <div>
+
+
+              {cta.title && (
+
+                <h2>
+                  {cta.title}
+                </h2>
+
+              )}
+
+
+              {cta.description && (
+
+                <p>
+                  {cta.description}
+                </p>
+
+              )}
+
+
+            </div>
+
+
+            <div className="hero-actions">
+
+
+              {cta
+                .primaryAction
+                ?.label &&
+                cta
+                  .primaryAction
+                  ?.link && (
+
+                <Link
+                  to={
+                    cta
+                      .primaryAction
+                      .link
+                  }
+                  className="btn btn-gold"
+                >
+
+                  {
+                    cta
+                      .primaryAction
+                      .label
+                  }
+
+                </Link>
+
+              )}
+
+
+              {cta
+                .secondaryAction
+                ?.label &&
+                cta
+                  .secondaryAction
+                  ?.link && (
+
+                <Link
+                  to={
+                    cta
+                      .secondaryAction
+                      .link
+                  }
+                  className="btn btn-outline"
+                >
+
+                  {
+                    cta
+                      .secondaryAction
+                      .label
+                  }
+
+                </Link>
+
+              )}
+
+
+            </div>
+
 
           </div>
 
-          <div className="hero-actions">
+        </section>
 
-            <Link
-              to="/shop"
-              className="btn btn-gold"
-            >
-              Start Shopping
-            </Link>
+      )}
 
-            <Link
-              to="/contact"
-              className="btn btn-outline"
-            >
-              Request Custom Quote
-            </Link>
-
-          </div>
-
-        </div>
-
-      </section>
 
     </div>
+
   );
+
 }

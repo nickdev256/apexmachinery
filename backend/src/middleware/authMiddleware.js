@@ -6,22 +6,23 @@ import {
 
 // ============================================================
 // APEX MACHINERY
-// AUTHENTICATION MIDDLEWARE
+// AUTHENTICATION & AUTHORIZATION MIDDLEWARE
 // ============================================================
 //
-// Handles:
+// requireAuth
+//   1. Reads Authorization header.
+//   2. Verifies Supabase access token.
+//   3. Loads the application's profile.
+//   4. Attaches user/profile information to req.
 //
-// 1. requireAuth
-//    Verifies Supabase access token.
+// requireAdmin
+//   Allows:
+//     admin
+//     administrator
 //
-// 2. requireAdmin
-//    Allows only:
-//      admin
-//      administrator
-//
-// 3. requireCustomer
-//    Allows only:
-//      customer
+// requireCustomer
+//   Allows:
+//     customer
 //
 // IMPORTANT:
 //
@@ -29,7 +30,7 @@ import {
 //   → token verification
 //
 // supabaseAdmin
-//   → profiles table / role verification
+//   → profiles database access
 //
 // NEVER expose SUPABASE_SERVICE_ROLE_KEY to React/Vite.
 // ============================================================
@@ -57,7 +58,7 @@ function normalizeRole(value) {
 function getBearerToken(req) {
 
   const authorization =
-    req.headers.authorization;
+    req.headers?.authorization;
 
 
   if (!authorization) {
@@ -74,39 +75,32 @@ function getBearerToken(req) {
 
 
   if (
-    authHeader
+    !authHeader
       .toLowerCase()
       .startsWith('bearer ')
   ) {
 
-    const token =
-      authHeader
-        .slice(7)
-        .trim();
-
-
-    return token || null;
+    return null;
 
   }
 
 
-  // ========================================================
-  // RAW TOKENS ARE NOT ACCEPTED
-  // ========================================================
-  //
-  // Frontend should send:
-  //
-  // Authorization: Bearer <token>
-  //
-  // ========================================================
+  const token =
+    authHeader
+      .slice(7)
+      .trim();
 
-  return null;
+
+  return (
+    token ||
+    null
+  );
 
 }
 
 
 // ============================================================
-// LOAD PROFILE
+// LOAD APPLICATION PROFILE
 // ============================================================
 
 async function loadProfile(
@@ -116,10 +110,13 @@ async function loadProfile(
   if (!userId) {
 
     return {
-      profile: null,
-      error: new Error(
-        'User ID is missing.'
-      ),
+      profile:
+        null,
+
+      error:
+        new Error(
+          'User ID is missing.'
+        ),
     };
 
   }
@@ -136,8 +133,10 @@ async function loadProfile(
         name,
         company,
         email,
+        phone,
         role,
-        member_since
+        member_since,
+        updated_at
       `)
       .eq(
         'id',
@@ -146,14 +145,43 @@ async function loadProfile(
       .maybeSingle();
 
 
-  return {
+  if (error) {
 
-    profile:
-      data || null,
+    return {
+      profile:
+        null,
+
+      error,
+    };
+
+  }
+
+
+  if (!data) {
+
+    return {
+      profile:
+        null,
+
+      error:
+        null,
+    };
+
+  }
+
+
+  return {
+    profile: {
+      ...data,
+
+      role:
+        normalizeRole(
+          data.role
+        ),
+    },
 
     error:
-      error || null,
-
+      null,
   };
 
 }
@@ -172,7 +200,7 @@ export async function requireAuth(
   try {
 
     // ========================================================
-    // GET ACCESS TOKEN
+    // TOKEN
     // ========================================================
 
     const token =
@@ -186,32 +214,26 @@ export async function requireAuth(
       return res
         .status(401)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Authentication required.',
-
         });
 
     }
 
 
     // ========================================================
-    // VERIFY TOKEN
-    // ========================================================
-    //
-    // IMPORTANT:
-    //
-    // Use supabaseAuth here.
-    //
-    // This validates the access token against Supabase Auth.
-    //
+    // VERIFY SUPABASE ACCESS TOKEN
     // ========================================================
 
     const {
-      data,
-      error,
+      data:
+        authData,
+
+      error:
+        authError,
     } =
       await supabaseAuth
         .auth
@@ -220,42 +242,144 @@ export async function requireAuth(
         );
 
 
-    // ========================================================
-    // INVALID TOKEN
-    // ========================================================
-
     if (
-      error ||
-      !data?.user?.id
+      authError ||
+      !authData?.user?.id
     ) {
 
-      console.error(
+      console.warn(
         '[AUTH TOKEN INVALID]',
-        error?.message ||
-        'User not returned by Supabase.'
+        authError?.message ||
+        'No authenticated user returned.'
       );
 
 
       return res
         .status(401)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Invalid or expired authentication token.',
+        });
 
+    }
+
+
+    const authUser =
+      authData.user;
+
+
+    // ========================================================
+    // LOAD PROFILE
+    // ========================================================
+
+    const {
+      profile,
+      error:
+        profileError,
+    } =
+      await loadProfile(
+        authUser.id
+      );
+
+
+    if (
+      profileError
+    ) {
+
+      console.error(
+        '[AUTH PROFILE ERROR]',
+        profileError
+      );
+
+
+      return res
+        .status(500)
+        .json({
+          success:
+            false,
+
+          message:
+            'Unable to load user profile.',
+        });
+
+    }
+
+
+    if (!profile) {
+
+      console.warn(
+        '[AUTH PROFILE NOT FOUND]',
+        {
+          userId:
+            authUser.id,
+        }
+      );
+
+
+      return res
+        .status(403)
+        .json({
+          success:
+            false,
+
+          message:
+            'User profile not found.',
         });
 
     }
 
 
     // ========================================================
-    // ATTACH AUTH INFORMATION
+    // OPTIONAL EMAIL CONSISTENCY CHECK
     // ========================================================
 
-    req.user =
-      data.user;
+    if (
+      authUser.email &&
+      profile.email &&
+      String(
+        authUser.email
+      ).toLowerCase() !==
+        String(
+          profile.email
+        ).toLowerCase()
+    ) {
+
+      console.warn(
+        '[AUTH EMAIL MISMATCH]',
+        {
+          userId:
+            authUser.id,
+        }
+      );
+
+    }
+
+
+    // ========================================================
+    // ATTACH AUTH DATA
+    // ========================================================
+
+    req.authUser =
+      authUser;
+
+
+    req.user = {
+      ...authUser,
+
+      role:
+        profile.role,
+    };
+
+
+    req.profile =
+      profile;
+
+
+    req.userRole =
+      profile.role;
 
 
     req.accessToken =
@@ -278,14 +402,13 @@ export async function requireAuth(
 
 
     return res
-      .status(401)
+      .status(500)
       .json({
-
-        success: false,
+        success:
+          false,
 
         message:
           'Authentication failed.',
-
       });
 
   }
@@ -297,18 +420,18 @@ export async function requireAuth(
 // REQUIRE ADMIN
 // ============================================================
 //
-// Usage:
+// Must come AFTER requireAuth.
 //
-// router.get(
-//   '/something',
+// Example:
+//
+// router.use(
 //   requireAuth,
-//   requireAdmin,
-//   controller
+//   requireAdmin
 // );
 //
 // ============================================================
 
-export async function requireAdmin(
+export function requireAdmin(
   req,
   res,
   next
@@ -316,111 +439,40 @@ export async function requireAdmin(
 
   try {
 
-    // ========================================================
-    // AUTH USER CHECK
-    // ========================================================
-
-    if (!req.user?.id) {
+    if (
+      !req.user?.id ||
+      !req.profile
+    ) {
 
       return res
         .status(401)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Authentication required.',
-
         });
 
     }
 
-
-    // ========================================================
-    // LOAD PROFILE
-    // ========================================================
-
-    const {
-      profile,
-      error,
-    } =
-      await loadProfile(
-        req.user.id
-      );
-
-
-    // ========================================================
-    // PROFILE QUERY ERROR
-    // ========================================================
-
-    if (error) {
-
-      console.error(
-        '[ADMIN PROFILE ERROR]',
-        error
-      );
-
-
-      return res
-        .status(500)
-        .json({
-
-          success: false,
-
-          message:
-            'Unable to verify administrator account.',
-
-        });
-
-    }
-
-
-    // ========================================================
-    // PROFILE NOT FOUND
-    // ========================================================
-
-    if (!profile) {
-
-      console.error(
-        '[ADMIN PROFILE NOT FOUND]',
-        req.user.id
-      );
-
-
-      return res
-        .status(403)
-        .json({
-
-          success: false,
-
-          message:
-            'User profile not found.',
-
-        });
-
-    }
-
-
-    // ========================================================
-    // NORMALIZE ROLE
-    // ========================================================
 
     const role =
       normalizeRole(
-        profile.role
+        req.userRole ||
+        req.profile.role
       );
 
 
-    // ========================================================
-    // ADMIN CHECK
-    // ========================================================
-
     const isAdmin =
       role === 'admin' ||
-      role === 'administrator';
+      role ===
+        'administrator';
 
 
-    if (!isAdmin) {
+    if (
+      !isAdmin
+    ) {
 
       console.warn(
         '[ADMIN ACCESS DENIED]',
@@ -436,37 +488,26 @@ export async function requireAdmin(
       return res
         .status(403)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Administrator access required.',
-
         });
 
     }
-
-
-    // ========================================================
-    // ATTACH PROFILE INFORMATION
-    // ========================================================
-
-    req.profile = {
-
-      ...profile,
-
-      role,
-
-    };
 
 
     req.userRole =
       role;
 
 
-    // ========================================================
-    // CONTINUE
-    // ========================================================
+    req.profile = {
+      ...req.profile,
+
+      role,
+    };
+
 
     return next();
 
@@ -474,7 +515,7 @@ export async function requireAdmin(
   } catch (error) {
 
     console.error(
-      '[ADMIN MIDDLEWARE ERROR]',
+      '[ADMIN AUTHORIZATION ERROR]',
       error
     );
 
@@ -482,12 +523,11 @@ export async function requireAdmin(
     return res
       .status(500)
       .json({
-
-        success: false,
+        success:
+          false,
 
         message:
           'Administrator authorization failed.',
-
       });
 
   }
@@ -499,18 +539,18 @@ export async function requireAdmin(
 // REQUIRE CUSTOMER
 // ============================================================
 //
-// Usage:
+// Must come AFTER requireAuth.
 //
-// router.get(
-//   '/customer-route',
+// Example:
+//
+// router.use(
 //   requireAuth,
-//   requireCustomer,
-//   controller
+//   requireCustomer
 // );
 //
 // ============================================================
 
-export async function requireCustomer(
+export function requireCustomer(
   req,
   res,
   next
@@ -518,107 +558,34 @@ export async function requireCustomer(
 
   try {
 
-    // ========================================================
-    // AUTH USER CHECK
-    // ========================================================
-
-    if (!req.user?.id) {
+    if (
+      !req.user?.id ||
+      !req.profile
+    ) {
 
       return res
         .status(401)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Authentication required.',
-
         });
 
     }
 
-
-    // ========================================================
-    // LOAD PROFILE
-    // ========================================================
-
-    const {
-      profile,
-      error,
-    } =
-      await loadProfile(
-        req.user.id
-      );
-
-
-    // ========================================================
-    // PROFILE QUERY ERROR
-    // ========================================================
-
-    if (error) {
-
-      console.error(
-        '[CUSTOMER PROFILE ERROR]',
-        error
-      );
-
-
-      return res
-        .status(500)
-        .json({
-
-          success: false,
-
-          message:
-            'Unable to verify customer account.',
-
-        });
-
-    }
-
-
-    // ========================================================
-    // PROFILE NOT FOUND
-    // ========================================================
-
-    if (!profile) {
-
-      console.error(
-        '[CUSTOMER PROFILE NOT FOUND]',
-        req.user.id
-      );
-
-
-      return res
-        .status(403)
-        .json({
-
-          success: false,
-
-          message:
-            'User profile not found.',
-
-        });
-
-    }
-
-
-    // ========================================================
-    // NORMALIZE ROLE
-    // ========================================================
 
     const role =
       normalizeRole(
-        profile.role
+        req.userRole ||
+        req.profile.role
       );
 
 
-    // ========================================================
-    // CUSTOMER CHECK
-    // ========================================================
-
     if (
-      role !== 'customer'
+      role !==
+      'customer'
     ) {
 
       console.warn(
@@ -635,37 +602,26 @@ export async function requireCustomer(
       return res
         .status(403)
         .json({
-
-          success: false,
+          success:
+            false,
 
           message:
             'Customer access required.',
-
         });
 
     }
-
-
-    // ========================================================
-    // ATTACH PROFILE INFORMATION
-    // ========================================================
-
-    req.profile = {
-
-      ...profile,
-
-      role,
-
-    };
 
 
     req.userRole =
       role;
 
 
-    // ========================================================
-    // CONTINUE
-    // ========================================================
+    req.profile = {
+      ...req.profile,
+
+      role,
+    };
+
 
     return next();
 
@@ -673,7 +629,7 @@ export async function requireCustomer(
   } catch (error) {
 
     console.error(
-      '[CUSTOMER MIDDLEWARE ERROR]',
+      '[CUSTOMER AUTHORIZATION ERROR]',
       error
     );
 
@@ -681,14 +637,142 @@ export async function requireCustomer(
     return res
       .status(500)
       .json({
-
-        success: false,
+        success:
+          false,
 
         message:
           'Customer authorization failed.',
-
       });
 
   }
+
+}
+
+
+// ============================================================
+// OPTIONAL ROLE MIDDLEWARE
+// ============================================================
+//
+// Useful later for routes that support multiple roles.
+//
+// Example:
+//
+// router.get(
+//   '/something',
+//   requireAuth,
+//   allowRoles(
+//     'admin',
+//     'administrator'
+//   ),
+//   controller
+// );
+//
+// ============================================================
+
+export function allowRoles(
+  ...allowedRoles
+) {
+
+  const normalizedAllowedRoles =
+    allowedRoles.map(
+      normalizeRole
+    );
+
+
+  return function roleMiddleware(
+    req,
+    res,
+    next
+  ) {
+
+    try {
+
+      if (
+        !req.user?.id ||
+        !req.profile
+      ) {
+
+        return res
+          .status(401)
+          .json({
+            success:
+              false,
+
+            message:
+              'Authentication required.',
+          });
+
+      }
+
+
+      const role =
+        normalizeRole(
+          req.userRole ||
+          req.profile.role
+        );
+
+
+      if (
+        !normalizedAllowedRoles
+          .includes(
+            role
+          )
+      ) {
+
+        console.warn(
+          '[ROLE ACCESS DENIED]',
+          {
+            userId:
+              req.user.id,
+
+            role,
+
+            allowedRoles:
+              normalizedAllowedRoles,
+          }
+        );
+
+
+        return res
+          .status(403)
+          .json({
+            success:
+              false,
+
+            message:
+              'You do not have permission to access this resource.',
+          });
+
+      }
+
+
+      req.userRole =
+        role;
+
+
+      return next();
+
+
+    } catch (error) {
+
+      console.error(
+        '[ROLE AUTHORIZATION ERROR]',
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+          success:
+            false,
+
+          message:
+            'Authorization failed.',
+        });
+
+    }
+
+  };
 
 }
