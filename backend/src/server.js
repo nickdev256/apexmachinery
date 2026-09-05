@@ -23,10 +23,123 @@ const app = express();
 const PORT =
   process.env.PORT || 5000;
 
-const FRONTEND_URL =
-  process.env.FRONTEND_URL ||
-  process.env.CLIENT_URL ||
-  'http://localhost:5173';
+
+// ============================================================
+// ALLOWED FRONTEND ORIGINS
+// ============================================================
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+
+  'https://www.apexmachinery256.com',
+  'https://apexmachinery256.com',
+
+  'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
+];
+
+
+// Add Render environment frontend URL if provided
+if (
+  process.env.FRONTEND_URL &&
+  !allowedOrigins.includes(
+    process.env.FRONTEND_URL
+  )
+) {
+  allowedOrigins.push(
+    process.env.FRONTEND_URL
+  );
+}
+
+
+// Add optional CLIENT_URL too
+if (
+  process.env.CLIENT_URL &&
+  !allowedOrigins.includes(
+    process.env.CLIENT_URL
+  )
+) {
+  allowedOrigins.push(
+    process.env.CLIENT_URL
+  );
+}
+
+
+// ============================================================
+// CORS CONFIGURATION
+// ============================================================
+
+const corsOptions = {
+
+  origin(
+    origin,
+    callback
+  ) {
+
+    /*
+     * Requests without an Origin header are allowed.
+     *
+     * Examples:
+     * - direct browser navigation
+     * - Render health checks
+     * - Postman
+     * - server-to-server requests
+     */
+
+    if (
+      !origin
+    ) {
+      return callback(
+        null,
+        true
+      );
+    }
+
+
+    if (
+      allowedOrigins.includes(
+        origin
+      )
+    ) {
+
+      return callback(
+        null,
+        true
+      );
+
+    }
+
+
+    console.warn(
+      `[CORS BLOCKED] ${origin}`
+    );
+
+
+    return callback(
+      new Error(
+        `CORS blocked for origin: ${origin}`
+      )
+    );
+
+  },
+
+  credentials: true,
+
+  methods: [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+  ],
+
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+  ],
+
+};
 
 
 // ============================================================
@@ -34,12 +147,15 @@ const FRONTEND_URL =
 // ============================================================
 
 app.use(
-  cors({
-    origin: FRONTEND_URL,
-    credentials: true,
-  })
+  cors(
+    corsOptions
+  )
 );
 
+
+// ============================================================
+// BODY PARSERS
+// ============================================================
 
 app.use(
   express.json({
@@ -89,6 +205,7 @@ app.get(
   ) => {
 
     return res.json({
+
       success: true,
 
       message:
@@ -100,6 +217,9 @@ app.get(
       environment:
         process.env.NODE_ENV ||
         'development',
+
+      allowedOrigins,
+
     });
 
   }
@@ -118,6 +238,7 @@ app.get(
   ) => {
 
     return res.json({
+
       success: true,
 
       message:
@@ -145,7 +266,9 @@ app.get(
 
         home:
           '/api/home',
+
       },
+
     });
 
   }
@@ -186,8 +309,6 @@ app.use(
 // PUBLIC PRODUCT ROUTES
 // ============================================================
 //
-// Public catalogue routes:
-//
 // GET /api/products
 // GET /api/products/categories
 // GET /api/products/:id
@@ -204,21 +325,7 @@ app.use(
 // PUBLIC HOME ROUTES
 // ============================================================
 //
-// Fully database-backed homepage.
-//
 // GET /api/home
-//
-// This returns:
-//
-// hero
-// stats
-// about
-// featured products
-// homepage categories
-// brands
-// features
-// testimonials
-// CTA
 //
 // ============================================================
 
@@ -315,7 +422,9 @@ app.use(
 
 
     return res
-      .status(status)
+      .status(
+        status
+      )
       .json({
 
         success: false,
@@ -362,52 +471,67 @@ app.listen(
 
 
     console.log(
-      `Server: http://localhost:${PORT}`
+      `Server running on port: ${PORT}`
     );
 
 
     console.log(
-      `API Root: http://localhost:${PORT}/api`
+      `Environment: ${
+        process.env.NODE_ENV ||
+        'development'
+      }`
     );
 
 
     console.log(
-      `Health: http://localhost:${PORT}/api/health`
+      'Allowed frontend origins:'
+    );
+
+
+    allowedOrigins.forEach(
+      (
+        origin
+      ) => {
+
+        console.log(
+          ` - ${origin}`
+        );
+
+      }
     );
 
 
     console.log(
-      `Auth API: http://localhost:${PORT}/api/auth`
+      '----------------------------------------'
     );
 
 
     console.log(
-      `Customer API: http://localhost:${PORT}/api/customer`
+      `Health: /api/health`
     );
 
-
     console.log(
-      `Admin API: http://localhost:${PORT}/api/admin`
+      `Auth API: /api/auth`
     );
 
-
     console.log(
-      `Products API: http://localhost:${PORT}/api/products`
+      `Customer API: /api/customer`
     );
 
-
     console.log(
-      `Product Categories API: http://localhost:${PORT}/api/products/categories`
+      `Admin API: /api/admin`
     );
 
-
     console.log(
-      `Home API: http://localhost:${PORT}/api/home`
+      `Products API: /api/products`
     );
 
+    console.log(
+      `Product Categories API: /api/products/categories`
+    );
 
     console.log(
-      `Frontend: ${FRONTEND_URL}`
+      `Home API: /api/home`
     );
 
 
