@@ -136,6 +136,49 @@ const paths = {
 
   calendar:
     'M5 3v4M19 3v4M4 7h16v14H4zM4 11h16',
+
+  utensils:
+    'M7 3v7M4 3v4a3 3 0 0 0 6 0V3M7 10v11M15 3v18M15 3c3 1 5 4 5 7h-5',
+
+  bath:
+    'M4 12h16v3a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-3zM7 12V7a3 3 0 0 1 6 0',
+
+  shirt:
+    'M8 4 4 6 2 11h4v4h8v-4h4l-2-11-4-2a4 4 0 0 1-8 0z',
+};
+
+
+// ============================================================
+// ICON ALIASES
+// ============================================================
+
+const aliases = {
+  'map-pin':
+    'location',
+
+  'shopping-cart':
+    'cart',
+
+  'arrow-right':
+    'arrowRight',
+
+  'arrow-left':
+    'arrowLeft',
+
+  'chevron-down':
+    'chevronDown',
+
+  'chevron-right':
+    'chevronRight',
+
+  'chevron-left':
+    'chevronLeft',
+
+  'eye-off':
+    'eyeOff',
+
+  zap:
+    'bolt',
 };
 
 
@@ -153,18 +196,32 @@ export default function Icon({
   ...props
 }) {
 
+  const rawName =
+    String(
+      name ||
+      ''
+    ).trim();
+
+
+  const resolvedName =
+    aliases[rawName] ||
+    rawName;
+
+
   const d =
-    paths[name];
+    paths[resolvedName];
 
 
-  if (!d) {
+  if (
+    !d
+  ) {
 
     if (
       import.meta.env.DEV
     ) {
 
       console.warn(
-        `[Icon] Unknown icon: "${name}"`
+        `[Icon] Unknown icon: "${rawName}"`
       );
 
     }
@@ -175,18 +232,29 @@ export default function Icon({
 
 
   const numericSize =
-    Number(size) || 20;
+    Number(
+      size
+    ) ||
+    20;
 
 
   const accessible =
-    Boolean(title);
+    Boolean(
+      title
+    );
 
 
   return (
 
     <svg
-      width={numericSize}
-      height={numericSize}
+      width={
+        numericSize
+      }
+
+      height={
+        numericSize
+      }
+
       viewBox="0 0 24 24"
 
       fill={
@@ -202,6 +270,7 @@ export default function Icon({
       }
 
       strokeLinecap="round"
+
       strokeLinejoin="round"
 
       className={
