@@ -7,34 +7,47 @@ import customerRoutes from './routes/customerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import homeRoutes from './routes/homeRoutes.js';
+import contactRoutes from './routes/contactRoutes.js';
+
+import {
+  verifyEmailService,
+} from './services/emailService.js';
 
 
 // ============================================================
 // APP
 // ============================================================
 
-const app = express();
+const app =
+  express();
+
 
 const PORT =
-  process.env.PORT || 5000;
+  process.env.PORT ||
+  5000;
 
 
 // ============================================================
 // ALLOWED ORIGINS
 // ============================================================
 
-const allowedOrigins = new Set([
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
+const allowedOrigins =
+  new Set(
+    [
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
 
-  'https://www.apexmachinery256.com',
-  'https://apexmachinery256.com',
+      'https://www.apexmachinery256.com',
+      'https://apexmachinery256.com',
 
-  'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
+      'https://apexmachinery-gslr-ay1qjtjbv-eth-tech.vercel.app',
 
-  process.env.FRONTEND_URL,
-  process.env.CLIENT_URL,
-].filter(Boolean));
+      process.env.FRONTEND_URL,
+      process.env.CLIENT_URL,
+    ].filter(
+      Boolean
+    )
+  );
 
 
 // ============================================================
@@ -43,13 +56,20 @@ const allowedOrigins = new Set([
 
 app.use(
   cors({
+
     origin: (
       origin,
       callback
     ) => {
 
-      // Allow requests without Origin header
-      if (!origin) {
+      // ------------------------------------------------------
+      // Allow requests without Origin
+      // Postman, curl, server-to-server, etc.
+      // ------------------------------------------------------
+
+      if (
+        !origin
+      ) {
 
         return callback(
           null,
@@ -58,6 +78,10 @@ app.use(
 
       }
 
+
+      // ------------------------------------------------------
+      // Allow trusted frontend origins
+      // ------------------------------------------------------
 
       if (
         allowedOrigins.has(
@@ -78,6 +102,10 @@ app.use(
       }
 
 
+      // ------------------------------------------------------
+      // Block unknown origins
+      // ------------------------------------------------------
+
       console.warn(
         `[CORS BLOCKED] ${origin}`
       );
@@ -89,7 +117,8 @@ app.use(
         );
 
 
-      error.status = 403;
+      error.status =
+        403;
 
 
       return callback(
@@ -99,7 +128,8 @@ app.use(
     },
 
 
-    credentials: true,
+    credentials:
+      true,
 
 
     methods: [
@@ -116,6 +146,7 @@ app.use(
       'Content-Type',
       'Authorization',
     ],
+
   })
 );
 
@@ -126,15 +157,21 @@ app.use(
 
 app.use(
   express.json({
-    limit: '10mb',
+    limit:
+      '10mb',
   })
 );
 
 
 app.use(
   express.urlencoded({
-    extended: true,
-    limit: '10mb',
+
+    extended:
+      true,
+
+    limit:
+      '10mb',
+
   })
 );
 
@@ -182,13 +219,15 @@ app.get(
 
     res.json({
 
-      success: true,
+      success:
+        true,
 
       message:
         'Apex Machinery API is running.',
 
       timestamp:
-        new Date().toISOString(),
+        new Date()
+          .toISOString(),
 
       environment:
         process.env.NODE_ENV ||
@@ -202,6 +241,21 @@ app.get(
         Array.from(
           allowedOrigins
         ),
+
+      services: {
+
+        database:
+          Boolean(
+            process.env.SUPABASE_URL
+          ),
+
+        emailConfigured:
+          Boolean(
+            process.env.GMAIL_USER &&
+            process.env.GMAIL_APP_PASSWORD
+          ),
+
+      },
 
     });
 
@@ -222,7 +276,8 @@ app.get(
 
     res.json({
 
-      success: true,
+      success:
+        true,
 
       message:
         'Welcome to the Apex Machinery API.',
@@ -250,6 +305,12 @@ app.get(
         home:
           '/api/home',
 
+        contact:
+          '/api/contact',
+
+        contactAdmin:
+          '/api/contact/admin',
+
       },
 
     });
@@ -262,11 +323,20 @@ app.get(
 // ROUTES
 // ============================================================
 
+
+// ------------------------------------------------------------
+// AUTH
+// ------------------------------------------------------------
+
 app.use(
   '/api/auth',
   authRoutes
 );
 
+
+// ------------------------------------------------------------
+// CUSTOMER
+// ------------------------------------------------------------
 
 app.use(
   '/api/customer',
@@ -274,11 +344,19 @@ app.use(
 );
 
 
+// ------------------------------------------------------------
+// ADMIN
+// ------------------------------------------------------------
+
 app.use(
   '/api/admin',
   adminRoutes
 );
 
+
+// ------------------------------------------------------------
+// PRODUCTS
+// ------------------------------------------------------------
 
 app.use(
   '/api/products',
@@ -286,9 +364,23 @@ app.use(
 );
 
 
+// ------------------------------------------------------------
+// HOME
+// ------------------------------------------------------------
+
 app.use(
   '/api/home',
   homeRoutes
+);
+
+
+// ------------------------------------------------------------
+// CONTACT
+// ------------------------------------------------------------
+
+app.use(
+  '/api/contact',
+  contactRoutes
 );
 
 
@@ -300,20 +392,29 @@ console.log(
   '✅ Auth routes mounted at /api/auth'
 );
 
+
 console.log(
   '✅ Customer routes mounted at /api/customer'
 );
+
 
 console.log(
   '✅ Admin routes mounted at /api/admin'
 );
 
+
 console.log(
   '✅ Product routes mounted at /api/products'
 );
 
+
 console.log(
   '✅ Home routes mounted at /api/home'
+);
+
+
+console.log(
+  '✅ Contact routes mounted at /api/contact'
 );
 
 
@@ -328,10 +429,13 @@ app.use(
   ) => {
 
     res
-      .status(404)
+      .status(
+        404
+      )
       .json({
 
-        success: false,
+        success:
+          false,
 
         message:
           `Route not found: ${req.method} ${req.originalUrl}`,
@@ -383,7 +487,8 @@ app.use(
       )
       .json({
 
-        success: false,
+        success:
+          false,
 
         message:
           error.message ||
@@ -401,15 +506,17 @@ app.use(
 
 app.listen(
   PORT,
-  () => {
+  async () => {
 
     console.log(
       '========================================'
     );
 
+
     console.log(
       '       APEX MACHINERY API'
     );
+
 
     console.log(
       '========================================'
@@ -449,6 +556,187 @@ app.listen(
 
         }
       );
+
+
+    console.log(
+      '----------------------------------------'
+    );
+
+
+    console.log(
+      'Mounted API routes:'
+    );
+
+
+    console.log(
+      ' - /api/health'
+    );
+
+
+    console.log(
+      ' - /api/auth'
+    );
+
+
+    console.log(
+      ' - /api/customer'
+    );
+
+
+    console.log(
+      ' - /api/admin'
+    );
+
+
+    console.log(
+      ' - /api/products'
+    );
+
+
+    console.log(
+      ' - /api/home'
+    );
+
+
+    console.log(
+      ' - /api/contact'
+    );
+
+
+    console.log(
+      '----------------------------------------'
+    );
+
+
+    // ========================================================
+    // EMAIL CONFIGURATION STATUS
+    // Never print the actual App Password.
+    // ========================================================
+
+    const gmailUser =
+      String(
+        process.env.GMAIL_USER ||
+        ''
+      ).trim();
+
+
+    const gmailPassword =
+      String(
+        process.env.GMAIL_APP_PASSWORD ||
+        ''
+      )
+        .replace(
+          /\s+/g,
+          ''
+        )
+        .trim();
+
+
+    const contactEmail =
+      String(
+        process.env.APEX_CONTACT_EMAIL ||
+        ''
+      ).trim();
+
+
+    console.log(
+      'Email configuration:'
+    );
+
+
+    console.log(
+      ` - Gmail user: ${
+        gmailUser ||
+        'MISSING'
+      }`
+    );
+
+
+    console.log(
+      ` - App password configured: ${
+        gmailPassword
+          ? 'YES'
+          : 'NO'
+      }`
+    );
+
+
+    console.log(
+      ` - App password length: ${
+        gmailPassword.length
+      }`
+    );
+
+
+    console.log(
+      ` - Contact recipient: ${
+        contactEmail ||
+        gmailUser ||
+        'MISSING'
+      }`
+    );
+
+
+    console.log(
+      '----------------------------------------'
+    );
+
+
+    // ========================================================
+    // VERIFY GMAIL SMTP
+    // ========================================================
+
+    try {
+
+      console.log(
+        'Checking Gmail SMTP...'
+      );
+
+
+      const emailStatus =
+        await verifyEmailService();
+
+
+      if (
+        emailStatus?.success
+      ) {
+
+        console.log(
+          '✅ Gmail SMTP is ready.'
+        );
+
+      } else {
+
+        console.error(
+          '❌ Gmail SMTP is not ready.'
+        );
+
+
+        console.error(
+          `Reason: ${
+            emailStatus?.message ||
+            'Unknown email configuration error.'
+          }`
+        );
+
+      }
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        '❌ Gmail SMTP startup check failed.'
+      );
+
+
+      console.error(
+        error?.message ||
+        error
+      );
+
+    }
 
 
     console.log(

@@ -1083,4 +1083,579 @@ td {
       auto !important;
   }
 
+}/* ============================================================
+   RESPONSIVE ENHANCEMENTS
+   Additive only — does not redesign existing components
+============================================================ */
+
+
+/* ============================================================
+   UNIVERSAL OVERFLOW PROTECTION
+============================================================ */
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+}
+
+#root {
+  min-width: 0;
+}
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+nav {
+  min-width: 0;
+}
+
+.container,
+.grid-2,
+.grid-3,
+.grid-4,
+.responsive-grid,
+.form-row,
+.flex {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   RESPONSIVE MEDIA SAFETY
+============================================================ */
+
+img,
+video,
+picture,
+iframe,
+canvas {
+  max-width: 100%;
+}
+
+img,
+video {
+  object-fit: contain;
+}
+
+iframe {
+  width: 100%;
+}
+
+
+/* ============================================================
+   LONG TEXT / LINKS PROTECTION
+============================================================ */
+
+p,
+a,
+span,
+strong,
+small,
+label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+td,
+th {
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   FLEX RESPONSIVENESS
+============================================================ */
+
+.flex {
+  min-width: 0;
+}
+
+.flex-wrap {
+  row-gap: var(--space-3);
+}
+
+.flex > *,
+.flex-wrap > * {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   FORM RESPONSIVENESS
+============================================================ */
+
+input,
+select,
+textarea,
+button {
+  min-width: 0;
+}
+
+.field input,
+.field select,
+.field textarea {
+  max-width: 100%;
+}
+
+.form-row > * {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   BUTTON RESPONSIVENESS
+============================================================ */
+
+.btn {
+  max-width: 100%;
+
+  overflow-wrap: break-word;
+}
+
+.btn svg {
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   TABLE RESPONSIVENESS
+============================================================ */
+
+.table-wrapper {
+  max-width: 100%;
+
+  overscroll-behavior-inline: contain;
+}
+
+.table-wrapper table {
+  min-width: 600px;
+}
+
+
+/* ============================================================
+   CARD RESPONSIVENESS
+============================================================ */
+
+.card {
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+
+/* ============================================================
+   GRID CHILD SAFETY
+============================================================ */
+
+.grid-2 > *,
+.grid-3 > *,
+.grid-4 > *,
+.responsive-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+
+/* ============================================================
+   VERY LARGE DESKTOP
+   1920px+
+============================================================ */
+
+@media (min-width: 1920px) {
+
+  .container {
+    width: min(
+      calc(100% - 96px),
+      var(--container-width)
+    );
+  }
+
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+   1600px - 1919px
+============================================================ */
+
+@media (
+  min-width: 1600px
+) and (
+  max-width: 1919px
+) {
+
+  .container {
+    width: min(
+      calc(100% - 80px),
+      var(--container-width)
+    );
+  }
+
+}
+
+
+/* ============================================================
+   DESKTOP
+   1280px - 1599px
+============================================================ */
+
+@media (
+  min-width: 1280px
+) and (
+  max-width: 1599px
+) {
+
+  .container {
+    width: min(
+      calc(100% - 56px),
+      var(--container-width)
+    );
+  }
+
+}
+
+
+/* ============================================================
+   SMALL LAPTOP
+   1025px - 1199px
+============================================================ */
+
+@media (
+  min-width: 1025px
+) and (
+  max-width: 1199px
+) {
+
+  .grid-4 {
+    gap: var(--space-4);
+  }
+
+  .grid-3 {
+    gap: var(--space-4);
+  }
+
+  .btn {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET LANDSCAPE
+   769px - 1024px
+============================================================ */
+
+@media (
+  min-width: 769px
+) and (
+  max-width: 1024px
+) {
+
+  .grid-2 {
+    gap: var(--space-5);
+  }
+
+  .grid-3,
+  .grid-4 {
+    gap: var(--space-4);
+  }
+
+  .section {
+    padding:
+      clamp(
+        48px,
+        6vw,
+        56px
+      )
+      0;
+  }
+
+  .section-heading {
+    max-width: 850px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET PORTRAIT
+   641px - 768px
+============================================================ */
+
+@media (
+  min-width: 641px
+) and (
+  max-width: 768px
+) {
+
+  .grid-3,
+  .grid-4 {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    white-space: normal;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE LANDSCAPE / LARGE PHONE
+   481px - 640px
+============================================================ */
+
+@media (
+  min-width: 481px
+) and (
+  max-width: 640px
+) {
+
+  .container {
+    width:
+      calc(
+        100% - 24px
+      );
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .responsive-grid {
+    grid-template-columns:
+      repeat(
+        auto-fit,
+        minmax(
+          min(
+            100%,
+            220px
+          ),
+          1fr
+        )
+      );
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    white-space: normal;
+  }
+
+}
+
+
+/* ============================================================
+   STANDARD MOBILE
+   361px - 480px
+============================================================ */
+
+@media (
+  min-width: 361px
+) and (
+  max-width: 480px
+) {
+
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    max-width: 100%;
+  }
+
+  .section-heading {
+    max-width: 100%;
+  }
+
+  .section-sub {
+    width: 100%;
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+   320px - 360px
+============================================================ */
+
+@media (
+  min-width: 320px
+) and (
+  max-width: 360px
+) {
+
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    width: 100%;
+
+    min-width: 0;
+
+    padding:
+      11px
+      14px;
+  }
+
+  .badge {
+    max-width: 100%;
+
+    font-size: 0.78rem;
+  }
+
+  .field label {
+    font-size: 0.88rem;
+  }
+
+  .section-heading {
+    width: 100%;
+  }
+
+  .section-sub {
+    width: 100%;
+  }
+
+}
+
+
+/* ============================================================
+   VERY NARROW DEVICE PROTECTION
+============================================================ */
+
+@media (max-width: 319px) {
+
+  html,
+  body {
+    min-width: 0;
+  }
+
+  .container {
+    width:
+      calc(
+        100% - 12px
+      );
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4,
+  .responsive-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    width: 100%;
+
+    white-space: normal;
+  }
+
+}
+
+
+/* ============================================================
+   SHORT HEIGHT DEVICES
+============================================================ */
+
+@media (max-height: 600px) {
+
+  .section {
+    padding-top: 36px;
+    padding-bottom: 36px;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (
+  hover: none
+) and (
+  pointer: coarse
+) {
+
+  .btn {
+    min-height: 46px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+}
+
+
+/* ============================================================
+   PRINT
+============================================================ */
+
+@media print {
+
+  html,
+  body {
+    overflow: visible;
+  }
+
+  .container {
+    width: 100%;
+    max-width: none;
+  }
+
+  .section {
+    padding:
+      20px
+      0;
+  }
+
 }

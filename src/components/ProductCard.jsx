@@ -40,8 +40,33 @@ export default function ProductCard({ product }) {
     isWishlisted,
   } = useWishlist();
 
+
+  // ----------------------------------------------------------
+  // SAFETY
+  // ----------------------------------------------------------
+
+  if (!product) {
+    return null;
+  }
+
+
+  // ----------------------------------------------------------
+  // WISHLIST
+  // ----------------------------------------------------------
+
   const wishlisted =
     isWishlisted(product.id);
+
+
+  // ----------------------------------------------------------
+  // PRODUCT URL
+  // Prefer readable slug for SEO
+  // ----------------------------------------------------------
+
+  const productPath =
+    product.slug
+      ? `/product/${product.slug}`
+      : `/product/${product.id}`;
 
 
   // ----------------------------------------------------------
@@ -49,20 +74,43 @@ export default function ProductCard({ product }) {
   // ----------------------------------------------------------
 
   const image =
-    product.image || null;
+    product.image ||
+    product.image_url ||
+    product.images?.[0] ||
+    null;
 
 
   // ----------------------------------------------------------
   // PRICE
   // ----------------------------------------------------------
 
+  const hasPrice =
+    product.price !== null &&
+    product.price !== undefined &&
+    Number(product.price) > 0;
+
   const priceDisplay =
     product.priceDisplay ||
     (
-      product.price
-        ? formatCurrency(product.price)
+      hasPrice
+        ? formatCurrency(
+            Number(product.price),
+            product.currency || "UGX"
+          )
         : "Request Quote"
     );
+
+
+  // ----------------------------------------------------------
+  // STATUS
+  // ----------------------------------------------------------
+
+  const productStatus =
+    product.status ||
+    "Available on Order";
+
+  const outOfStock =
+    productStatus === "Out of Stock";
 
 
   // ----------------------------------------------------------
@@ -71,9 +119,7 @@ export default function ProductCard({ product }) {
 
   const handleAddToCart = () => {
 
-    if (
-      product.status === "Out of Stock"
-    ) {
+    if (outOfStock) {
       return;
     }
 
@@ -97,17 +143,19 @@ export default function ProductCard({ product }) {
       <div className="product-card-image">
 
         <Link
-          to={`/product/${product.id}`}
+          to={productPath}
           className="product-card-image-link"
+          aria-label={`View ${product.name}`}
         >
 
           {image ? (
 
             <img
               src={image}
-              alt={product.name}
+              alt={product.name || "ApexMach UG product"}
               className="machine-image"
               loading="lazy"
+              decoding="async"
 
               onError={(event) => {
 
@@ -133,7 +181,6 @@ export default function ProductCard({ product }) {
                   "======================================"
                 );
 
-                // Remove broken image
                 event.currentTarget.style.display =
                   "none";
 
@@ -168,14 +215,14 @@ export default function ProductCard({ product }) {
           className={`
             badge
             ${
-              statusClass[product.status] ||
+              statusClass[productStatus] ||
               "badge-limited"
             }
             product-card-badge
           `}
         >
 
-          {product.status}
+          {productStatus}
 
         </span>
 
@@ -195,8 +242,8 @@ export default function ProductCard({ product }) {
           }
           aria-label={
             wishlisted
-              ? "Remove from wishlist"
-              : "Add to wishlist"
+              ? `Remove ${product.name} from wishlist`
+              : `Add ${product.name} to wishlist`
           }
         >
 
@@ -224,18 +271,26 @@ export default function ProductCard({ product }) {
         <div className="product-card-meta">
 
           <span className="product-card-brand">
-            {product.brand}
+            {product.brand || "ApexMach UG"}
           </span>
 
           <span className="product-card-rating">
 
-            <span className="star">
+            <span
+              className="star"
+              aria-hidden="true"
+            >
               ★
             </span>
 
             {" "}
 
-            {product.rating || "—"}
+            {
+              product.rating !== null &&
+              product.rating !== undefined
+                ? Number(product.rating).toFixed(1)
+                : "—"
+            }
 
           </span>
 
@@ -247,7 +302,7 @@ export default function ProductCard({ product }) {
         ==================================================== */}
 
         <Link
-          to={`/product/${product.id}`}
+          to={productPath}
           className="product-card-name"
         >
 
@@ -294,10 +349,7 @@ export default function ProductCard({ product }) {
             btn-sm
             btn-block
           "
-          disabled={
-            product.status ===
-            "Out of Stock"
-          }
+          disabled={outOfStock}
           onClick={handleAddToCart}
         >
 
@@ -306,10 +358,11 @@ export default function ProductCard({ product }) {
             size={16}
           />
 
-          {product.status ===
-          "Out of Stock"
-            ? "Out of Stock"
-            : "Add to Cart"}
+          {
+            outOfStock
+              ? "Out of Stock"
+              : "Add to Cart"
+          }
 
         </button>
 

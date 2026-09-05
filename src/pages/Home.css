@@ -1,7 +1,38 @@
-.hero {
-  background: var(--navy);
-  color: var(--white);
-  padding: var(--space-9) 0;
+/* ============================================================
+   APEXMACH UG
+   HOME PAGE
+   Scoped to .home-page only
+   ============================================================ */
+
+
+/* ============================================================
+   PAGE
+   ============================================================ */
+
+.home-page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.home-page .hero {
+  width: 100%;
+
+  min-height: 520px;
+
+  display: flex;
+  align-items: center;
+
+  padding:
+    clamp(70px, 9vw, 120px)
+    0;
+
+  background-color: var(--navy);
 
   background-image:
     linear-gradient(
@@ -13,129 +44,843 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-}
-.hero-inner {
-  max-width: 720px;
-}
-.hero-badge {
-  margin-bottom: var(--space-4);
-}
-.hero h1 {
+
   color: var(--white);
-  font-size: clamp(2.2rem, 5vw, 3.4rem);
-  line-height: 1.1;
-  margin-bottom: var(--space-4);
-}
-.hero p {
-  color: rgba(255,255,255,0.85);
-  font-size: 1.1rem;
-  margin-bottom: var(--space-6);
-}
-.hero-actions {
-  display: flex;
-  gap: var(--space-4);
-  flex-wrap: wrap;
 }
 
-.stats-section {
-  padding: var(--space-7) 0;
-  border-bottom: 1px solid var(--border);
-}
 
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-7);
-  align-items: center;
-}
-.about-media img {
-  border-radius: var(--radius);
+/* ============================================================
+   HERO INNER
+   ============================================================ */
+
+.home-page .hero-inner {
   width: 100%;
-  aspect-ratio: 4/3;
-  object-fit: cover;
 }
-.about-points {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-5);
-  margin-top: var(--space-5);
+
+
+/* ============================================================
+   HERO CONTENT
+   ============================================================ */
+
+.home-page .hero-content {
+  width: min(100%, 720px);
 }
-.about-points h4 {
+
+.home-page .hero .eyebrow {
+  margin-bottom: 16px;
+}
+
+.home-page .hero h1 {
+  max-width: 720px;
+
+  margin: 0 0 20px;
+
+  color: var(--white);
+
+  font-size:
+    clamp(
+      2.3rem,
+      5vw,
+      4rem
+    );
+
+  line-height: 1.08;
+
+  overflow-wrap: break-word;
+}
+
+.home-page .hero-sub {
+  width: min(100%, 660px);
+
+  margin-bottom: 28px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.88
+    );
+
+  font-size:
+    clamp(
+      1rem,
+      1.7vw,
+      1.18rem
+    );
+
+  line-height: 1.65;
+}
+
+
+/* ============================================================
+   HERO ACTIONS
+   ============================================================ */
+
+.home-page .hero-actions {
   display: flex;
+
   align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 14px;
+}
+
+
+/* ============================================================
+   STATS
+   ============================================================ */
+
+.home-page .stats-section {
+  padding:
+    clamp(
+      28px,
+      5vw,
+      52px
+    )
+    0;
+
+  border-bottom:
+    1px solid
+    var(--border);
+}
+
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+
+.home-page .about-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap:
+    clamp(
+      32px,
+      6vw,
+      72px
+    );
+}
+
+
+/* ============================================================
+   ABOUT IMAGE
+   ============================================================ */
+
+.home-page .about-media {
+  width: 100%;
+  min-width: 0;
+}
+
+.home-page .about-media img {
+  display: block;
+
+  width: 100%;
+
+  aspect-ratio: 4 / 3;
+
+  object-fit: cover;
+
+  border-radius: var(--radius);
+}
+
+
+/* ============================================================
+   ABOUT POINTS
+   ============================================================ */
+
+.home-page .about-points {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    clamp(
+      18px,
+      3vw,
+      32px
+    );
+
+  margin-top: 28px;
+}
+
+.home-page .about-points > div {
+  min-width: 0;
+}
+
+.home-page .about-points h4 {
+  display: flex;
+
+  align-items: center;
+
   gap: 8px;
+
+  margin-bottom: 7px;
+
   color: var(--navy);
-  margin-bottom: 6px;
+
   font-size: 1rem;
 }
-.about-points p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
+
+.home-page .about-points h4 svg {
+  flex-shrink: 0;
 }
 
-.section-header-row {
+.home-page .about-points p {
+  color: var(--text-muted);
+
+  font-size: 0.9rem;
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+   ============================================================ */
+
+.home-page .section-header-row {
   display: flex;
+
   align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: var(--space-6);
-  gap: var(--space-4);
+
   flex-wrap: wrap;
+
+  gap: 18px;
+
+  margin-bottom:
+    clamp(
+      24px,
+      4vw,
+      40px
+    );
 }
 
-.brand-strip {
+.home-page .section-header-row > div {
+  min-width: 0;
+}
+
+
+/* ============================================================
+   CATEGORY LINKS
+   ============================================================ */
+
+.home-page .home-category-link {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--space-7);
-  margin-top: var(--space-6);
-}
-.brand-strip span {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--navy);
-  opacity: 0.6;
-  letter-spacing: 0.02em;
+
+  align-items: flex-start;
+
+  gap: 16px;
+
+  padding:
+    clamp(
+      18px,
+      2.5vw,
+      26px
+    );
+
+  background: var(--white);
+
+  border:
+    1px solid
+    var(--border);
+
+  border-radius:
+    var(--radius);
+
+  color: var(--text-dark);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.testimonial-card {
-  padding: var(--space-5);
+.home-page .home-category-link:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(
+      11,
+      31,
+      77,
+      0.25
+    );
+
+  box-shadow:
+    0 8px 20px
+    rgba(
+      0,
+      0,
+      0,
+      0.06
+    );
+}
+
+.home-page .home-category-link > svg {
+  flex-shrink: 0;
+
+  color: var(--navy);
+}
+
+.home-page .home-category-link > div {
+  min-width: 0;
+}
+
+.home-page .home-category-link h3 {
+  margin-bottom: 7px;
+
+  color: var(--navy);
+
+  font-size:
+    clamp(
+      1rem,
+      1.5vw,
+      1.15rem
+    );
+
+  line-height: 1.3;
+}
+
+.home-page .home-category-link p {
+  color: var(--text-muted);
+
+  font-size: 0.88rem;
+
+  line-height: 1.55;
+}
+
+
+/* ============================================================
+   BRAND STRIP
+   ============================================================ */
+
+.home-page .brand-strip {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap:
+    clamp(
+      18px,
+      4vw,
+      48px
+    );
+
+  margin-top:
+    clamp(
+      24px,
+      4vw,
+      40px
+    );
+}
+
+.home-page .brand-strip span {
+  color: var(--navy);
+
+  font-size:
+    clamp(
+      0.95rem,
+      1.5vw,
+      1.1rem
+    );
+
+  font-weight: 700;
+
+  letter-spacing: 0.02em;
+
+  opacity: 0.65;
+
+  white-space: nowrap;
+}
+
+
+/* ============================================================
+   TESTIMONIAL
+   ============================================================ */
+
+.home-page .testimonial-card {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+
+  padding:
+    clamp(
+      18px,
+      2.5vw,
+      26px
+    );
+
   color: var(--gold-dark);
 }
-.testimonial-card p {
+
+.home-page .testimonial-card > svg {
+  color: var(--gold-dark);
+}
+
+.home-page .testimonial-card p {
+  margin:
+    14px
+    0
+    18px;
+
   color: var(--text-dark);
-  margin: var(--space-3) 0 var(--space-4);
+
   font-style: italic;
+
+  font-size: 0.95rem;
+
+  line-height: 1.65;
 }
-.testimonial-author strong {
+
+.home-page .testimonial-author strong {
   display: block;
+
   color: var(--navy);
+
+  margin-bottom: 2px;
 }
-.testimonial-author span {
-  font-size: 0.85rem;
+
+.home-page .testimonial-author span {
+  display: block;
+
+  color: var(--text-muted);
+
+  font-size: 0.82rem;
+
+  line-height: 1.4;
+}
+
+
+/* ============================================================
+   HOME PRODUCT MESSAGE
+   ============================================================ */
+
+.home-page .home-products-message {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  min-height: 220px;
+
+  padding: 30px;
+
+  text-align: center;
+
   color: var(--text-muted);
 }
 
-.cta-band {
-  background: var(--navy);
-  color: var(--white);
-  padding: var(--space-7) 0;
-}
-.cta-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
-  flex-wrap: wrap;
-}
-.cta-inner h2 {
-  color: var(--white);
-  margin-bottom: 6px;
-}
-.cta-inner p {
-  color: rgba(255,255,255,0.8);
+.home-page .home-products-message h2 {
+  color: var(--navy);
+
+  font-size:
+    clamp(
+      1.4rem,
+      3vw,
+      2rem
+    );
 }
 
+.home-page .home-products-message p {
+  max-width: 520px;
+}
+
+
+/* ============================================================
+   CTA
+   ============================================================ */
+
+.home-page .cta-band {
+  width: 100%;
+
+  padding:
+    clamp(
+      42px,
+      6vw,
+      70px
+    )
+    0;
+
+  background: var(--navy);
+
+  color: var(--white);
+}
+
+.home-page .cta-inner {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap:
+    clamp(
+      20px,
+      4vw,
+      40px
+    );
+}
+
+.home-page .cta-inner > div {
+  min-width: 0;
+}
+
+.home-page .cta-inner h2 {
+  margin-bottom: 8px;
+
+  color: var(--white);
+
+  font-size:
+    clamp(
+      1.7rem,
+      3vw,
+      2.5rem
+    );
+}
+
+.home-page .cta-inner p {
+  max-width: 650px;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.82
+    );
+
+  line-height: 1.6;
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+   ============================================================ */
+
+@media (min-width: 1440px) {
+
+  .home-page .hero {
+    min-height: 600px;
+  }
+
+  .home-page .hero-content {
+    max-width: 760px;
+  }
+
+}
+
+
+/* ============================================================
+   LAPTOP
+   ============================================================ */
+
+@media (max-width: 1200px) {
+
+  .home-page .hero {
+    min-height: 500px;
+  }
+
+  .home-page .about-grid {
+    gap: 44px;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET LANDSCAPE
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+  .home-page .hero {
+    min-height: 460px;
+
+    padding:
+      70px
+      0;
+  }
+
+  .home-page .about-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 0.9fr);
+
+    gap: 32px;
+  }
+
+  .home-page .about-points {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; }
-  .about-points { grid-template-columns: 1fr; }
+
+  .home-page .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-page .about-media {
+    max-width: 700px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE / TABLET PORTRAIT
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .home-page .hero {
+    min-height: 430px;
+
+    padding:
+      60px
+      0;
+
+    background-position: center;
+  }
+
+  .home-page .hero-content {
+    width: 100%;
+  }
+
+  .home-page .hero h1 {
+    max-width: 620px;
+  }
+
+  .home-page .hero-sub {
+    max-width: 580px;
+  }
+
+  .home-page .section-header-row {
+    align-items: flex-start;
+  }
+
+  .home-page .about-points {
+    margin-top: 22px;
+  }
+
+  .home-page .brand-strip {
+    gap:
+      18px
+      28px;
+  }
+
+  .home-page .cta-inner {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 640px) {
+
+  .home-page .hero {
+    min-height: 400px;
+
+    padding:
+      52px
+      0;
+  }
+
+  .home-page .hero h1 {
+    font-size:
+      clamp(
+        2rem,
+        9vw,
+        2.8rem
+      );
+  }
+
+  .home-page .hero-sub {
+    font-size: 1rem;
+  }
+
+  .home-page .hero-actions {
+    width: 100%;
+  }
+
+  .home-page .hero-actions .btn {
+    flex:
+      1
+      1
+      190px;
+  }
+
+  .home-page .section-header-row {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .home-page .section-header-row .btn {
+    align-self: flex-start;
+  }
+
+  .home-page .about-grid {
+    gap: 26px;
+  }
+
+  .home-page .brand-strip span {
+    white-space: normal;
+
+    text-align: center;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  .home-page .hero {
+    min-height: 370px;
+
+    padding:
+      46px
+      0;
+  }
+
+  .home-page .hero h1 {
+    margin-bottom: 16px;
+  }
+
+  .home-page .hero-sub {
+    margin-bottom: 22px;
+
+    font-size: 0.95rem;
+  }
+
+  .home-page .hero-actions {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 10px;
+  }
+
+  .home-page .hero-actions .btn {
+    width: 100%;
+
+    flex: none;
+  }
+
+  .home-page .about-points {
+    gap: 18px;
+  }
+
+  .home-page .home-category-link {
+    padding: 16px;
+
+    gap: 12px;
+  }
+
+  .home-page .brand-strip {
+    gap:
+      14px
+      22px;
+  }
+
+  .home-page .testimonial-card {
+    padding: 18px;
+  }
+
+  .home-page .home-products-message {
+    min-height: 180px;
+
+    padding: 24px 14px;
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 360px) {
+
+  .home-page .hero {
+    min-height: 350px;
+
+    padding:
+      40px
+      0;
+  }
+
+  .home-page .hero h1 {
+    font-size: 1.9rem;
+  }
+
+  .home-page .hero-sub {
+    font-size: 0.9rem;
+  }
+
+  .home-page .home-category-link {
+    padding: 14px;
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .home-page .home-category-link {
+    transition: none;
+  }
+
+  .home-page .home-category-link:hover {
+    transform: none;
+  }
+
 }

@@ -4,6 +4,7 @@ import {
 } from 'react';
 
 import {
+  Link,
   useNavigate,
 } from 'react-router-dom';
 
@@ -26,19 +27,67 @@ import './Checkout.css';
 
 
 // ============================================================
-// INITIAL FORM
+// INITIAL SHIPPING FORM
 // ============================================================
 
 const initialShippingForm = {
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  streetAddress: '',
-  city: '',
-  country: 'Uganda',
-  purchaseOrderNumber: '',
+
+  firstName:
+    '',
+
+  lastName:
+    '',
+
+  email:
+    '',
+
+  phone:
+    '',
+
+  streetAddress:
+    '',
+
+  city:
+    '',
+
+  country:
+    'Uganda',
+
+  purchaseOrderNumber:
+    '',
+
 };
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getItemImage(
+  item
+) {
+
+  return (
+    item?.image ||
+    item?.image_url ||
+    item?.images?.[0] ||
+    '/logo.jpg'
+  );
+
+}
+
+
+function getItemSlug(
+  item
+) {
+
+  return (
+    item?.slug ||
+    item?.id ||
+    ''
+  );
+
+}
 
 
 // ============================================================
@@ -48,8 +97,8 @@ const initialShippingForm = {
 export default function Checkout() {
 
   const {
-    items,
-    subtotal,
+    items = [],
+    subtotal = 0,
     clearCart,
   } =
     useCart();
@@ -58,6 +107,10 @@ export default function Checkout() {
   const navigate =
     useNavigate();
 
+
+  // ==========================================================
+  // STATE
+  // ==========================================================
 
   const [
     delivery,
@@ -99,7 +152,9 @@ export default function Checkout() {
     error,
     setError,
   ] =
-    useState('');
+    useState(
+      ''
+    );
 
 
   const [
@@ -115,24 +170,33 @@ export default function Checkout() {
   // TOTALS
   // ==========================================================
 
+  const safeSubtotal =
+    Number(
+      subtotal ||
+      0
+    );
+
+
   const shippingCost =
-    delivery === 'express'
+    delivery ===
+    'express'
       ? 250000
       : 0;
 
 
+  const taxRate =
+    0.05;
+
+
   const tax =
     Math.round(
-      Number(
-        subtotal || 0
-      ) * 0.05
+      safeSubtotal *
+      taxRate
     );
 
 
   const total =
-    Number(
-      subtotal || 0
-    ) +
+    safeSubtotal +
     shippingCost +
     tax;
 
@@ -145,39 +209,84 @@ export default function Checkout() {
     useMemo(
       () => {
 
-        return (
-          items || []
-        ).map(
-          (item) => ({
+        return items
+          .filter(
+            (
+              item
+            ) =>
+              Boolean(
+                item?.id
+              )
+          )
+          .map(
+            (
+              item
+            ) => ({
 
-            productId:
-              item.id,
+              productId:
+                item.id,
 
-            productName:
-              item.name,
+              productName:
+                item.name ||
+                'Product',
 
-            sku:
-              item.sku ||
-              '',
+              sku:
+                item.sku ||
+                item.slug ||
+                '',
 
-            quantity:
-              Number(
-                item.qty ||
-                1
-              ),
+              quantity:
+                Math.max(
+                  1,
+                  Number(
+                    item.qty ||
+                    1
+                  )
+                ),
 
-            unitPrice:
-              Number(
-                item.price ||
-                0
-              ),
+              unitPrice:
+                Math.max(
+                  0,
+                  Number(
+                    item.price ||
+                    0
+                  )
+                ),
 
-          })
-        );
+            })
+          );
 
       },
       [
         items,
+      ]
+    );
+
+
+  // ==========================================================
+  // TOTAL QUANTITY
+  // ==========================================================
+
+  const totalQuantity =
+    useMemo(
+      () => {
+
+        return normalizedItems.reduce(
+          (
+            totalItems,
+            item
+          ) =>
+            totalItems +
+            Number(
+              item.quantity ||
+              0
+            ),
+          0
+        );
+
+      },
+      [
+        normalizedItems,
       ]
     );
 
@@ -198,7 +307,9 @@ export default function Checkout() {
 
 
     setForm(
-      (previous) => ({
+      (
+        previous
+      ) => ({
 
         ...previous,
 
@@ -207,6 +318,99 @@ export default function Checkout() {
 
       })
     );
+
+
+    if (error) {
+
+      setError(
+        ''
+      );
+
+    }
+
+  }
+
+
+  // ==========================================================
+  // VALIDATE
+  // ==========================================================
+
+  function validateForm() {
+
+    if (
+      normalizedItems.length ===
+      0
+    ) {
+
+      return 'Your cart is empty.';
+
+    }
+
+
+    if (
+      !form.firstName.trim()
+    ) {
+
+      return 'Please enter your first name.';
+
+    }
+
+
+    if (
+      !form.lastName.trim()
+    ) {
+
+      return 'Please enter your last name.';
+
+    }
+
+
+    if (
+      !form.email.trim()
+    ) {
+
+      return 'Please enter your email address.';
+
+    }
+
+
+    if (
+      !form.phone.trim()
+    ) {
+
+      return 'Please enter your phone number.';
+
+    }
+
+
+    if (
+      !form.streetAddress.trim()
+    ) {
+
+      return 'Please enter your delivery address.';
+
+    }
+
+
+    if (
+      !form.city.trim()
+    ) {
+
+      return 'Please enter your city or district.';
+
+    }
+
+
+    if (
+      !form.country.trim()
+    ) {
+
+      return 'Please enter your country.';
+
+    }
+
+
+    return '';
 
   }
 
@@ -225,18 +429,31 @@ export default function Checkout() {
     if (
       submitting
     ) {
+
       return;
+
     }
 
 
+    const validationError =
+      validateForm();
+
+
     if (
-      normalizedItems.length ===
-      0
+      validationError
     ) {
 
       setError(
-        'Your cart is empty.'
+        validationError
       );
+
+      window.scrollTo({
+        top:
+          0,
+
+        behavior:
+          'smooth',
+      });
 
       return;
 
@@ -249,8 +466,15 @@ export default function Checkout() {
         true
       );
 
-      setError('');
 
+      setError(
+        ''
+      );
+
+
+      // ======================================================
+      // PAYLOAD
+      // ======================================================
 
       const payload = {
 
@@ -263,9 +487,12 @@ export default function Checkout() {
         purchaseOrderNumber:
           payment ===
           'invoice'
-            ? form
-                .purchaseOrderNumber
-                .trim()
+            ? (
+                form
+                  .purchaseOrderNumber
+                  .trim() ||
+                null
+              )
             : null,
 
 
@@ -316,9 +543,7 @@ export default function Checkout() {
         summary: {
 
           subtotal:
-            Number(
-              subtotal || 0
-            ),
+            safeSubtotal,
 
           shipping:
             shippingCost,
@@ -332,10 +557,32 @@ export default function Checkout() {
       };
 
 
-      const order =
+      // ======================================================
+      // CREATE ORDER
+      // ======================================================
+
+      const response =
         await createCustomerOrder(
           payload
         );
+
+
+      const order =
+        response?.order ||
+        response?.data?.order ||
+        response?.data ||
+        response;
+
+
+      if (
+        !order
+      ) {
+
+        throw new Error(
+          'Order was created but no order information was returned.'
+        );
+
+      }
 
 
       setPlacedOrder(
@@ -346,7 +593,18 @@ export default function Checkout() {
       clearCart();
 
 
-    } catch (requestError) {
+      window.scrollTo({
+        top:
+          0,
+
+        behavior:
+          'smooth',
+      });
+
+
+    } catch (
+      requestError
+    ) {
 
       console.error(
         '[CHECKOUT ERROR]',
@@ -363,6 +621,16 @@ export default function Checkout() {
           ?.message ||
         'Unable to place your order. Please try again.'
       );
+
+
+      window.scrollTo({
+        top:
+          0,
+
+        behavior:
+          'smooth',
+      });
+
 
     } finally {
 
@@ -383,77 +651,199 @@ export default function Checkout() {
     placedOrder
   ) {
 
+    const orderReference =
+      placedOrder.orderNumber ||
+      placedOrder.order_number ||
+      placedOrder.id ||
+      'Order received';
+
+
     return (
 
-      <div className="section">
+      <main className="checkout-page">
 
-        <div className="container checkout-confirm">
+        <div className="container">
 
-          <Icon
-            name="check"
-            size={48}
-          />
+          <div className="checkout-confirm">
 
+            <div className="checkout-confirm-icon">
 
-          <h1>
-            Order Confirmed
-          </h1>
+              <Icon
+                name="check"
+                size={44}
+                strokeWidth={2}
+              />
 
-
-          <p>
-            Your procurement order has
-            been received by Apex
-            Machinery and is now awaiting
-            processing.
-          </p>
+            </div>
 
 
-          <div className="checkout-order-reference">
-
-            <span>
-              Order Number
+            <span className="eyebrow">
+              Procurement Request Received
             </span>
 
-            <strong>
-              {placedOrder.orderNumber ||
-                placedOrder.id}
-            </strong>
 
-          </div>
+            <h1>
+              Order Confirmed
+            </h1>
 
 
-          <div className="checkout-confirm-actions">
-
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() =>
-                navigate(
-                  '/order-tracking'
-                )
-              }
-            >
-              Track Your Order
-            </button>
+            <p>
+              Your procurement order has
+              been received by ApexMach UG
+              and is now awaiting processing.
+            </p>
 
 
-            <button
-              type="button"
-              className="btn btn-outline-navy"
-              onClick={() =>
-                navigate(
-                  '/shop'
-                )
-              }
-            >
-              Continue Shopping
-            </button>
+            <div className="checkout-order-reference">
+
+              <span>
+                Order Number
+              </span>
+
+
+              <strong>
+                {
+                  orderReference
+                }
+              </strong>
+
+            </div>
+
+
+            {
+              payment ===
+              'card' && (
+
+                <div className="checkout-confirm-notice">
+
+                  <Icon
+                    name="info"
+                    size={18}
+                  />
+
+
+                  <p>
+                    Your order has been
+                    recorded. Card payment
+                    processing will become
+                    available once the secure
+                    payment gateway is connected.
+                  </p>
+
+                </div>
+
+              )
+            }
+
+
+            <div className="checkout-confirm-actions">
+
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={
+                  () =>
+                    navigate(
+                      '/order-tracking'
+                    )
+                }
+              >
+                Track Your Order
+              </button>
+
+
+              <button
+                type="button"
+                className="btn btn-outline-navy"
+                onClick={
+                  () =>
+                    navigate(
+                      '/shop'
+                    )
+                }
+              >
+                Continue Shopping
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+      </main>
+
+    );
+
+  }
+
+
+  // ==========================================================
+  // EMPTY CHECKOUT
+  // ==========================================================
+
+  if (
+    items.length ===
+    0
+  ) {
+
+    return (
+
+      <main className="checkout-page">
+
+        <div className="container">
+
+          <Breadcrumb
+            items={[
+              {
+                to:
+                  '/cart',
+
+                label:
+                  'Cart',
+              },
+
+              {
+                label:
+                  'Checkout',
+              },
+            ]}
+          />
+
+
+          <div className="checkout-empty">
+
+            <Icon
+              name="cart"
+              size={42}
+            />
+
+
+            <h1>
+              Your cart is empty
+            </h1>
+
+
+            <p>
+              Add machinery, tools or
+              industrial equipment to your
+              cart before proceeding to
+              checkout.
+            </p>
+
+
+            <Link
+              to="/shop"
+              className="btn btn-primary"
+            >
+              Browse Products
+            </Link>
+
+          </div>
+
+        </div>
+
+      </main>
 
     );
 
@@ -466,10 +856,14 @@ export default function Checkout() {
 
   return (
 
-    <div className="section">
+    <main className="checkout-page">
 
       <div className="container">
 
+
+        {/* ==================================================
+            BREADCRUMB
+        ================================================== */}
 
         <Breadcrumb
           items={[
@@ -489,28 +883,82 @@ export default function Checkout() {
         />
 
 
-        <h1 className="checkout-title">
-          Secure Checkout
-        </h1>
+        {/* ==================================================
+            PAGE HEADER
+        ================================================== */}
 
+        <div className="checkout-header">
 
-        {error && (
+          <div>
 
-          <div className="checkout-error">
-
-            <Icon
-              name="alert"
-              size={18}
-            />
-
-            <span>
-              {error}
+            <span className="eyebrow">
+              Secure Procurement
             </span>
+
+
+            <h1 className="checkout-title">
+              Secure Checkout
+            </h1>
+
+
+            <p className="checkout-subtitle">
+
+              Complete your delivery
+              information and submit your
+              ApexMach UG procurement order.
+
+            </p>
 
           </div>
 
-        )}
 
+          <div className="checkout-secure-badge">
+
+            <Icon
+              name="shield"
+              size={18}
+            />
+
+            Secure Order
+
+          </div>
+
+        </div>
+
+
+        {/* ==================================================
+            ERROR
+        ================================================== */}
+
+        {
+          error && (
+
+            <div
+              className="checkout-error"
+              role="alert"
+            >
+
+              <Icon
+                name="warning"
+                size={20}
+              />
+
+
+              <span>
+                {
+                  error
+                }
+              </span>
+
+            </div>
+
+          )
+        }
+
+
+        {/* ==================================================
+            CHECKOUT FORM
+        ================================================== */}
 
         <form
           className="checkout-layout"
@@ -544,16 +992,28 @@ export default function Checkout() {
               </h2>
 
 
+              <p className="checkout-step-description">
+                Enter the delivery details
+                for this procurement order.
+              </p>
+
+
               <div className="form-row">
 
                 <div className="field">
 
-                  <label>
+                  <label
+                    htmlFor="checkout-first-name"
+                  >
                     First Name
                   </label>
 
+
                   <input
+                    id="checkout-first-name"
                     name="firstName"
+                    type="text"
+                    autoComplete="given-name"
                     value={
                       form.firstName
                     }
@@ -569,12 +1029,18 @@ export default function Checkout() {
 
                 <div className="field">
 
-                  <label>
+                  <label
+                    htmlFor="checkout-last-name"
+                  >
                     Last Name
                   </label>
 
+
                   <input
+                    id="checkout-last-name"
                     name="lastName"
+                    type="text"
+                    autoComplete="family-name"
                     value={
                       form.lastName
                     }
@@ -592,13 +1058,18 @@ export default function Checkout() {
 
               <div className="field">
 
-                <label>
+                <label
+                  htmlFor="checkout-email"
+                >
                   Email Address
                 </label>
 
+
                 <input
+                  id="checkout-email"
                   name="email"
                   type="email"
+                  autoComplete="email"
                   value={
                     form.email
                   }
@@ -614,13 +1085,19 @@ export default function Checkout() {
 
               <div className="field">
 
-                <label>
+                <label
+                  htmlFor="checkout-phone"
+                >
                   Phone Number
                 </label>
 
+
                 <input
+                  id="checkout-phone"
                   name="phone"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   value={
                     form.phone
                   }
@@ -636,12 +1113,18 @@ export default function Checkout() {
 
               <div className="field">
 
-                <label>
+                <label
+                  htmlFor="checkout-address"
+                >
                   Street Address
                 </label>
 
+
                 <input
+                  id="checkout-address"
                   name="streetAddress"
+                  type="text"
+                  autoComplete="street-address"
                   value={
                     form.streetAddress
                   }
@@ -649,7 +1132,7 @@ export default function Checkout() {
                     handleChange
                   }
                   required
-                  placeholder="Street address"
+                  placeholder="Street, building or delivery location"
                 />
 
               </div>
@@ -659,12 +1142,18 @@ export default function Checkout() {
 
                 <div className="field">
 
-                  <label>
-                    City
+                  <label
+                    htmlFor="checkout-city"
+                  >
+                    City / District
                   </label>
 
+
                   <input
+                    id="checkout-city"
                     name="city"
+                    type="text"
+                    autoComplete="address-level2"
                     value={
                       form.city
                     }
@@ -672,7 +1161,7 @@ export default function Checkout() {
                       handleChange
                     }
                     required
-                    placeholder="City"
+                    placeholder="Kampala"
                   />
 
                 </div>
@@ -680,12 +1169,18 @@ export default function Checkout() {
 
                 <div className="field">
 
-                  <label>
+                  <label
+                    htmlFor="checkout-country"
+                  >
                     Country
                   </label>
 
+
                   <input
+                    id="checkout-country"
                     name="country"
+                    type="text"
+                    autoComplete="country-name"
                     value={
                       form.country
                     }
@@ -693,7 +1188,7 @@ export default function Checkout() {
                       handleChange
                     }
                     required
-                    placeholder="Country"
+                    placeholder="Uganda"
                   />
 
                 </div>
@@ -720,7 +1215,16 @@ export default function Checkout() {
               </h2>
 
 
+              <p className="checkout-step-description">
+                Select the logistics option
+                for your equipment order.
+              </p>
+
+
               <div className="checkout-options">
+
+
+                {/* STANDARD */}
 
                 <label
                   className={`checkout-option ${
@@ -734,6 +1238,7 @@ export default function Checkout() {
                   <input
                     type="radio"
                     name="delivery"
+                    value="standard"
                     checked={
                       delivery ===
                       'standard'
@@ -746,14 +1251,25 @@ export default function Checkout() {
                   />
 
 
-                  <div>
+                  <div className="checkout-option-icon">
+
+                    <Icon
+                      name="truck"
+                      size={20}
+                    />
+
+                  </div>
+
+
+                  <div className="checkout-option-content">
 
                     <strong>
                       Standard Delivery
                     </strong>
 
+
                     <span>
-                      3–5 Business Days
+                      Estimated 3–5 business days
                     </span>
 
                   </div>
@@ -765,6 +1281,8 @@ export default function Checkout() {
 
                 </label>
 
+
+                {/* EXPRESS */}
 
                 <label
                   className={`checkout-option ${
@@ -778,6 +1296,7 @@ export default function Checkout() {
                   <input
                     type="radio"
                     name="delivery"
+                    value="express"
                     checked={
                       delivery ===
                       'express'
@@ -790,11 +1309,22 @@ export default function Checkout() {
                   />
 
 
-                  <div>
+                  <div className="checkout-option-icon">
+
+                    <Icon
+                      name="bolt"
+                      size={20}
+                    />
+
+                  </div>
+
+
+                  <div className="checkout-option-content">
 
                     <strong>
                       Express Logistics
                     </strong>
+
 
                     <span>
                       Priority industrial delivery
@@ -805,9 +1335,11 @@ export default function Checkout() {
 
                   <span className="checkout-option-price">
 
-                    {formatCurrency(
-                      shippingCost
-                    )}
+                    {
+                      formatCurrency(
+                        250000
+                      )
+                    }
 
                   </span>
 
@@ -835,7 +1367,17 @@ export default function Checkout() {
               </h2>
 
 
-              <div className="checkout-payment-tabs">
+              <p className="checkout-step-description">
+                Choose how this procurement
+                order will be processed.
+              </p>
+
+
+              <div
+                className="checkout-payment-tabs"
+                role="group"
+                aria-label="Payment method"
+              >
 
                 <button
                   type="button"
@@ -845,13 +1387,24 @@ export default function Checkout() {
                       ? 'active'
                       : ''
                   }
+                  aria-pressed={
+                    payment ===
+                    'invoice'
+                  }
                   onClick={() =>
                     setPayment(
                       'invoice'
                     )
                   }
                 >
+
+                  <Icon
+                    name="package"
+                    size={17}
+                  />
+
                   Enterprise Invoice
+
                 </button>
 
 
@@ -863,70 +1416,115 @@ export default function Checkout() {
                       ? 'active'
                       : ''
                   }
+                  aria-pressed={
+                    payment ===
+                    'card'
+                  }
                   onClick={() =>
                     setPayment(
                       'card'
                     )
                   }
                 >
+
+                  <Icon
+                    name="shield"
+                    size={17}
+                  />
+
                   Card Payment
+
                 </button>
 
               </div>
 
 
-              {payment ===
-              'invoice' ? (
+              {
+                payment ===
+                'invoice'
+                  ? (
 
-                <div className="field">
+                    <div className="checkout-payment-panel">
 
-                  <label>
-                    Purchase Order Number
-                  </label>
+                      <div className="field">
 
-                  <input
-                    name="purchaseOrderNumber"
-                    value={
-                      form
-                        .purchaseOrderNumber
-                    }
-                    onChange={
-                      handleChange
-                    }
-                    placeholder="PO-2026-XXXX"
-                  />
+                        <label
+                          htmlFor="checkout-po"
+                        >
+                          Purchase Order Number
+                          <span className="field-optional">
+                            {' '}(Optional)
+                          </span>
+                        </label>
 
-                </div>
 
-              ) : (
+                        <input
+                          id="checkout-po"
+                          name="purchaseOrderNumber"
+                          type="text"
+                          value={
+                            form.purchaseOrderNumber
+                          }
+                          onChange={
+                            handleChange
+                          }
+                          placeholder="PO-2026-XXXX"
+                        />
 
-                <div className="checkout-payment-notice">
+                      </div>
 
-                  <Icon
-                    name="shield"
-                    size={18}
-                  />
 
-                  <div>
+                      <div className="checkout-payment-info">
 
-                    <strong>
-                      Card gateway pending
-                    </strong>
+                        <Icon
+                          name="info"
+                          size={18}
+                        />
 
-                    <p>
-                      Your order can be
-                      submitted now, but
-                      card details are not
-                      collected until a
-                      certified payment
-                      provider is connected.
-                    </p>
 
-                  </div>
+                        <p>
+                          Enterprise orders can
+                          include your organization&apos;s
+                          purchase order reference for
+                          easier procurement tracking.
+                        </p>
 
-                </div>
+                      </div>
 
-              )}
+                    </div>
+
+                  )
+                  : (
+
+                    <div className="checkout-payment-notice">
+
+                      <Icon
+                        name="shield"
+                        size={20}
+                      />
+
+
+                      <div>
+
+                        <strong>
+                          Secure card gateway coming soon
+                        </strong>
+
+
+                        <p>
+                          No card details are collected
+                          on this page. Your procurement
+                          order can still be recorded
+                          while the certified payment
+                          gateway is being connected.
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                  )
+              }
 
             </section>
 
@@ -939,127 +1537,237 @@ export default function Checkout() {
 
           <aside className="checkout-summary card">
 
-            <h3>
-              Order Summary
-            </h3>
+            <div className="checkout-summary-header">
+
+              <div>
+
+                <h3>
+                  Order Summary
+                </h3>
 
 
-            {items.map(
-              (item) => (
-
-                <div
-                  key={
-                    item.id
+                <span>
+                  {totalQuantity}{' '}
+                  item
+                  {
+                    totalQuantity !==
+                    1
+                      ? 's'
+                      : ''
                   }
-                  className="checkout-summary-item"
-                >
+                </span>
 
-                  <img
-                    src={
-                      item.image
-                    }
-                    alt={
-                      item.name
-                    }
-                  />
+              </div>
 
 
-                  <div>
-
-                    <strong>
-                      {item.name}
-                    </strong>
-
-                    <span>
-                      Qty: {item.qty}
-                    </span>
-
-                  </div>
-
-
-                  <span>
-
-                    {formatCurrency(
-                      item.price *
-                      item.qty
-                    )}
-
-                  </span>
-
-                </div>
-
-              )
-            )}
-
-
-            <div className="cart-summary-row">
-
-              <span>
-                Subtotal
-              </span>
-
-              <strong>
-                {formatCurrency(
-                  subtotal
-                )}
-              </strong>
+              <Link
+                to="/cart"
+                className="checkout-edit-cart"
+              >
+                Edit Cart
+              </Link>
 
             </div>
 
 
-            <div className="cart-summary-row">
+            {/* ITEMS */}
 
-              <span>
-                Shipping
-              </span>
+            <div className="checkout-summary-items">
 
-              <strong>
+              {
+                items.map(
+                  (
+                    item
+                  ) => {
 
-                {shippingCost ===
-                0
-                  ? 'Free'
-                  : formatCurrency(
-                      shippingCost
-                    )}
+                    const quantity =
+                      Math.max(
+                        1,
+                        Number(
+                          item.qty ||
+                          1
+                        )
+                      );
 
-              </strong>
+
+                    const itemPrice =
+                      Number(
+                        item.price ||
+                        0
+                      );
+
+
+                    const productPath =
+                      `/product/${getItemSlug(
+                        item
+                      )}`;
+
+
+                    return (
+
+                      <div
+                        key={
+                          item.id
+                        }
+                        className="checkout-summary-item"
+                      >
+
+                        <Link
+                          to={
+                            productPath
+                          }
+                          className="checkout-summary-image"
+                        >
+
+                          <img
+                            src={
+                              getItemImage(
+                                item
+                              )
+                            }
+                            alt={
+                              item.name ||
+                              'Product'
+                            }
+                            loading="lazy"
+                          />
+
+                        </Link>
+
+
+                        <div className="checkout-summary-product">
+
+                          <Link
+                            to={
+                              productPath
+                            }
+                            className="checkout-summary-name"
+                          >
+                            {
+                              item.name
+                            }
+                          </Link>
+
+
+                          <span>
+                            Qty: {
+                              quantity
+                            }
+                          </span>
+
+                        </div>
+
+
+                        <strong className="checkout-summary-product-price">
+
+                          {
+                            formatCurrency(
+                              itemPrice *
+                              quantity
+                            )
+                          }
+
+                        </strong>
+
+                      </div>
+
+                    );
+
+                  }
+                )
+              }
 
             </div>
 
 
-            <div className="cart-summary-row">
+            {/* TOTALS */}
 
-              <span>
-                Tax
-              </span>
+            <div className="checkout-summary-totals">
 
-              <strong>
-                {formatCurrency(
-                  tax
-                )}
-              </strong>
+              <div className="checkout-summary-row">
+
+                <span>
+                  Subtotal
+                </span>
+
+
+                <strong>
+                  {
+                    formatCurrency(
+                      safeSubtotal
+                    )
+                  }
+                </strong>
+
+              </div>
+
+
+              <div className="checkout-summary-row">
+
+                <span>
+                  Shipping
+                </span>
+
+
+                <strong>
+
+                  {
+                    shippingCost ===
+                    0
+                      ? 'Free'
+                      : formatCurrency(
+                          shippingCost
+                        )
+                  }
+
+                </strong>
+
+              </div>
+
+
+              <div className="checkout-summary-row">
+
+                <span>
+                  Tax (5%)
+                </span>
+
+
+                <strong>
+                  {
+                    formatCurrency(
+                      tax
+                    )
+                  }
+                </strong>
+
+              </div>
+
+
+              <div className="checkout-summary-total">
+
+                <span>
+                  Total
+                </span>
+
+
+                <strong>
+                  {
+                    formatCurrency(
+                      total
+                    )
+                  }
+                </strong>
+
+              </div>
 
             </div>
 
 
-            <div className="cart-summary-total">
-
-              <span>
-                Total
-              </span>
-
-              <strong>
-                {formatCurrency(
-                  total
-                )}
-              </strong>
-
-            </div>
-
+            {/* PLACE ORDER */}
 
             <button
               type="submit"
-              className="btn btn-primary btn-block"
+              className="btn btn-primary btn-block checkout-submit"
               disabled={
                 items.length ===
                   0 ||
@@ -1067,11 +1775,48 @@ export default function Checkout() {
               }
             >
 
-              {submitting
-                ? 'Placing Order...'
-                : 'Place Order'}
+              {
+                submitting
+                  ? 'Placing Order...'
+                  : 'Place Order'
+              }
+
+              {
+                !submitting && (
+
+                  <Icon
+                    name="arrowRight"
+                    size={16}
+                  />
+
+                )
+              }
 
             </button>
+
+
+            <div className="checkout-secure-note">
+
+              <Icon
+                name="shield"
+                size={16}
+              />
+
+
+              <span>
+                Your order information is
+                submitted securely.
+              </span>
+
+            </div>
+
+
+            <p className="checkout-terms">
+              By placing your order, you
+              confirm that the delivery and
+              procurement information above
+              is correct.
+            </p>
 
           </aside>
 
@@ -1079,7 +1824,7 @@ export default function Checkout() {
 
       </div>
 
-    </div>
+    </main>
 
   );
 

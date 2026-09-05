@@ -1,5 +1,20 @@
-import { useState } from 'react';
-import { useParams, Link, Navigate } from 'react-router-dom';
+// ============================================================
+// APEXMACH UG
+// PRODUCT DETAILS
+// ============================================================
+
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+import {
+  useParams,
+  Link,
+  Navigate,
+} from 'react-router-dom';
+
 import { Helmet } from 'react-helmet-async';
 
 import Breadcrumb from '../components/Breadcrumb';
@@ -8,9 +23,9 @@ import ProductCard from '../components/ProductCard';
 import Modal from '../components/Modal';
 
 import {
-  getProductById,
-  getRelatedProducts,
-} from '../data/products';
+  getProduct,
+  getProducts,
+} from '../services/productApi';
 
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -18,6 +33,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { formatCurrency } from '../utils/format';
 
 import './ProductDetails.css';
+
 
 
 // ============================================================
@@ -29,23 +45,108 @@ const reviews = [
     name: 'Jonathan Reyes',
     rating: 5,
     date: 'Mar 12, 2026',
-    text: 'Exceeded expectations for the price point. Runs smooth under continuous industrial load.',
+    text:
+      'Exceeded expectations for the price point. Runs smooth under continuous industrial load.',
   },
 
   {
     name: 'Amara Osei',
     rating: 4,
     date: 'Feb 28, 2026',
-    text: 'Solid build quality. Shipping took a little longer than quoted but support kept us updated.',
+    text:
+      'Solid build quality. Shipping took a little longer than quoted but support kept us updated.',
   },
 
   {
     name: 'Liu Wei',
     rating: 5,
     date: 'Feb 09, 2026',
-    text: 'Specifications matched exactly what was listed. Our maintenance team is impressed.',
+    text:
+      'Specifications matched exactly what was listed. Our maintenance team is impressed.',
   },
 ];
+
+
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getProductsArray(data) {
+
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data?.products)) {
+    return data.products;
+  }
+
+  if (Array.isArray(data?.data?.products)) {
+    return data.data.products;
+  }
+
+  return [];
+
+}
+
+
+
+function getProductObject(data) {
+
+  if (!data) {
+    return null;
+  }
+
+  if (
+    data?.product &&
+    typeof data.product === 'object'
+  ) {
+    return data.product;
+  }
+
+  if (
+    data?.data?.product &&
+    typeof data.data.product === 'object'
+  ) {
+    return data.data.product;
+  }
+
+  if (
+    typeof data === 'object' &&
+    !Array.isArray(data)
+  ) {
+    return data;
+  }
+
+  return null;
+
+}
+
+
+
+function makeAbsoluteImageUrl(image) {
+
+  if (!image) {
+    return 'https://www.apexmachinery256.com/logo.jpg';
+  }
+
+  if (
+    image.startsWith('http://') ||
+    image.startsWith('https://')
+  ) {
+    return image;
+  }
+
+  const normalized =
+    image.startsWith('/')
+      ? image
+      : `/${image}`;
+
+  return `https://www.apexmachinery256.com${normalized}`;
+
+}
+
 
 
 // ============================================================
@@ -56,29 +157,69 @@ export default function ProductDetails() {
 
   const { id } = useParams();
 
-  // ----------------------------------------------------------
-  // GET PRODUCT
-  // ----------------------------------------------------------
-
-  const product = getProductById(id);
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // STATE
-  // ----------------------------------------------------------
+  // ==========================================================
 
-  const [activeImg, setActiveImg] = useState(0);
+  const [
+    product,
+    setProduct,
+  ] = useState(null);
 
-  const [qty, setQty] = useState(1);
 
-  const [quoteOpen, setQuoteOpen] = useState(false);
+  const [
+    allProducts,
+    setAllProducts,
+  ] = useState([]);
 
 
-  // ----------------------------------------------------------
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+
+  const [
+    error,
+    setError,
+  ] = useState('');
+
+
+  const [
+    notFound,
+    setNotFound,
+  ] = useState(false);
+
+
+  const [
+    activeImg,
+    setActiveImg,
+  ] = useState(0);
+
+
+  const [
+    qty,
+    setQty,
+  ] = useState(1);
+
+
+  const [
+    quoteOpen,
+    setQuoteOpen,
+  ] = useState(false);
+
+
+
+  // ==========================================================
   // CONTEXT
-  // ----------------------------------------------------------
+  // ==========================================================
 
-  const { addToCart } = useCart();
+  const {
+    addToCart,
+  } = useCart();
+
 
   const {
     toggleWishlist,
@@ -86,99 +227,175 @@ export default function ProductDetails() {
   } = useWishlist();
 
 
-  // ----------------------------------------------------------
-  // PRODUCT NOT FOUND
-  // ----------------------------------------------------------
-
-  if (!product) {
-    return <Navigate to="/shop" replace />;
-  }
-
 
   // ==========================================================
-  // DYNAMIC SEO INFORMATION
+  // LOAD PRODUCT FROM BACKEND
   // ==========================================================
 
-  const productTitle =
-    `${product.name} | Apex Machinery`;
+  useEffect(
+    () => {
 
-  const productDescription =
-    product.description ||
-    `Buy ${product.name} from Apex Machinery. View product specifications, pricing, availability and request a quote.`;
-
-  const productUrl =
-    `https://apexmachinery256.com/product/${product.id}`;
-
-  const productImage =
-    product.images?.[0] ||
-    product.image ||
-    'https://apexmachinery256.com/logo.jpg';
+      let cancelled = false;
 
 
-  // ==========================================================
-  // PRODUCT SCHEMA
-  // ==========================================================
+      async function loadProductDetails() {
 
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+        try {
 
-    name: product.name,
+          setLoading(true);
 
-    description: productDescription,
+          setError('');
 
-    image: [productImage],
+          setNotFound(false);
 
-    sku: product.slug || String(product.id),
+          setActiveImg(0);
 
-    brand: {
-      '@type': 'Brand',
-      name: 'Apex Machinery',
+          setQty(1);
+
+
+          // --------------------------------------------------
+          // Load selected product
+          // --------------------------------------------------
+
+          const productResponse =
+            await getProduct(id);
+
+
+          if (cancelled) {
+            return;
+          }
+
+
+          const selectedProduct =
+            getProductObject(
+              productResponse
+            );
+
+
+          if (!selectedProduct?.id) {
+
+            setNotFound(true);
+
+            setProduct(null);
+
+            return;
+
+          }
+
+
+          setProduct(
+            selectedProduct
+          );
+
+
+          // --------------------------------------------------
+          // Load catalogue for related products
+          // --------------------------------------------------
+
+          try {
+
+            const productsResponse =
+              await getProducts();
+
+
+            if (cancelled) {
+              return;
+            }
+
+
+            setAllProducts(
+              getProductsArray(
+                productsResponse
+              )
+            );
+
+          } catch (
+            relatedError
+          ) {
+
+            console.error(
+              'Related products loading error:',
+              relatedError
+            );
+
+
+            // Product page can still work even if
+            // related products fail to load.
+            setAllProducts([]);
+
+          }
+
+
+        } catch (
+          loadError
+        ) {
+
+          if (cancelled) {
+            return;
+          }
+
+
+          console.error(
+            'Product details loading error:',
+            loadError
+          );
+
+
+          if (
+            loadError?.response?.status === 404
+          ) {
+
+            setNotFound(true);
+
+            setProduct(null);
+
+          } else {
+
+            setError(
+              loadError?.response?.data?.message ||
+              loadError?.message ||
+              'Unable to load this product.'
+            );
+
+          }
+
+
+        } finally {
+
+          if (!cancelled) {
+
+            setLoading(false);
+
+          }
+
+        }
+
+      }
+
+
+      if (id) {
+
+        loadProductDetails();
+
+      } else {
+
+        setLoading(false);
+
+        setNotFound(true);
+
+      }
+
+
+      return () => {
+
+        cancelled = true;
+
+      };
+
     },
+    [id]
+  );
 
-    category:
-      product.categoryName ||
-      product.category ||
-      'Industrial Equipment',
-
-    ...(product.rating &&
-    product.reviewCount
-      ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: Number(product.rating),
-            reviewCount: Number(product.reviewCount),
-          },
-        }
-      : {}),
-
-    ...(product.price !== undefined &&
-    product.price !== null
-      ? {
-          offers: {
-            '@type': 'Offer',
-
-            url: productUrl,
-
-            priceCurrency: 'UGX',
-
-            price: Number(product.price),
-
-            availability:
-              product.status === 'In Stock'
-                ? 'https://schema.org/InStock'
-                : product.status === 'Out of Stock'
-                  ? 'https://schema.org/OutOfStock'
-                  : 'https://schema.org/LimitedAvailability',
-
-            seller: {
-              '@type': 'Organization',
-              name: 'Apex Machinery',
-            },
-          },
-        }
-      : {}),
-  };
 
 
   // ==========================================================
@@ -186,20 +403,187 @@ export default function ProductDetails() {
   // ==========================================================
 
   const related =
-    getRelatedProducts(product, 8);
+    useMemo(
+      () => {
+
+        if (!product) {
+          return [];
+        }
 
 
-  // ----------------------------------------------------------
-  // WISHLIST
-  // ----------------------------------------------------------
+        const productCategoryValues =
+          [
+            product.category,
+            product.categoryId,
+            product.categorySlug,
+            product.categoryName,
+          ]
+            .filter(Boolean)
+            .map(
+              (value) =>
+                String(value)
+                  .trim()
+                  .toLowerCase()
+            );
+
+
+        return allProducts
+          .filter(
+            (item) => {
+
+              if (!item) {
+                return false;
+              }
+
+
+              if (
+                String(item.id) ===
+                String(product.id)
+              ) {
+                return false;
+              }
+
+
+              const itemCategoryValues =
+                [
+                  item.category,
+                  item.categoryId,
+                  item.categorySlug,
+                  item.categoryName,
+                ]
+                  .filter(Boolean)
+                  .map(
+                    (value) =>
+                      String(value)
+                        .trim()
+                        .toLowerCase()
+                  );
+
+
+              return itemCategoryValues.some(
+                (value) =>
+                  productCategoryValues.includes(
+                    value
+                  )
+              );
+
+            }
+          )
+          .slice(
+            0,
+            8
+          );
+
+      },
+      [
+        allProducts,
+        product,
+      ]
+    );
+
+
+
+  // ==========================================================
+  // LOADING
+  // ==========================================================
+
+  if (loading) {
+
+    return (
+
+      <main className="product-details-page">
+
+        <div className="pd-loading">
+
+          <div className="pd-loading-spinner" />
+
+          <h2>
+            Loading product...
+          </h2>
+
+          <p>
+            Retrieving equipment information.
+          </p>
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+
+  // ==========================================================
+  // PRODUCT NOT FOUND
+  // ==========================================================
+
+  if (notFound) {
+
+    return (
+      <Navigate
+        to="/shop"
+        replace
+      />
+    );
+
+  }
+
+
+
+  // ==========================================================
+  // ERROR
+  // ==========================================================
+
+  if (
+    error ||
+    !product
+  ) {
+
+    return (
+
+      <main className="product-details-page">
+
+        <div className="pd-error">
+
+          <h2>
+            Unable to load product
+          </h2>
+
+          <p>
+            {
+              error ||
+              'This product could not be loaded.'
+            }
+          </p>
+
+          <Link
+            to="/shop"
+            className="btn btn-primary"
+          >
+            Back to Shop
+          </Link>
+
+        </div>
+
+      </main>
+
+    );
+
+  }
+
+
+
+  // ==========================================================
+  // PRODUCT DATA
+  // ==========================================================
 
   const wishlisted =
-    isWishlisted(product.id);
+    isWishlisted(
+      product.id
+    );
 
-
-  // ----------------------------------------------------------
-  // SAFE IMAGES
-  // ----------------------------------------------------------
 
   const productImages =
     product.images?.length
@@ -209,11 +593,203 @@ export default function ProductDetails() {
         : [];
 
 
+  const safeActiveImg =
+    activeImg >= productImages.length
+      ? 0
+      : activeImg;
+
+
+  const productSlug =
+    product.slug ||
+    product.id;
+
+
+  const productTitle =
+    `${product.name} | ApexMach UG`;
+
+
+  const productDescription =
+    product.description ||
+    `Buy ${product.name} from ApexMach UG. View specifications, pricing and availability or request a quote.`;
+
+
+  const productUrl =
+    `https://www.apexmachinery256.com/product/${productSlug}`;
+
+
+  const productImage =
+    makeAbsoluteImageUrl(
+      productImages[0]
+    );
+
+
+  const categoryLabel =
+    product.categoryName ||
+    product.category ||
+    'Industrial Equipment';
+
+
+  const categoryValue =
+    product.category ||
+    product.categorySlug ||
+    product.categoryId ||
+    '';
+
+
+  const statusClass =
+    product.status === 'In Stock'
+      ? 'badge-instock'
+      : product.status === 'Out of Stock'
+        ? 'badge-outofstock'
+        : 'badge-limited';
+
+
+  const outOfStock =
+    product.status ===
+    'Out of Stock';
+
+
+  const priceDisplay =
+    product.priceDisplay ||
+    (
+      product.price !== null &&
+      product.price !== undefined &&
+      Number(product.price) > 0
+        ? formatCurrency(
+            Number(product.price),
+            product.currency ||
+              'UGX'
+          )
+        : 'Request Quote'
+    );
+
+
+  const sku =
+    product.slug
+      ? product.slug.toUpperCase()
+      : String(
+          product.id
+        ).toUpperCase();
+
+
+
+  // ==========================================================
+  // PRODUCT SCHEMA
+  // ==========================================================
+
+  const productSchema = {
+
+    '@context':
+      'https://schema.org',
+
+    '@type':
+      'Product',
+
+    name:
+      product.name,
+
+    description:
+      productDescription,
+
+    image:
+      [productImage],
+
+    sku,
+
+    brand: {
+      '@type':
+        'Brand',
+
+      name:
+        product.brand ||
+        'ApexMach UG',
+    },
+
+    category:
+      categoryLabel,
+
+
+    ...(product.rating &&
+    product.reviewCount
+      ? {
+
+          aggregateRating: {
+
+            '@type':
+              'AggregateRating',
+
+            ratingValue:
+              Number(
+                product.rating
+              ),
+
+            reviewCount:
+              Number(
+                product.reviewCount
+              ),
+
+          },
+
+        }
+      : {}),
+
+
+    ...(product.price !== undefined &&
+    product.price !== null &&
+    Number(product.price) > 0
+      ? {
+
+          offers: {
+
+            '@type':
+              'Offer',
+
+            url:
+              productUrl,
+
+            priceCurrency:
+              product.currency ||
+              'UGX',
+
+            price:
+              Number(
+                product.price
+              ),
+
+            availability:
+              product.status ===
+              'In Stock'
+                ? 'https://schema.org/InStock'
+                : product.status ===
+                    'Out of Stock'
+                  ? 'https://schema.org/OutOfStock'
+                  : 'https://schema.org/LimitedAvailability',
+
+            seller: {
+
+              '@type':
+                'Organization',
+
+              name:
+                'ApexMach UG',
+
+            },
+
+          },
+
+        }
+      : {}),
+
+  };
+
+
+
   // ==========================================================
   // RENDER
   // ==========================================================
 
   return (
+
     <>
 
       {/* ======================================================
@@ -222,27 +798,24 @@ export default function ProductDetails() {
 
       <Helmet>
 
-        {/* Page Title */}
-
         <title>
           {productTitle}
         </title>
 
 
-        {/* Meta Description */}
-
         <meta
           name="description"
-          content={productDescription}
+          content={
+            productDescription
+          }
         />
 
-
-        {/* Search Engine Instructions */}
 
         <meta
           name="robots"
           content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
         />
+
 
         <meta
           name="googlebot"
@@ -250,90 +823,119 @@ export default function ProductDetails() {
         />
 
 
-        {/* Canonical URL */}
-
         <link
           rel="canonical"
-          href={productUrl}
+          href={
+            productUrl
+          }
         />
 
 
-        {/* ==================================================
+        {/* ====================================================
             OPEN GRAPH
-        ================================================== */}
+        ==================================================== */}
 
         <meta
           property="og:type"
           content="product"
         />
 
+
         <meta
           property="og:title"
-          content={productTitle}
+          content={
+            productTitle
+          }
         />
+
 
         <meta
           property="og:description"
-          content={productDescription}
+          content={
+            productDescription
+          }
         />
+
 
         <meta
           property="og:url"
-          content={productUrl}
+          content={
+            productUrl
+          }
         />
+
 
         <meta
           property="og:image"
-          content={productImage}
+          content={
+            productImage
+          }
         />
+
 
         <meta
           property="og:site_name"
-          content="Apex Machinery"
+          content="ApexMach UG"
         />
 
 
-        {/* ==================================================
+        {/* ====================================================
             TWITTER / X
-        ================================================== */}
+        ==================================================== */}
 
         <meta
           name="twitter:card"
           content="summary_large_image"
         />
 
+
         <meta
           name="twitter:title"
-          content={productTitle}
+          content={
+            productTitle
+          }
         />
+
 
         <meta
           name="twitter:description"
-          content={productDescription}
+          content={
+            productDescription
+          }
         />
+
 
         <meta
           name="twitter:image"
-          content={productImage}
+          content={
+            productImage
+          }
         />
 
 
-        {/* ==================================================
-            PRODUCT STRUCTURED DATA
-        ================================================== */}
+        {/* ====================================================
+            STRUCTURED DATA
+        ==================================================== */}
 
-        <script type="application/ld+json">
-          {JSON.stringify(productSchema)}
+        <script
+          type="application/ld+json"
+        >
+          {
+            JSON.stringify(
+              productSchema
+            )
+          }
         </script>
 
       </Helmet>
 
 
+
       {/* ======================================================
-          MAIN PRODUCT PAGE
+          PAGE
       ====================================================== */}
 
-      <div className="product-details-page">
+      <main className="product-details-page">
 
 
         {/* ====================================================
@@ -348,92 +950,129 @@ export default function ProductDetails() {
             },
 
             {
-              to: `/shop?category=${product.category}`,
-              label: product.categoryName,
+              to:
+                categoryValue
+                  ? `/shop?category=${encodeURIComponent(
+                      categoryValue
+                    )}`
+                  : '/shop',
+
+              label:
+                categoryLabel,
             },
 
             {
-              label: product.name,
+              label:
+                product.name,
             },
           ]}
         />
 
 
+
         {/* ====================================================
-            PRODUCT MAIN SECTION
+            PRODUCT MAIN AREA
         ==================================================== */}
 
         <div className="pd-layout">
 
 
           {/* ==================================================
-              PRODUCT GALLERY
+              GALLERY
           ================================================== */}
 
           <div className="pd-gallery">
 
+
             <div className="pd-main-image">
 
-              {productImages.length > 0 ? (
+              {
+                productImages.length >
+                0
+                  ? (
 
-                <img
-                  src={productImages[activeImg]}
-                  alt={`${product.name} - Apex Machinery`}
-                  loading="eager"
-                />
+                    <img
+                      src={
+                        productImages[
+                          safeActiveImg
+                        ]
+                      }
+                      alt={`${product.name} - ApexMach UG`}
+                      loading="eager"
+                      decoding="async"
+                    />
 
-              ) : (
+                  )
+                  : (
 
-                <div className="pd-no-image">
-                  No Image Available
-                </div>
+                    <div className="pd-no-image">
+                      No Image Available
+                    </div>
 
-              )}
+                  )
+              }
 
             </div>
 
 
+
             {/* ==================================================
-                IMAGE THUMBNAILS
+                THUMBNAILS
             ================================================== */}
 
-            {productImages.length > 1 && (
+            {
+              productImages.length >
+              1 && (
 
-              <div className="pd-thumbs">
+                <div className="pd-thumbs">
 
-                {productImages.map(
-                  (img, i) => (
+                  {
+                    productImages.map(
+                      (
+                        img,
+                        index
+                      ) => (
 
-                    <button
-                      key={i}
-                      className={
-                        i === activeImg
-                          ? 'active'
-                          : ''
-                      }
-                      onClick={() =>
-                        setActiveImg(i)
-                      }
-                      type="button"
-                      aria-label={`View image ${i + 1} of ${product.name}`}
-                    >
+                        <button
+                          key={`${img}-${index}`}
+                          type="button"
+                          className={
+                            index ===
+                            safeActiveImg
+                              ? 'active'
+                              : ''
+                          }
+                          onClick={
+                            () =>
+                              setActiveImg(
+                                index
+                              )
+                          }
+                          aria-label={`View image ${index + 1} of ${product.name}`}
+                        >
 
-                      <img
-                        src={img}
-                        alt={`${product.name} image ${i + 1}`}
-                        loading="lazy"
-                      />
+                          <img
+                            src={
+                              img
+                            }
+                            alt={`${product.name} image ${index + 1}`}
+                            loading="lazy"
+                            decoding="async"
+                          />
 
-                    </button>
+                        </button>
 
-                  )
-                )}
+                      )
+                    )
+                  }
 
-              </div>
+                </div>
 
-            )}
+              )
+            }
 
           </div>
+
 
 
           {/* ==================================================
@@ -446,62 +1085,76 @@ export default function ProductDetails() {
             {/* STATUS */}
 
             <span
-              className={`
-                badge
-                ${
-                  product.status === 'In Stock'
-                    ? 'badge-instock'
-                    : product.status === 'Limited'
-                      ? 'badge-limited'
-                      : 'badge-outofstock'
-                }
-              `}
+              className={`badge ${statusClass}`}
             >
-              {product.status}
+              {
+                product.status ||
+                'Available on Order'
+              }
             </span>
+
 
 
             {/* PRODUCT NAME */}
 
             <h1>
-              {product.name}
+              {
+                product.name
+              }
             </h1>
 
 
-            {/* PRODUCT META */}
+
+            {/* META */}
 
             <div className="pd-meta">
 
               <span className="stars">
-                ★ {product.rating}
+                ★{' '}
+                {
+                  product.rating ??
+                  '—'
+                }
               </span>
+
 
               <span>
-                ({product.reviewCount} reviews)
+                (
+                {
+                  product.reviewCount ??
+                  0
+                }{' '}
+                reviews)
               </span>
 
+
               <span className="pd-sku">
-                SKU: {product.slug.toUpperCase()}
+                SKU: {sku}
               </span>
 
             </div>
+
 
 
             {/* PRICE */}
 
             <div className="pd-price">
-
-              {product.priceDisplay ||
-                formatCurrency(product.price)}
-
+              {
+                priceDisplay
+              }
             </div>
+
 
 
             {/* DESCRIPTION */}
 
             <p className="pd-desc">
-              {product.description}
+              {
+                product.description ||
+                'Product details are available on request.'
+              }
             </p>
+
 
 
             {/* ==================================================
@@ -515,11 +1168,18 @@ export default function ProductDetails() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setQty(
-                      (q) =>
-                        Math.max(1, q - 1)
-                    )
+                  onClick={
+                    () =>
+                      setQty(
+                        (
+                          currentQty
+                        ) =>
+                          Math.max(
+                            1,
+                            currentQty -
+                              1
+                          )
+                      )
                   }
                   aria-label="Decrease quantity"
                 >
@@ -539,10 +1199,15 @@ export default function ProductDetails() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setQty(
-                      (q) => q + 1
-                    )
+                  onClick={
+                    () =>
+                      setQty(
+                        (
+                          currentQty
+                        ) =>
+                          currentQty +
+                          1
+                      )
                   }
                   aria-label="Increase quantity"
                 >
@@ -557,19 +1222,21 @@ export default function ProductDetails() {
               </div>
 
 
+
               {/* ADD TO CART */}
 
               <button
+                type="button"
                 className="btn btn-primary"
                 disabled={
-                  product.status ===
-                  'Out of Stock'
+                  outOfStock
                 }
-                onClick={() =>
-                  addToCart(
-                    product,
-                    qty
-                  )
+                onClick={
+                  () =>
+                    addToCart(
+                      product,
+                      qty
+                    )
                 }
               >
 
@@ -578,14 +1245,20 @@ export default function ProductDetails() {
                   size={16}
                 />
 
-                Add to Cart
+                {
+                  outOfStock
+                    ? 'Out of Stock'
+                    : 'Add to Cart'
+                }
 
               </button>
+
 
 
               {/* WISHLIST */}
 
               <button
+                type="button"
                 className={`
                   btn
                   btn-outline-navy
@@ -595,10 +1268,11 @@ export default function ProductDetails() {
                       : ''
                   }
                 `}
-                onClick={() =>
-                  toggleWishlist(
-                    product
-                  )
+                onClick={
+                  () =>
+                    toggleWishlist(
+                      product
+                    )
                 }
                 aria-label={
                   wishlisted
@@ -610,14 +1284,21 @@ export default function ProductDetails() {
                 <Icon
                   name="heart"
                   size={16}
-                  fill={wishlisted}
+                  fill={
+                    wishlisted
+                  }
                 />
 
-                Wishlist
+                {
+                  wishlisted
+                    ? 'Wishlisted'
+                    : 'Wishlist'
+                }
 
               </button>
 
             </div>
+
 
 
             {/* ==================================================
@@ -635,15 +1316,20 @@ export default function ProductDetails() {
 
 
               <button
+                type="button"
                 className="btn btn-outline-navy btn-block"
-                onClick={() =>
-                  setQuoteOpen(true)
+                onClick={
+                  () =>
+                    setQuoteOpen(
+                      true
+                    )
                 }
               >
                 Request Quote
               </button>
 
             </div>
+
 
 
             {/* ==================================================
@@ -653,32 +1339,38 @@ export default function ProductDetails() {
             <div className="pd-trust">
 
               <div>
+
                 <Icon
                   name="shield"
                   size={18}
                 />
 
                 Certified &amp; Warrantied
+
               </div>
 
 
               <div>
+
                 <Icon
                   name="truck"
                   size={18}
                 />
 
                 Global Logistics
+
               </div>
 
 
               <div>
+
                 <Icon
                   name="check"
                   size={18}
                 />
 
                 Verified Supplier
+
               </div>
 
             </div>
@@ -686,6 +1378,7 @@ export default function ProductDetails() {
           </div>
 
         </div>
+
 
 
         {/* ======================================================
@@ -702,43 +1395,82 @@ export default function ProductDetails() {
           <section className="pd-specs">
 
             <h2>
-              {product.name} Specifications
+              {
+                product.name
+              }{' '}
+              Specifications
             </h2>
 
 
-            <table>
+            {
+              Object.keys(
+                product.specifications ||
+                {}
+              ).length >
+              0
+                ? (
 
-              <tbody>
+                  <table>
 
-                {Object.entries(
-                  product.specifications || {}
-                ).map(
-                  ([key, value]) => (
+                    <tbody>
 
-                    <tr key={key}>
+                      {
+                        Object.entries(
+                          product.specifications
+                        ).map(
+                          (
+                            [
+                              key,
+                              value,
+                            ]
+                          ) => (
 
-                      <th>
-                        {key}
-                      </th>
+                            <tr
+                              key={
+                                key
+                              }
+                            >
 
-                      <td>
-                        {value}
-                      </td>
+                              <th>
+                                {
+                                  key
+                                }
+                              </th>
 
-                    </tr>
+                              <td>
+                                {
+                                  String(
+                                    value
+                                  )
+                                }
+                              </td>
 
-                  )
-                )}
+                            </tr>
 
-              </tbody>
+                          )
+                        )
+                      }
 
-            </table>
+                    </tbody>
+
+                  </table>
+
+                )
+                : (
+
+                  <p className="pd-desc">
+                    Specifications are available on request.
+                  </p>
+
+                )
+            }
 
           </section>
 
 
+
           {/* ====================================================
-              CUSTOMER REVIEWS
+              REVIEWS
           ==================================================== */}
 
           <section className="pd-reviews">
@@ -748,128 +1480,169 @@ export default function ProductDetails() {
             </h2>
 
 
-            {reviews.map(
-              (review) => (
+            {
+              reviews.map(
+                (
+                  review
+                ) => (
 
-                <div
-                  key={review.name}
-                  className="pd-review"
-                >
+                  <div
+                    key={
+                      review.name
+                    }
+                    className="pd-review"
+                  >
 
-                  <div className="pd-review-top">
+                    <div className="pd-review-top">
 
-                    <strong>
-                      {review.name}
-                    </strong>
-
-
-                    <span className="stars">
-
-                      {'★'.repeat(
-                        review.rating
-                      )}
-
-                      {'☆'.repeat(
-                        5 - review.rating
-                      )}
-
-                    </span>
+                      <strong>
+                        {
+                          review.name
+                        }
+                      </strong>
 
 
-                    <span className="pd-review-date">
-                      {review.date}
-                    </span>
+                      <span className="stars">
+
+                        {
+                          '★'.repeat(
+                            review.rating
+                          )
+                        }
+
+                        {
+                          '☆'.repeat(
+                            5 -
+                            review.rating
+                          )
+                        }
+
+                      </span>
+
+
+                      <span className="pd-review-date">
+                        {
+                          review.date
+                        }
+                      </span>
+
+                    </div>
+
+
+                    <p>
+                      {
+                        review.text
+                      }
+                    </p>
 
                   </div>
 
-
-                  <p>
-                    {review.text}
-                  </p>
-
-                </div>
-
+                )
               )
-            )}
+            }
 
           </section>
 
         </div>
 
 
+
         {/* ======================================================
             RELATED PRODUCTS
         ====================================================== */}
 
-        {related.length > 0 && (
+        {
+          related.length >
+          0 && (
 
-          <section className="pd-related">
+            <section className="pd-related">
 
-            <div className="pd-related-header">
 
-              <div>
+              <div className="pd-related-header">
 
-                <span className="section-eyebrow">
-                  {product.categoryName}
-                </span>
+                <div>
 
-                <h2 className="section-heading">
-                  More {product.categoryName}
-                </h2>
+                  <span className="section-eyebrow">
+                    {
+                      categoryLabel
+                    }
+                  </span>
 
-                <p>
-                  Explore other products available
-                  in the{' '}
-                  {product.categoryName
-                    ?.toLowerCase() ||
-                    'same'}{' '}
-                  category.
-                </p>
+
+                  <h2 className="section-heading">
+                    More{' '}
+                    {
+                      categoryLabel
+                    }
+                  </h2>
+
+
+                  <p>
+                    Explore other products available
+                    in the{' '}
+                    {
+                      String(
+                        categoryLabel
+                      ).toLowerCase()
+                    }{' '}
+                    category.
+                  </p>
+
+                </div>
+
+
+                <Link
+                  to={
+                    categoryValue
+                      ? `/shop?category=${encodeURIComponent(
+                          categoryValue
+                        )}`
+                      : '/shop'
+                  }
+                  className="btn btn-outline-navy"
+                >
+
+                  View All
+
+                  <Icon
+                    name="arrow-right"
+                    size={16}
+                  />
+
+                </Link>
 
               </div>
 
 
-              {/* VIEW ALL CATEGORY */}
 
-              <Link
-                to={`/shop?category=${product.category}`}
-                className="btn btn-outline-navy"
-              >
+              <div className="grid-4">
 
-                View All
+                {
+                  related.map(
+                    (
+                      relatedProduct
+                    ) => (
 
-                <Icon
-                  name="arrow-right"
-                  size={16}
-                />
+                      <ProductCard
+                        key={
+                          relatedProduct.id
+                        }
+                        product={
+                          relatedProduct
+                        }
+                      />
 
-              </Link>
+                    )
+                  )
+                }
 
-            </div>
+              </div>
 
+            </section>
 
-            {/* ==================================================
-                RELATED PRODUCT GRID
-            ================================================== */}
+          )
+        }
 
-            <div className="grid-4">
-
-              {related.map(
-                (relatedProduct) => (
-
-                  <ProductCard
-                    key={relatedProduct.id}
-                    product={relatedProduct}
-                  />
-
-                )
-              )}
-
-            </div>
-
-          </section>
-
-        )}
 
 
         {/* ======================================================
@@ -877,33 +1650,45 @@ export default function ProductDetails() {
         ====================================================== */}
 
         <Modal
-          open={quoteOpen}
-          onClose={() =>
-            setQuoteOpen(false)
+          open={
+            quoteOpen
+          }
+          onClose={
+            () =>
+              setQuoteOpen(
+                false
+              )
           }
           title={`Request a Quote - ${product.name}`}
         >
 
           <form
-            onSubmit={(e) => {
+            onSubmit={
+              (
+                event
+              ) => {
 
-              e.preventDefault();
+                event.preventDefault();
 
-              setQuoteOpen(false);
+                setQuoteOpen(
+                  false
+                );
 
-            }}
+              }
+            }
           >
 
 
-            {/* COMPANY */}
-
             <div className="field">
 
-              <label>
+              <label
+                htmlFor="quote-company"
+              >
                 Company Name
               </label>
 
               <input
+                id="quote-company"
                 required
                 placeholder="Your company"
               />
@@ -911,15 +1696,16 @@ export default function ProductDetails() {
             </div>
 
 
-            {/* EMAIL */}
-
             <div className="field">
 
-              <label>
+              <label
+                htmlFor="quote-email"
+              >
                 Work Email
               </label>
 
               <input
+                id="quote-email"
                 required
                 type="email"
                 placeholder="you@company.com"
@@ -928,40 +1714,42 @@ export default function ProductDetails() {
             </div>
 
 
-            {/* QUANTITY */}
-
             <div className="field">
 
-              <label>
+              <label
+                htmlFor="quote-quantity"
+              >
                 Quantity Needed
               </label>
 
               <input
+                id="quote-quantity"
                 type="number"
                 min="1"
-                defaultValue={qty}
+                defaultValue={
+                  qty
+                }
               />
 
             </div>
 
 
-            {/* NOTES */}
-
             <div className="field">
 
-              <label>
+              <label
+                htmlFor="quote-notes"
+              >
                 Notes
               </label>
 
               <textarea
+                id="quote-notes"
                 rows="3"
                 placeholder="Delivery timeline, customization requests, etc."
               />
 
             </div>
 
-
-            {/* SUBMIT */}
 
             <button
               type="submit"
@@ -974,8 +1762,10 @@ export default function ProductDetails() {
 
         </Modal>
 
-      </div>
+      </main>
 
     </>
+
   );
+
 }

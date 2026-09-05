@@ -10,11 +10,14 @@ import {
 function normalizeProduct(
   product
 ) {
+
   const category =
     product.category ||
     null;
 
+
   return {
+
     id:
       product.id,
 
@@ -121,10 +124,34 @@ function normalizeProduct(
       category?.slug ||
       '',
 
+    categorySlug:
+      category?.slug ||
+      '',
+
     categoryName:
       category?.name ||
       'Uncategorized',
+
   };
+
+}
+
+
+// ============================================================
+// UUID CHECK
+// ============================================================
+
+function isValidUuid(
+  value
+) {
+
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    String(
+      value ||
+      ''
+    )
+  );
+
 }
 
 
@@ -136,13 +163,17 @@ export async function getProducts(
   req,
   res
 ) {
+
   try {
+
     const {
       data,
       error,
     } =
       await supabaseAdmin
-        .from('products')
+        .from(
+          'products'
+        )
         .select(`
           *,
           category:categories (
@@ -164,63 +195,121 @@ export async function getProducts(
           }
         );
 
+
     if (error) {
+
       throw error;
+
     }
 
+
     const products =
-      (data || []).map(
+      (
+        data ||
+        []
+      ).map(
         normalizeProduct
       );
 
+
     return res.json({
-      success: true,
+
+      success:
+        true,
 
       data: {
         products,
       },
+
     });
+
+
   } catch (
     error
   ) {
+
     console.error(
       'Public products error:',
       error
     );
 
+
     return res
-      .status(500)
+      .status(
+        500
+      )
       .json({
-        success: false,
+
+        success:
+          false,
 
         message:
           error.message ||
           'Unable to load products.',
+
       });
+
   }
+
 }
 
 
 // ============================================================
 // GET ONE PUBLIC PRODUCT
+//
+// Supports:
+//
+// /api/products/:uuid
+// /api/products/:slug
 // ============================================================
 
 export async function getProduct(
   req,
   res
 ) {
-  try {
-    const {
-      id,
-    } =
-      req.params;
 
-    const {
-      data,
-      error,
-    } =
-      await supabaseAdmin
-        .from('products')
+  try {
+
+    const identifier =
+      String(
+        req.params.id ||
+        ''
+      )
+        .trim();
+
+
+    // --------------------------------------------------------
+    // VALIDATE IDENTIFIER
+    // --------------------------------------------------------
+
+    if (!identifier) {
+
+      return res
+        .status(
+          400
+        )
+        .json({
+
+          success:
+            false,
+
+          message:
+            'Product identifier is required.',
+
+        });
+
+    }
+
+
+    // --------------------------------------------------------
+    // BASE QUERY
+    // --------------------------------------------------------
+
+    let query =
+      supabaseAdmin
+        .from(
+          'products'
+        )
         .select(`
           *,
           category:categories (
@@ -230,54 +319,125 @@ export async function getProduct(
             icon
           )
         `)
-        .or(
-          `id.eq.${id},slug.eq.${id}`
-        )
         .eq(
           'is_active',
           true
-        )
+        );
+
+
+    // --------------------------------------------------------
+    // UUID OR SLUG
+    // --------------------------------------------------------
+
+    if (
+      isValidUuid(
+        identifier
+      )
+    ) {
+
+      query =
+        query.eq(
+          'id',
+          identifier
+        );
+
+    } else {
+
+      query =
+        query.eq(
+          'slug',
+          identifier
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // EXECUTE QUERY
+    // --------------------------------------------------------
+
+    const {
+      data,
+      error,
+    } =
+      await query
         .maybeSingle();
 
+
     if (error) {
+
       throw error;
+
     }
+
+
+    // --------------------------------------------------------
+    // PRODUCT NOT FOUND
+    // --------------------------------------------------------
 
     if (!data) {
+
       return res
-        .status(404)
+        .status(
+          404
+        )
         .json({
-          success: false,
+
+          success:
+            false,
+
           message:
             'Product not found.',
+
         });
+
     }
 
+
+    // --------------------------------------------------------
+    // SUCCESS
+    // --------------------------------------------------------
+
     return res.json({
-      success: true,
+
+      success:
+        true,
+
       data:
         normalizeProduct(
           data
         ),
+
     });
+
+
   } catch (
     error
   ) {
+
     console.error(
       'Public product error:',
       error
     );
 
+
     return res
-      .status(500)
+      .status(
+        500
+      )
       .json({
-        success: false,
+
+        success:
+          false,
 
         message:
           error.message ||
           'Unable to load product.',
+
       });
+
   }
+
 }
 
 
@@ -289,13 +449,17 @@ export async function getCategories(
   req,
   res
 ) {
+
   try {
+
     const {
       data,
       error,
     } =
       await supabaseAdmin
-        .from('categories')
+        .from(
+          'categories'
+        )
         .select(`
           id,
           name,
@@ -317,15 +481,23 @@ export async function getCategories(
           }
         );
 
+
     if (error) {
+
       throw error;
+
     }
 
+
     const categories =
-      (data || []).map(
+      (
+        data ||
+        []
+      ).map(
         (
           category
         ) => ({
+
           id:
             category.slug,
 
@@ -345,32 +517,48 @@ export async function getCategories(
           icon:
             category.icon ||
             'settings',
+
         })
       );
 
+
     return res.json({
-      success: true,
+
+      success:
+        true,
 
       data: {
         categories,
       },
+
     });
+
+
   } catch (
     error
   ) {
+
     console.error(
       'Public categories error:',
       error
     );
 
+
     return res
-      .status(500)
+      .status(
+        500
+      )
       .json({
-        success: false,
+
+        success:
+          false,
 
         message:
           error.message ||
           'Unable to load categories.',
+
       });
+
   }
+
 }

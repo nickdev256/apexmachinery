@@ -1,74 +1,899 @@
+/* ============================================================
+   APEXMACH UG
+   PRODUCT FILTERS
+============================================================ */
+
+
+/* ============================================================
+   MAIN FILTER PANEL
+============================================================ */
+
 .filters {
-  padding: var(--space-5);
-  position: sticky;
-  top: 90px;
+  width: 100%;
+  min-width: 0;
+
   height: fit-content;
+
+  padding:
+    var(--space-5);
+
+  position: sticky;
+
+  top: 90px;
+
+  overflow: hidden;
+
+  background:
+    var(--white);
 }
-.filters-header {
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.filters .filters-header {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: var(--space-4);
-  padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border);
+
+  gap: 12px;
+
+  margin-bottom:
+    var(--space-4);
+
+  padding-bottom:
+    var(--space-3);
+
+  border-bottom:
+    1px solid
+    var(--border);
 }
-.filters-header span {
+
+
+.filters .filters-title {
   display: flex;
+
   align-items: center;
-  gap: 6px;
+
+  gap: 7px;
+
+  min-width: 0;
+
+  color:
+    var(--navy);
+
+  font-weight:
+    700;
 }
-.filters-clear {
-  background: none;
-  border: none;
-  color: var(--gold-dark);
-  font-weight: 700;
-  font-size: 0.8rem;
+
+
+.filters .filters-title > span:not(.filters-count) {
+  overflow: hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
 }
-.filters-group {
-  margin-bottom: var(--space-5);
-}
-.filters-group h4 {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--navy);
-  margin-bottom: var(--space-3);
-}
-.filters-checkbox {
-  display: flex;
+
+
+/* ============================================================
+   ACTIVE FILTER COUNT
+============================================================ */
+
+.filters .filters-count {
+  min-width: 22px;
+  height: 22px;
+
+  display: inline-flex;
+
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  margin-bottom: var(--space-2);
-  cursor: pointer;
-  color: var(--text-dark);
+  justify-content: center;
+
+  padding:
+    0 6px;
+
+  border-radius:
+    999px;
+
+  background:
+    var(--navy);
+
+  color:
+    var(--white);
+
+  font-size:
+    0.72rem;
+
+  line-height:
+    1;
 }
-.filters-checkbox input {
-  accent-color: var(--navy);
-  width: 16px;
-  height: 16px;
+
+
+/* ============================================================
+   CLEAR BUTTON
+============================================================ */
+
+.filters .filters-clear {
+  flex-shrink:
+    0;
+
+  padding:
+    4px 0;
+
+  border:
+    none;
+
+  background:
+    none;
+
+  color:
+    var(--gold-dark);
+
+  font: inherit;
+
+  font-size:
+    0.8rem;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    opacity
+    var(
+      --transition-normal,
+      0.2s ease
+    );
 }
-.filters-range {
-  width: 100%;
-  accent-color: var(--navy);
+
+
+.filters .filters-clear:hover:not(:disabled) {
+  opacity:
+    0.75;
 }
-.filters-range-value {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 4px;
+
+
+.filters .filters-clear:disabled {
+  color:
+    var(--text-muted);
+
+  cursor:
+    default;
+
+  opacity:
+    0.45;
 }
-.filters-promo {
-  background: var(--navy);
-  color: var(--white);
-  padding: var(--space-4);
-  border-radius: var(--radius);
+
+
+/* ============================================================
+   FILTER GROUP
+============================================================ */
+
+.filters .filters-group {
+  min-width: 0;
+
+  margin-bottom:
+    var(--space-5);
+}
+
+
+.filters .filters-group:last-of-type {
+  margin-bottom:
+    var(--space-5);
+}
+
+
+.filters .filters-group h4 {
+  margin:
+    0
+    0
+    var(--space-3);
+
+  color:
+    var(--navy);
+
+  font-size:
+    0.82rem;
+
+  font-weight:
+    700;
+
+  line-height:
+    1.25;
+
+  letter-spacing:
+    0.05em;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* ============================================================
+   GROUP HEADING
+============================================================ */
+
+.filters .filters-group-heading {
   display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom:
+    var(--space-3);
+}
+
+
+.filters .filters-group-heading h4 {
+  margin:
+    0;
+}
+
+
+.filters .filters-group-heading > span {
+  color:
+    var(--navy);
+
+  font-size:
+    0.76rem;
+
+  font-weight:
+    700;
+
+  text-align:
+    right;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+/* ============================================================
+   OPTIONS CONTAINER
+============================================================ */
+
+.filters .filters-options {
+  display: flex;
+
   flex-direction: column;
-  gap: 8px;
+
+  gap: 2px;
+
+  min-width: 0;
 }
-.filters-promo p {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.75);
+
+
+/* ============================================================
+   CHECKBOX
+============================================================ */
+
+.filters .filters-checkbox {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 9px;
+
+  width: 100%;
+
+  min-width: 0;
+
+  padding:
+    5px 0;
+
+  color:
+    var(--text-dark);
+
+  font-size:
+    0.9rem;
+
+  line-height:
+    1.35;
+
+  cursor:
+    pointer;
+}
+
+
+.filters .filters-checkbox input {
+  width: 17px;
+  height: 17px;
+
+  min-width: 17px;
+
+  margin:
+    1px 0 0;
+
+  accent-color:
+    var(--navy);
+
+  cursor:
+    pointer;
+}
+
+
+.filters .filters-checkbox-label {
+  min-width: 0;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+/* ============================================================
+   CHECKBOX HOVER
+============================================================ */
+
+@media (hover: hover) {
+
+  .filters .filters-checkbox:hover {
+    color:
+      var(--navy);
+  }
+
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.filters .filters-empty {
+  margin:
+    0;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    0.82rem;
+
+  line-height:
+    1.5;
+}
+
+
+/* ============================================================
+   PRICE RANGE
+============================================================ */
+
+.filters .filters-price-group {
+  min-width: 0;
+}
+
+
+.filters .filters-range {
+  width:
+    100%;
+
+  height:
+    5px;
+
+  margin:
+    6px 0;
+
+  accent-color:
+    var(--navy);
+
+  cursor:
+    pointer;
+}
+
+
+/* ============================================================
+   PRICE RANGE LABELS
+============================================================ */
+
+.filters .filters-range-labels {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap:
+    10px;
+
+  margin-top:
+    2px;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    0.68rem;
+}
+
+
+.filters .filters-range-labels span {
+  min-width:
+    0;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.filters .filters-range-labels span:last-child {
+  text-align:
+    right;
+}
+
+
+/* ============================================================
+   PRICE VALUE
+============================================================ */
+
+.filters .filters-range-value {
+  margin-top:
+    8px;
+
+  color:
+    var(--text-muted);
+
+  font-size:
+    0.79rem;
+
+  line-height:
+    1.4;
+
+  overflow-wrap:
+    anywhere;
+}
+
+
+.filters .filters-range-value strong {
+  color:
+    var(--navy);
+}
+
+
+/* ============================================================
+   PROCUREMENT PROMO
+============================================================ */
+
+.filters .filters-promo {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+  width: 100%;
+
+  min-width: 0;
+
+  padding:
+    var(--space-4);
+
+  border-radius:
+    var(--radius);
+
+  background:
+    var(--navy);
+
+  color:
+    var(--white);
+}
+
+
+/* ============================================================
+   PROMO ICON
+============================================================ */
+
+.filters .filters-promo-icon {
+  width:
+    38px;
+
+  height:
+    38px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+  justify-content:
+    center;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.1
+    );
+
+  color:
+    var(--gold);
+}
+
+
+.filters .filters-promo strong {
+  line-height:
+    1.25;
+}
+
+
+.filters .filters-promo p {
+  margin:
+    0;
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      0.76
+    );
+
+  font-size:
+    0.8rem;
+
+  line-height:
+    1.5;
+}
+
+
+.filters .filters-promo .btn {
+  width:
+    100%;
+
+  margin-top:
+    2px;
+}
+
+
+/* ============================================================
+   LARGE DESKTOP
+============================================================ */
+
+@media (
+  min-width: 1600px
+) {
+
+  .filters {
+    padding:
+      26px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL LAPTOP
+============================================================ */
+
+@media (
+  max-width: 1200px
+) {
+
+  .filters {
+    padding:
+      20px;
+  }
+
+
+  .filters .filters-checkbox {
+    font-size:
+      0.87rem;
+  }
+
+}
+
+
+/* ============================================================
+   TABLET
+============================================================ */
+
+@media (
+  max-width: 1024px
+) {
+
+  .filters {
+    position:
+      static;
+
+    top:
+      auto;
+
+    width:
+      100%;
+
+    padding:
+      20px;
+  }
+
+
+  .filters .filters-header {
+    margin-bottom:
+      18px;
+  }
+
+
+  .filters .filters-options {
+    display:
+      grid;
+
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(
+          0,
+          1fr
+        )
+      );
+
+    column-gap:
+      22px;
+
+    row-gap:
+      2px;
+  }
+
+
+  .filters .filters-price-group {
+    max-width:
+      100%;
+  }
+
+
+  .filters .filters-promo {
+    max-width:
+      100%;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE LANDSCAPE
+============================================================ */
+
+@media (
+  max-width: 768px
+) {
+
+  .filters {
+    padding:
+      18px;
+  }
+
+
+  .filters .filters-header {
+    align-items:
+      center;
+  }
+
+
+  .filters .filters-group {
+    margin-bottom:
+      22px;
+  }
+
+
+  .filters .filters-checkbox {
+    min-height:
+      32px;
+  }
+
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (
+  max-width: 640px
+) {
+
+  .filters {
+    padding:
+      16px;
+  }
+
+
+  .filters .filters-options {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  .filters .filters-header {
+    gap:
+      8px;
+  }
+
+
+  .filters .filters-title {
+    font-size:
+      0.95rem;
+  }
+
+
+  .filters .filters-clear {
+    font-size:
+      0.76rem;
+  }
+
+
+  .filters .filters-group-heading {
+    align-items:
+      center;
+  }
+
+
+  .filters .filters-promo {
+    padding:
+      16px;
+  }
+
+}
+
+
+/* ============================================================
+   SMALL MOBILE
+============================================================ */
+
+@media (
+  max-width: 480px
+) {
+
+  .filters {
+    padding:
+      14px;
+  }
+
+
+  .filters .filters-group {
+    margin-bottom:
+      20px;
+  }
+
+
+  .filters .filters-group h4 {
+    font-size:
+      0.78rem;
+  }
+
+
+  .filters .filters-checkbox {
+    font-size:
+      0.85rem;
+  }
+
+
+  .filters .filters-checkbox input {
+    width:
+      16px;
+
+    height:
+      16px;
+
+    min-width:
+      16px;
+  }
+
+
+  .filters .filters-range-value {
+    font-size:
+      0.75rem;
+  }
+
+
+  .filters .filters-range-labels {
+    font-size:
+      0.64rem;
+  }
+
+}
+
+
+/* ============================================================
+   EXTRA SMALL MOBILE
+============================================================ */
+
+@media (
+  max-width: 360px
+) {
+
+  .filters {
+    padding:
+      12px;
+  }
+
+
+  .filters .filters-title {
+    gap:
+      5px;
+  }
+
+
+  .filters .filters-count {
+    min-width:
+      20px;
+
+    height:
+      20px;
+  }
+
+
+  .filters .filters-promo {
+    padding:
+      14px;
+  }
+
+}
+
+
+/* ============================================================
+   TOUCH DEVICES
+============================================================ */
+
+@media (
+  hover: none
+) and (
+  pointer: coarse
+) {
+
+  .filters .filters-checkbox {
+    min-height:
+      42px;
+
+    align-items:
+      center;
+  }
+
+
+  .filters .filters-checkbox input {
+    width:
+      18px;
+
+    height:
+      18px;
+
+    min-width:
+      18px;
+  }
+
+
+  .filters .filters-clear {
+    min-height:
+      40px;
+  }
+
+
+  .filters .filters-range {
+    min-height:
+      28px;
+  }
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+
+  .filters .filters-clear {
+    transition:
+      none;
+  }
+
 }
