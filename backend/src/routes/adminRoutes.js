@@ -45,6 +45,26 @@ import {
 } from '../controllers/productController.js';
 
 
+// ============================================================
+// ADMIN INVENTORY ROUTES
+// ============================================================
+
+import adminInventoryRoutes
+  from './adminInventoryRoutes.js';
+
+
+// ============================================================
+// ADMIN REPORTS ROUTES
+// ============================================================
+
+import adminReportsRoutes
+  from './adminReportsRoutes.js';
+
+
+// ============================================================
+// ROUTER
+// ============================================================
+
 const router =
   Router();
 
@@ -88,6 +108,32 @@ router.get(
 router.patch(
   '/orders/:id/status',
   updateAdminOrderStatus
+);
+
+
+// ============================================================
+// INVENTORY
+//
+// GET    /api/admin/inventory
+// PATCH  /api/admin/inventory/:id
+// POST   /api/admin/inventory/:id/restock
+// ============================================================
+
+router.use(
+  '/inventory',
+  adminInventoryRoutes
+);
+
+
+// ============================================================
+// REPORTS
+//
+// GET /api/admin/reports
+// ============================================================
+
+router.use(
+  '/reports',
+  adminReportsRoutes
 );
 
 
